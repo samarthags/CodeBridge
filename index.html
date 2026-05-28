@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CodeBridge — P2P Transfer</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#000;
+  --s1:#0a0a0a;
+  --s2:#111;
+  --s3:#171717;
+  --s4:#1e1e1e;
+  --border:#252525;
+  --border2:#323232;
+  --text:#ededed;
+  --text2:#999;
+  --text3:#555;
+  --white:#fff;
+  --danger:#e44;
+  --ok:#4d4;
+  --warn:#fa3;
+  --mono:'DM Mono',monospace;
+  --sans:'DM Sans',sans-serif;
+  --display:'Bebas Neue',cursive;
+}
+
+html{font-size:16px}
+body{
+  font-family:var(--sans);
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  overflow-x:hidden;
+}
+
+/* ── Noise texture overlay ── */
+body::after{
+  content:'';
+  position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  background-repeat:repeat;
+  background-size:256px 256px;
+  pointer-events:none;
+  z-index:9999;
+  opacity:0.6;
+}
+
+/* ── Layout ── */
+.wrap{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  padding:20px 16px 32px;
+  position:relative;
+  z-index:1;
+}
+
+/* ── Header ── */
+.hd{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:28px;
+  user-select:none;
+}
+.hd-logo{
+  font-family:var(--display);
+  font-size:2rem;
+  letter-spacing:0.08em;
+  color:var(--white);
+  line-height:1;
+}
+.hd-sep{font-family:var(--mono);color:var(--text3);font-size:0.7rem}
+.hd-tag{
+  font-family:var(--mono);
+  font-size:0.62rem;
+  letter-spacing:0.15em;
+  text-transform:uppercase;
+  color:var(--text3);
+  line-height:1;
+}
+.hd-pip{
+  width:5px;height:5px;border-radius:50%;
+  background:var(--white);
+  animation:pip 2s ease-in-out infinite;
+}
+@keyframes pip{0%,100%{opacity:1}50%{opacity:0.2}}
+
+/* ── Card ── */
+.card{
+  background:var(--s1);
+  border:1px solid var(--border);
+  border-radius:12px;
+  width:100%;
+  max-width:500px;
+  overflow:hidden;
+  position:relative;
+}
+.card-body{padding:28px}
+
+/* ── Divider ── */
+.divider{height:1px;background:var(--border);margin:20px 0}
+.divider-label{
+  display:flex;align-items:center;gap:10px;
+  font-family:var(--mono);font-size:0.65rem;
+  color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;
+  margin:20px 0;
+}
+.divider-label::before,.divider-label::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* ── Views ── */
+.view{display:none;flex-direction:column;gap:18px}
+.view.active{display:flex}
+
+/* ── Status bar ── */
+.status-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px;
+  background:var(--s3);
+  border:1px solid var(--border);
+  border-radius:8px;
+  font-size:0.8rem;
+}
+.status-row.full{width:100%}
+.s-dot{
+  width:7px;height:7px;border-radius:50%;
+  flex-shrink:0;
+}
+.s-dot.idle{background:var(--text3)}
+.s-dot.wait{background:var(--warn);animation:bk 1.2s ease-in-out infinite}
+.s-dot.live{background:var(--ok)}
+.s-dot.err{background:var(--danger)}
+@keyframes bk{0%,100%{opacity:.25}50%{opacity:1}}
+
+/* ── Typography helpers ── */
+.lbl{
+  font-family:var(--mono);font-size:0.62rem;
+  font-weight:500;letter-spacing:0.12em;
+  text-transform:uppercase;color:var(--text3);
+  display:block;margin-bottom:7px;
+}
+.h2{font-weight:600;font-size:1.05rem;line-height:1.3}
+.h3{font-weight:500;font-size:0.9rem;color:var(--text2);line-height:1.5}
+.mono{font-family:var(--mono)}
+.muted{color:var(--text2)}
+.sm{font-size:0.8rem}
+.xs{font-size:0.72rem}
+.tc{text-align:center}
+.row{display:flex;align-items:center;gap:10px}
+.row-sb{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.col{display:flex;flex-direction:column;gap:8px}
+.mt4{margin-top:4px}
+.mt8{margin-top:8px}
+.mt12{margin-top:12px}
+.mt16{margin-top:16px}
+
+/* ── Session code big display ── */
+.big-code{
+  font-family:var(--display);
+  font-size:3.2rem;
+  letter-spacing:0.25em;
+  color:var(--white);
+  text-align:center;
+  line-height:1;
+}
+
+/* ── QR wrapper ── */
+.qr-wrap{
+  background:#fff;
+  border-radius:10px;
+  padding:14px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+}
+#qrcode canvas,#qrcode img{display:block;border-radius:4px}
+
+/* ── Buttons ── */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  gap:8px;
+  padding:11px 18px;
+  border:1px solid var(--border2);
+  border-radius:8px;
+  background:transparent;
+  color:var(--text2);
+  font-family:var(--sans);font-size:0.85rem;font-weight:500;
+  cursor:pointer;transition:all 0.15s ease;
+  text-decoration:none;white-space:nowrap;
+  position:relative;overflow:hidden;
+}
+.btn:hover{border-color:var(--text3);color:var(--text);background:var(--s3)}
+.btn:active{transform:scale(0.98)}
+.btn-w{width:100%}
+.btn-sm{padding:7px 13px;font-size:0.78rem}
+.btn-xs{padding:5px 10px;font-size:0.72rem;gap:5px}
+
+.btn-prime{
+  background:var(--white);color:#000;
+  border-color:var(--white);font-weight:600;
+}
+.btn-prime:hover{background:#ddd;border-color:#ddd;color:#000}
+.btn-prime:disabled{background:var(--s4);color:var(--text3);border-color:var(--border);cursor:not-allowed}
+
+.btn-ghost{border-color:transparent;color:var(--text3)}
+.btn-ghost:hover{border-color:var(--border);color:var(--text2);background:transparent}
+
+.btn-danger{color:#e55;border-color:rgba(238,85,85,.25)}
+.btn-danger:hover{background:rgba(238,85,85,.07);border-color:#e55}
+
+.btn-ok{color:var(--ok);border-color:rgba(68,221,68,.25)}
+.btn-ok:hover{background:rgba(68,221,68,.07);border-color:var(--ok)}
+
+/* ── Input / Textarea ── */
+textarea,input.txt-in{
+  width:100%;
+  background:var(--s2);
+  border:1px solid var(--border);
+  border-radius:8px;
+  color:var(--text);
+  font-family:var(--mono);font-size:0.875rem;line-height:1.65;
+  padding:12px 14px;resize:vertical;
+  outline:none;transition:border-color 0.15s;
+}
+textarea:focus,input.txt-in:focus{border-color:var(--border2)}
+textarea::placeholder,input.txt-in::placeholder{color:var(--text3)}
+
+/* ── Tabs ── */
+.tabs{
+  display:flex;background:var(--s2);
+  border:1px solid var(--border);border-radius:8px;
+  padding:3px;gap:2px;
+}
+.tab-btn{
+  flex:1;padding:8px 6px;
+  border:none;background:transparent;
+  color:var(--text3);font-family:var(--sans);
+  font-size:0.78rem;font-weight:500;
+  border-radius:6px;cursor:pointer;
+  transition:all 0.15s;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+}
+.tab-btn.active{background:var(--s4);color:var(--text);border:1px solid var(--border)}
+.tab-btn:hover:not(.active){color:var(--text2)}
+
+.tab-panel{display:none;flex-direction:column;gap:14px}
+.tab-panel.active{display:flex}
+
+/* ── Drop zone ── */
+.drop-zone{
+  border:1px dashed var(--border2);border-radius:8px;
+  padding:28px 20px;text-align:center;
+  cursor:pointer;transition:all 0.15s;
+  position:relative;background:var(--s2);
+}
+.drop-zone:hover,.drop-zone.drag-over{
+  border-color:var(--text3);background:var(--s3);
+}
+.drop-zone input[type=file]{
+  position:absolute;inset:0;opacity:0;cursor:pointer;
+  width:100%;height:100%;
+}
+.drop-icon{font-size:1.6rem;color:var(--text3);margin-bottom:10px}
+.drop-txt{font-size:0.82rem;color:var(--text2);line-height:1.6}
+.drop-txt span{color:var(--text)}
+
+/* ── File list ── */
+.file-list{display:flex;flex-direction:column;gap:6px}
+.file-item{
+  display:flex;align-items:center;gap:10px;
+  background:var(--s2);border:1px solid var(--border);
+  border-radius:8px;padding:10px 12px;
+}
+.fi-icon{font-size:0.95rem;color:var(--text2);width:18px;text-align:center;flex-shrink:0}
+.fi-name{flex:1;font-size:0.8rem;font-family:var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fi-size{font-size:0.68rem;color:var(--text3);font-family:var(--mono);flex-shrink:0}
+.fi-rm{background:none;border:none;color:var(--text3);cursor:pointer;padding:4px 6px;border-radius:4px;transition:color 0.15s;line-height:1}
+.fi-rm:hover{color:var(--danger)}
+
+/* ── Progress ── */
+.prog-wrap{display:none;gap:6px;flex-direction:column}
+.prog-wrap.on{display:flex}
+.prog-bar{height:2px;background:var(--s4);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:var(--white);border-radius:2px;transition:width .15s;width:0%}
+.prog-txt{font-size:0.68rem;color:var(--text3);font-family:var(--mono);text-align:right}
+
+/* ── Received items ── */
+.rcv-list{display:flex;flex-direction:column;gap:10px;max-height:400px;overflow-y:auto}
+.rcv-list::-webkit-scrollbar{width:4px}
+.rcv-list::-webkit-scrollbar-track{background:transparent}
+.rcv-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+.rcv-item{
+  background:var(--s2);border:1px solid var(--border);
+  border-radius:8px;padding:14px;
+  animation:slideUp .25s ease both;
+}
+@keyframes slideUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.rcv-type{
+  font-family:var(--mono);font-size:0.62rem;
+  letter-spacing:0.1em;text-transform:uppercase;
+  color:var(--text3);margin-bottom:8px;
+  display:flex;align-items:center;gap:6px;
+}
+.rcv-content{
+  font-family:var(--mono);font-size:0.83rem;line-height:1.65;
+  color:var(--text);white-space:pre-wrap;word-break:break-all;
+  max-height:160px;overflow-y:auto;
+}
+.rcv-content::-webkit-scrollbar{width:3px}
+.rcv-content::-webkit-scrollbar-thumb{background:var(--border2)}
+.rcv-img{max-width:100%;border-radius:6px;margin-top:8px;display:block;border:1px solid var(--border)}
+.rcv-actions{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+.rcv-link{color:var(--text);text-decoration:underline;text-underline-offset:3px;word-break:break-all}
+.rcv-link:hover{color:var(--white)}
+
+/* ── Badge ── */
+.badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  padding:2px 8px;border-radius:99px;
+  font-family:var(--mono);font-size:0.62rem;
+  font-weight:500;letter-spacing:0.05em;
+  background:var(--s4);border:1px solid var(--border2);
+  color:var(--text2);
+}
+.badge.live{background:rgba(68,221,68,.1);border-color:rgba(68,221,68,.3);color:var(--ok)}
+
+/* ── Code digit inputs ── */
+.digit-row{display:flex;gap:7px;justify-content:center}
+.digit{
+  width:44px;height:52px;
+  background:var(--s2);
+  border:1px solid var(--border);border-radius:8px;
+  text-align:center;
+  font-family:var(--display);font-size:1.6rem;
+  color:var(--white);outline:none;
+  transition:border-color 0.15s;caret-color:var(--white);
+  letter-spacing:0;
+}
+.digit:focus{border-color:var(--border2)}
+.digit::selection{background:var(--s4)}
+
+/* ── Copy-link row ── */
+.copy-link-row{
+  display:flex;gap:6px;align-items:center;
+  background:var(--s2);border:1px solid var(--border);
+  border-radius:8px;padding:8px 12px;overflow:hidden;
+}
+.copy-link-url{
+  flex:1;font-family:var(--mono);font-size:0.72rem;
+  color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+
+/* ── Received empty state ── */
+.empty-state{
+  display:flex;flex-direction:column;align-items:center;gap:12px;
+  padding:32px 20px;text-align:center;
+}
+.empty-icon{font-size:2rem;color:var(--text3)}
+
+/* ── Success ── */
+.success-wrap{
+  display:flex;flex-direction:column;align-items:center;
+  gap:14px;padding:20px 0;text-align:center;
+}
+.success-ico{
+  width:56px;height:56px;
+  border-radius:50%;border:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;
+  animation:popIn .4s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes popIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+
+/* ── Connecting ── */
+.connecting-wrap{
+  display:flex;flex-direction:column;align-items:center;
+  gap:16px;padding:24px 0;text-align:center;
+}
+.spin{animation:spin 1s linear infinite}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+/* ── Toast ── */
+.toast{
+  position:fixed;bottom:72px;left:50%;
+  transform:translateX(-50%) translateY(14px);
+  background:var(--s3);border:1px solid var(--border2);
+  border-radius:8px;padding:9px 16px;
+  font-family:var(--mono);font-size:0.78rem;color:var(--text);
+  opacity:0;transition:all .22s;pointer-events:none;z-index:9998;
+  white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.7);
+  display:flex;align-items:center;gap:8px;
+}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── Footer ── */
+footer{
+  position:relative;z-index:1;
+  border-top:1px solid var(--border);
+  padding:14px 16px;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+  flex-wrap:wrap;
+}
+.ft-text{
+  font-family:var(--mono);font-size:0.65rem;
+  color:var(--text3);letter-spacing:0.08em;
+  display:flex;align-items:center;gap:5px;
+}
+.ft-sep{color:var(--border2)}
+.ft-a{color:var(--text2);text-decoration:none}
+.ft-a:hover{color:var(--text)}
+
+/* ── Responsive ── */
+@media(max-width:520px){
+  .card-body{padding:20px 16px}
+  .big-code{font-size:2.4rem;letter-spacing:.2em}
+  .digit{width:40px;height:50px;font-size:1.4rem}
+  .tab-btn{font-size:.72rem;padding:7px 4px;gap:4px}
+}
+@media(max-width:360px){
+  .digit{width:36px;height:46px;font-size:1.25rem}
+  .digit-row{gap:5px}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="hd">
+    <div class="hd-pip"></div>
+    <div class="hd-logo">CodeBridge</div>
+    <div class="hd-sep">/</div>
+    <div class="hd-tag">P2P&nbsp;Transfer</div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+
+      <!-- ═══ DESKTOP: QR WAIT ═══ -->
+      <div id="vd-wait" class="view" style="align-items:center">
+        <div class="col" style="align-items:center;gap:14px;width:100%">
+          <div class="qr-wrap"><div id="qrcode"></div></div>
+          <div>
+            <div class="big-code" id="s-code">──────</div>
+            <div class="lbl tc mt4">Session Code</div>
+          </div>
+          <div class="row">
+            <div class="s-dot wait" id="dd-dot"></div>
+            <span class="mono sm muted" id="dd-txt">Waiting for device…</span>
+          </div>
+          <div id="copy-link-box" class="copy-link-row" style="width:100%;max-width:380px">
+            <i class="fas fa-link" style="color:var(--text3);font-size:.8rem;flex-shrink:0"></i>
+            <span class="copy-link-url" id="share-url">—</span>
+            <button class="btn btn-xs" onclick="copyShareLink()">
+              <i class="fas fa-copy"></i> Copy
+            </button>
+          </div>
+          <p class="sm muted tc" style="line-height:1.6;max-width:300px">
+            Scan the QR with your phone or enter the code on any browser to send files, text, and links instantly.
+          </p>
+        </div>
+      </div>
+
+      <!-- ═══ DESKTOP: RECEIVED ═══ -->
+      <div id="vd-rcv" class="view">
+        <div class="row-sb">
+          <div class="col" style="gap:3px">
+            <div class="h2">Inbox</div>
+            <div class="row" style="gap:6px">
+              <span class="mono xs muted" id="rcv-count">0 items</span>
+              <span class="badge live" id="live-badge">● LIVE</span>
+            </div>
+          </div>
+          <div class="row" style="gap:8px">
+            <div class="s-dot live" id="dd-dot2"></div>
+            <span class="mono xs muted" id="dd-txt2">Connected</span>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div id="rcv-list" class="rcv-list">
+          <div class="empty-state" id="empty-msg">
+            <div class="empty-icon"><i class="fas fa-inbox"></i></div>
+            <div class="mono xs muted">Send something from your phone</div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <button class="btn btn-w" onclick="resetDesktop()">
+          <i class="fas fa-rotate-right"></i> New Session
+        </button>
+      </div>
+
+      <!-- ═══ MOBILE: CODE INPUT ═══ -->
+      <div id="vm-code" class="view" style="align-items:center">
+        <div class="col" style="align-items:center;gap:6px;width:100%">
+          <i class="fas fa-mobile-screen-button" style="font-size:2rem;color:var(--text3)"></i>
+          <div class="h2 tc">Enter Code</div>
+          <div class="h3 tc sm" style="max-width:260px">
+            Open SnapShare on your desktop and type the 6-digit session code below.
+          </div>
+        </div>
+        <div class="digit-row">
+          <input class="digit" maxlength="1" id="d0" inputmode="numeric" autocomplete="off">
+          <input class="digit" maxlength="1" id="d1" inputmode="numeric" autocomplete="off">
+          <input class="digit" maxlength="1" id="d2" inputmode="numeric" autocomplete="off">
+          <input class="digit" maxlength="1" id="d3" inputmode="numeric" autocomplete="off">
+          <input class="digit" maxlength="1" id="d4" inputmode="numeric" autocomplete="off">
+          <input class="digit" maxlength="1" id="d5" inputmode="numeric" autocomplete="off">
+        </div>
+        <button class="btn btn-prime btn-w" onclick="connectWithCode()">
+          <i class="fas fa-plug"></i> Connect
+        </button>
+        <div class="divider-label">or scan QR on desktop</div>
+        <p class="mono xs muted tc" style="line-height:1.6">
+          <i class="fas fa-shield-halved"></i> &nbsp;All data is transferred peer-to-peer.<br>Nothing is stored on any server.
+        </p>
+      </div>
+
+      <!-- ═══ MOBILE: CONNECTING ═══ -->
+      <div id="vm-connecting" class="view" style="align-items:center">
+        <div class="connecting-wrap">
+          <i class="fas fa-circle-nodes fa-2x muted spin"></i>
+          <div class="h2">Connecting…</div>
+          <div class="row">
+            <div class="s-dot wait"></div>
+            <span class="mono xs muted">Establishing P2P connection</span>
+          </div>
+          <button class="btn btn-sm btn-ghost" onclick="showView('vm-code')">
+            <i class="fas fa-xmark"></i> Cancel
+          </button>
+        </div>
+      </div>
+
+      <!-- ═══ MOBILE: SENDER ═══ -->
+      <div id="vm-send" class="view">
+        <!-- connection banner -->
+        <div class="status-row full">
+          <div class="row" style="gap:8px">
+            <div class="s-dot live"></div>
+            <span class="mono xs" id="mob-sess-lbl">Session ——</span>
+          </div>
+          <button class="btn btn-xs btn-danger" onclick="disconnectMobile()">
+            <i class="fas fa-power-off"></i> Disconnect
+          </button>
+        </div>
+
+        <!-- tabs -->
+        <div class="tabs">
+          <button class="tab-btn active" id="tb-text" onclick="switchTab('text',this)">
+            <i class="fas fa-font"></i> Text
+          </button>
+          <button class="tab-btn" id="tb-file" onclick="switchTab('file',this)">
+            <i class="fas fa-paperclip"></i> Files
+          </button>
+          <button class="tab-btn" id="tb-link" onclick="switchTab('link',this)">
+            <i class="fas fa-link"></i> Link
+          </button>
+          <button class="tab-btn" id="tb-clip" onclick="switchTab('clip',this)">
+            <i class="fas fa-clipboard"></i> Paste
+          </button>
+        </div>
+
+        <!-- ── TEXT TAB ── -->
+        <div id="tab-text" class="tab-panel active">
+          <div>
+            <span class="lbl">Message / Snippet</span>
+            <textarea id="txt-in" rows="6" placeholder="Type or paste text, code, notes, commands…"></textarea>
+          </div>
+          <div class="row-sb">
+            <span class="mono xs muted" id="char-count">0 chars</span>
+            <button class="btn btn-xs btn-ghost" onclick="clearText()">
+              <i class="fas fa-eraser"></i> Clear
+            </button>
+          </div>
+          <button class="btn btn-prime btn-w" onclick="sendText()">
+            <i class="fas fa-paper-plane"></i> Send Text
+          </button>
+        </div>
+
+        <!-- ── FILE TAB ── -->
+        <div id="tab-file" class="tab-panel">
+          <div class="drop-zone" id="drop-zone"
+               ondragover="onDrag(event,true)"
+               ondragleave="onDrag(event,false)"
+               ondrop="onDrop(event)">
+            <input type="file" multiple id="file-input" onchange="onFileChange(event)">
+            <div class="drop-icon"><i class="fas fa-cloud-arrow-up"></i></div>
+            <div class="drop-txt">Tap to pick files &nbsp;·&nbsp; <span>drop here</span><br>
+              <span style="font-size:.72rem;color:var(--text3)">Any type · Multiple · Max 50 MB each</span>
+            </div>
+          </div>
+          <div id="file-list" class="file-list"></div>
+          <div class="prog-wrap" id="prog-wrap">
+            <div class="prog-bar"><div class="prog-fill" id="prog-fill"></div></div>
+            <div class="prog-txt" id="prog-txt">0%</div>
+          </div>
+          <button class="btn btn-prime btn-w" id="send-files-btn" onclick="sendFiles()">
+            <i class="fas fa-cloud-arrow-up"></i> Send Files
+          </button>
+        </div>
+
+        <!-- ── LINK TAB ── -->
+        <div id="tab-link" class="tab-panel">
+          <div>
+            <span class="lbl">URL</span>
+            <textarea id="link-in" rows="3" placeholder="https://…"></textarea>
+          </div>
+          <button class="btn btn-prime btn-w" onclick="sendLink()">
+            <i class="fas fa-arrow-up-right-from-square"></i> Send Link
+          </button>
+        </div>
+
+        <!-- ── CLIPBOARD TAB ── -->
+        <div id="tab-clip" class="tab-panel">
+          <div style="text-align:center;padding:20px 0 10px">
+            <i class="fas fa-clipboard" style="font-size:2rem;color:var(--text3);margin-bottom:12px;display:block"></i>
+            <div class="sm muted" style="line-height:1.65">
+              Reads your clipboard and sends it<br>to the desktop instantly.
+            </div>
+          </div>
+          <div id="clip-preview" style="display:none">
+            <span class="lbl">Preview</span>
+            <div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px;
+              font-family:var(--mono);font-size:.78rem;line-height:1.6;max-height:100px;overflow:hidden;
+              color:var(--text2);" id="clip-txt"></div>
+          </div>
+          <button class="btn btn-prime btn-w" onclick="sendClipboard()">
+            <i class="fas fa-clipboard-check"></i> Read &amp; Send Clipboard
+          </button>
+        </div>
+      </div>
+
+      <!-- ═══ MOBILE: SUCCESS ═══ -->
+      <div id="vm-success" class="view" style="align-items:center">
+        <div class="success-wrap">
+          <div class="success-ico"><i class="fas fa-check"></i></div>
+          <div class="h2">Delivered!</div>
+          <div class="mono xs muted">Check your desktop — it's there.</div>
+          <div class="row" style="gap:8px;margin-top:6px">
+            <button class="btn" onclick="backToSend()">
+              <i class="fas fa-arrow-left"></i> Send More
+            </button>
+            <button class="btn btn-ghost" onclick="disconnectMobile()">
+              <i class="fas fa-power-off"></i> Done
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /card-body -->
+  </div><!-- /card -->
+</div><!-- /wrap -->
+
+<footer>
+  <span class="ft-text"><i class="fas fa-bolt"></i> CodeBridge</span>
+  <span class="ft-sep">·</span>
+  <span class="ft-text">Built by <a class="ft-a" href="#"><strong>samartha gs</strong></a></span>
+  <span class="ft-sep">·</span>
+  <span class="ft-text"><i class="fas fa-lock"></i> P2P Encrypted</span>
+  <span class="ft-sep">·</span>
+  <span class="ft-text"><i class="fas fa-server" style="opacity:.4"></i> <span style="opacity:.4">No server storage</span></span>
+  <span class="ft-sep">·</span>
+  <span class="ft-text"><i class="fab fa-github" style="opacity:.5"></i></span>
+</footer>
+
+<div class="toast" id="toast">
+  <i class="fas fa-circle-info" style="opacity:.6;flex-shrink:0"></i>
+  <span id="toast-txt"></span>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+//  SnapShare v2 — Real P2P via PeerJS WebRTC
+// ══════════════════════════════════════════════════
+
+const CHUNK = 16 * 1024; // 16 KB chunks
+
+let peer = null,
+    conn = null,
+    isMobile = false,
+    session = '',
+    activeTab = 'text',
+    pendingFiles = [],
+    rcvCount = 0;
+
+// incoming file assembly
+let inFile = null, inChunks = [], inRcv = 0;
+
+// ── Detect device ────────────────────────────────
+const detectMobile = () =>
+  /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || window.innerWidth <= 768;
+
+// ── 6-digit code ─────────────────────────────────
+const genCode = () => String(Math.floor(100000 + Math.random() * 900000));
+
+// ── Boot ──────────────────────────────────────────
+window.addEventListener('load', () => {
+  isMobile = detectMobile();
+  const params = new URLSearchParams(location.search);
+  const codeParam = params.get('code');
+
+  if (isMobile) {
+    if (codeParam && /^\d{6}$/.test(codeParam)) {
+      connectAsMobile(codeParam);
+    } else {
+      showView('vm-code');
+      initDigits();
+    }
+  } else {
+    initDesktop();
+  }
+
+  // char counter for text area
+  document.getElementById('txt-in').addEventListener('input', function () {
+    document.getElementById('char-count').textContent = this.value.length + ' chars';
+  });
+});
+
+// ══ DESKTOP ══════════════════════════════════════
+
+function initDesktop() {
+  session = genCode();
+  showView('vd-wait');
+
+  peer = new Peer(session, {
+    config: {
+      iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' },
+        { urls: 'stun:stun1.l.google.com:19302' },
+        { urls: 'stun:stun2.l.google.com:19302' }
+      ]
+    }
+  });
+
+  peer.on('open', id => {
+    document.getElementById('s-code').textContent = id;
+    renderQR(id);
+    const url = location.origin + location.pathname + '?code=' + id;
+    document.getElementById('share-url').textContent = url;
+  });
+
+  peer.on('connection', c => {
+    conn = c;
+    bindConn();
+    // switch desktop to received view
+    showView('vd-rcv');
+    setStatus('dd-dot2', 'dd-txt2', 'live', 'Connected');
+    toast('fa-plug', 'Device connected');
+  });
+
+  peer.on('error', err => {
+    console.error('[peer]', err.type, err);
+    if (err.type === 'unavailable-id') {
+      peer.destroy();
+      initDesktop(); // regenerate code
+    } else if (err.type === 'network' || err.type === 'server-error') {
+      toast('fa-triangle-exclamation', 'Peer server unreachable. Check internet.');
+    } else {
+      toast('fa-circle-exclamation', 'Error: ' + err.type);
+    }
+  });
+}
+
+function renderQR(code) {
+  const url = location.origin + location.pathname + '?code=' + code;
+  document.getElementById('qrcode').innerHTML = '';
+  new QRCode(document.getElementById('qrcode'), {
+    text: url, width: 180, height: 180,
+    colorDark: '#000', colorLight: '#fff',
+    correctLevel: QRCode.CorrectLevel.M
+  });
+}
+
+function copyShareLink() {
+  const url = location.origin + location.pathname + '?code=' + session;
+  navigator.clipboard.writeText(url).then(() => toast('fa-check', 'Link copied!'));
+}
+
+function resetDesktop() {
+  rcvCount = 0;
+  document.getElementById('rcv-list').innerHTML = `
+    <div class="empty-state" id="empty-msg">
+      <div class="empty-icon"><i class="fas fa-inbox"></i></div>
+      <div class="mono xs muted">Send something from your phone</div>
+    </div>`;
+  document.getElementById('rcv-count').textContent = '0 items';
+  if (conn) conn.close();
+  if (peer) peer.destroy();
+  conn = null; peer = null;
+  inFile = null; inChunks = []; inRcv = 0;
+  initDesktop();
+}
+
+// ══ MOBILE ═══════════════════════════════════════
+
+function connectWithCode() {
+  const digits = ['d0','d1','d2','d3','d4','d5'].map(id => (document.getElementById(id).value || '')).join('');
+  if (!/^\d{6}$/.test(digits)) { toast('fa-triangle-exclamation', 'Enter all 6 digits'); return; }
+  connectAsMobile(digits);
+}
+
+function connectAsMobile(code) {
+  session = code;
+  showView('vm-connecting');
+  document.getElementById('mob-sess-lbl').textContent = 'Session ' + code;
+
+  peer = new Peer({
+    config: {
+      iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' },
+        { urls: 'stun:stun1.l.google.com:19302' }
+      ]
+    }
+  });
+
+  peer.on('open', () => {
+    conn = peer.connect(code, { reliable: true });
+    bindConn();
+  });
+
+  peer.on('error', err => {
+    console.error('[mobile-peer]', err.type, err);
+    if (err.type === 'peer-unavailable') {
+      toast('fa-circle-exclamation', 'Session not found. Check the code.');
+    } else {
+      toast('fa-triangle-exclamation', 'Error: ' + err.type);
+    }
+    showView('vm-code');
+  });
+}
+
+function disconnectMobile() {
+  if (conn) { try { conn.close(); } catch(e){} }
+  if (peer) { try { peer.destroy(); } catch(e){} }
+  conn = null; peer = null;
+  showView('vm-code');
+}
+
+// ══ CONNECTION BINDING ════════════════════════════
+
+function bindConn() {
+  conn.on('open', () => {
+    if (isMobile) {
+      showView('vm-send');
+      toast('fa-check', 'Connected to desktop!');
+    }
+  });
+
+  conn.on('data', handleData);
+
+  conn.on('close', () => {
+    if (isMobile) {
+      toast('fa-power-off', 'Disconnected');
+      showView('vm-code');
+    } else {
+      setStatus('dd-dot2', 'dd-txt2', 'err', 'Disconnected');
+      document.getElementById('live-badge').style.display = 'none';
+    }
+  });
+
+  conn.on('error', err => {
+    console.error('[conn]', err);
+    toast('fa-circle-exclamation', 'Connection error');
+  });
+}
+
+// ══ DATA HANDLER (desktop receives) ══════════════
+
+function handleData(data) {
+  if (!data || isMobile) return;
+
+  if (data.type === 'TEXT')       appendRcv('text', data);
+  else if (data.type === 'LINK')  appendRcv('link', data);
+  else if (data.type === 'FILE_META') {
+    inFile = data;
+    inChunks = new Array(data.totalChunks);
+    inRcv = 0;
+  } else if (data.type === 'FILE_CHUNK') {
+    if (inFile) {
+      inChunks[data.idx] = data.chunk;
+      inRcv++;
+    }
+  } else if (data.type === 'FILE_END') {
+    if (inFile) {
+      const blob = new Blob(inChunks, { type: inFile.mime });
+      const url = URL.createObjectURL(blob);
+      appendRcv('file', { name: inFile.name, size: inFile.size, mime: inFile.mime, url });
+      inFile = null; inChunks = []; inRcv = 0;
+    }
+  }
+}
+
+function appendRcv(kind, payload) {
+  rcvCount++;
+  document.getElementById('rcv-count').textContent = rcvCount + (rcvCount === 1 ? ' item' : ' items');
+
+  // remove empty state
+  const em = document.getElementById('empty-msg');
+  if (em) em.remove();
+
+  const list = document.getElementById('rcv-list');
+  const el = document.createElement('div');
+  el.className = 'rcv-item';
+
+  if (kind === 'text') {
+    el.innerHTML = `
+      <div class="rcv-type"><i class="fas fa-font"></i> Text snippet</div>
+      <div class="rcv-content">${esc(payload.content)}</div>
+      <div class="rcv-actions">
+        <button class="btn btn-xs" onclick="doCopy(this,${JSON.stringify(payload.content)})">
+          <i class="fas fa-copy"></i> Copy
+        </button>
+      </div>`;
+  } else if (kind === 'link') {
+    el.innerHTML = `
+      <div class="rcv-type"><i class="fas fa-link"></i> Link</div>
+      <div class="rcv-content">
+        <a class="rcv-link" href="${esc(payload.content)}" target="_blank" rel="noopener">
+          ${esc(payload.content)}
+        </a>
+      </div>
+      <div class="rcv-actions">
+        <button class="btn btn-xs" onclick="doCopy(this,${JSON.stringify(payload.content)})">
+          <i class="fas fa-copy"></i> Copy
+        </button>
+        <a class="btn btn-xs btn-ok" href="${esc(payload.content)}" target="_blank" rel="noopener">
+          <i class="fas fa-arrow-up-right-from-square"></i> Open
+        </a>
+      </div>`;
+  } else if (kind === 'file') {
+    const isImg = /^image\//.test(payload.mime);
+    const isAudio = /^audio\//.test(payload.mime);
+    const isVideo = /^video\//.test(payload.mime);
+    el.innerHTML = `
+      <div class="rcv-type">${fileIconFA(payload.name)} &nbsp;${esc(payload.name)}</div>
+      <div class="mono xs muted">${humanSize(payload.size)}</div>
+      ${isImg ? `<img class="rcv-img" src="${payload.url}" alt="${esc(payload.name)}">` : ''}
+      ${isAudio ? `<audio controls style="width:100%;margin-top:8px;border-radius:6px"><source src="${payload.url}" type="${payload.mime}"></audio>` : ''}
+      ${isVideo ? `<video controls style="width:100%;max-height:200px;margin-top:8px;border-radius:6px;background:#000"><source src="${payload.url}" type="${payload.mime}"></video>` : ''}
+      <div class="rcv-actions">
+        <a class="btn btn-xs btn-prime" href="${payload.url}" download="${esc(payload.name)}">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <button class="btn btn-xs" onclick="doCopy(this,${JSON.stringify(payload.name)})">
+          <i class="fas fa-copy"></i> Filename
+        </button>
+      </div>`;
+  }
+
+  list.insertBefore(el, list.firstChild);
+  toast('fa-inbox', kind === 'file' ? 'File received: ' + payload.name : kind + ' received');
+}
+
+// ══ SEND FUNCTIONS (mobile) ════════════════════════
+
+function sendText() {
+  if (!conn?.open) { toast('fa-triangle-exclamation', 'Not connected'); return; }
+  const v = document.getElementById('txt-in').value.trim();
+  if (!v) { toast('fa-triangle-exclamation', 'Nothing to send'); return; }
+  conn.send({ type: 'TEXT', content: v });
+  document.getElementById('txt-in').value = '';
+  document.getElementById('char-count').textContent = '0 chars';
+  showView('vm-success');
+}
+
+function clearText() {
+  document.getElementById('txt-in').value = '';
+  document.getElementById('char-count').textContent = '0 chars';
+}
+
+function sendLink() {
+  if (!conn?.open) { toast('fa-triangle-exclamation', 'Not connected'); return; }
+  let v = document.getElementById('link-in').value.trim();
+  if (!v) { toast('fa-triangle-exclamation', 'Enter a URL'); return; }
+  if (!/^https?:\/\//i.test(v)) v = 'https://' + v;
+  conn.send({ type: 'LINK', content: v });
+  document.getElementById('link-in').value = '';
+  showView('vm-success');
+}
+
+async function sendFiles() {
+  if (!conn?.open) { toast('fa-triangle-exclamation', 'Not connected'); return; }
+  if (!pendingFiles.length) { toast('fa-triangle-exclamation', 'No files selected'); return; }
+
+  const btn = document.getElementById('send-files-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Sending…';
+
+  const prog = document.getElementById('prog-wrap');
+  const fill = document.getElementById('prog-fill');
+  const ptxt = document.getElementById('prog-txt');
+  prog.classList.add('on');
+
+  for (let fi = 0; fi < pendingFiles.length; fi++) {
+    const file = pendingFiles[fi];
+
+    if (file.size > 50 * 1024 * 1024) {
+      toast('fa-triangle-exclamation', file.name + ' exceeds 50 MB limit, skipped');
+      continue;
+    }
+
+    const buf = await file.arrayBuffer();
+    const total = Math.ceil(buf.byteLength / CHUNK);
+    if (total === 0) continue;
+
+    conn.send({ type: 'FILE_META', name: file.name, size: file.size, mime: file.type, totalChunks: total });
+
+    for (let i = 0; i < total; i++) {
+      conn.send({ type: 'FILE_CHUNK', idx: i, chunk: buf.slice(i * CHUNK, (i + 1) * CHUNK) });
+      const pct = Math.round(((fi / pendingFiles.length) + ((i + 1) / total / pendingFiles.length)) * 100);
+      fill.style.width = pct + '%';
+      ptxt.textContent = pct + '% — ' + file.name;
+      if (i % 8 === 0) await tick();
+    }
+
+    conn.send({ type: 'FILE_END' });
+  }
+
+  fill.style.width = '100%';
+  ptxt.textContent = 'Complete!';
+
+  await sleep(700);
+  prog.classList.remove('on');
+  fill.style.width = '0%';
+  pendingFiles = [];
+  renderFileList();
+  btn.disabled = false;
+  btn.innerHTML = '<i class="fas fa-cloud-arrow-up"></i> Send Files';
+  showView('vm-success');
+}
+
+async function sendClipboard() {
+  if (!conn?.open) { toast('fa-triangle-exclamation', 'Not connected'); return; }
+  try {
+    const txt = await navigator.clipboard.readText();
+    if (!txt?.trim()) { toast('fa-triangle-exclamation', 'Clipboard is empty'); return; }
+    const prev = document.getElementById('clip-preview');
+    const ptxt = document.getElementById('clip-txt');
+    ptxt.textContent = txt.slice(0, 200) + (txt.length > 200 ? '…' : '');
+    prev.style.display = 'flex';
+    prev.style.flexDirection = 'column';
+    prev.style.gap = '6px';
+    conn.send({ type: 'TEXT', content: txt });
+    showView('vm-success');
+  } catch (e) {
+    toast('fa-triangle-exclamation', 'Clipboard access denied — try HTTPS');
+  }
+}
+
+function backToSend() {
+  showView('vm-send');
+}
+
+// ══ FILE HANDLING ══════════════════════════════════
+
+function onDrag(e, over) {
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.toggle('drag-over', over);
+}
+function onDrop(e) {
+  e.preventDefault();
+  onDrag(e, false);
+  addFiles(e.dataTransfer.files);
+}
+function onFileChange(e) {
+  addFiles(e.target.files);
+  e.target.value = '';
+}
+function addFiles(list) {
+  Array.from(list).forEach(f => pendingFiles.push(f));
+  renderFileList();
+}
+function removeFile(i) {
+  pendingFiles.splice(i, 1);
+  renderFileList();
+}
+function renderFileList() {
+  document.getElementById('file-list').innerHTML =
+    pendingFiles.map((f, i) => `
+      <div class="file-item">
+        <span class="fi-icon">${fileIconFA(f.name)}</span>
+        <span class="fi-name">${esc(f.name)}</span>
+        <span class="fi-size">${humanSize(f.size)}</span>
+        <button class="fi-rm" onclick="removeFile(${i})" title="Remove">
+          <i class="fas fa-xmark"></i>
+        </button>
+      </div>`).join('');
+}
+
+function fileIconFA(name) {
+  const ext = (name.split('.').pop() || '').toLowerCase();
+  const map = {
+    pdf:'<i class="fas fa-file-pdf"></i>',
+    doc:'<i class="fas fa-file-word"></i>',docx:'<i class="fas fa-file-word"></i>',
+    xls:'<i class="fas fa-file-excel"></i>',xlsx:'<i class="fas fa-file-excel"></i>',
+    ppt:'<i class="fas fa-file-powerpoint"></i>',pptx:'<i class="fas fa-file-powerpoint"></i>',
+    jpg:'<i class="fas fa-file-image"></i>',jpeg:'<i class="fas fa-file-image"></i>',
+    png:'<i class="fas fa-file-image"></i>',gif:'<i class="fas fa-file-image"></i>',
+    webp:'<i class="fas fa-file-image"></i>',svg:'<i class="fas fa-file-image"></i>',
+    mp3:'<i class="fas fa-file-audio"></i>',wav:'<i class="fas fa-file-audio"></i>',
+    ogg:'<i class="fas fa-file-audio"></i>',
+    mp4:'<i class="fas fa-file-video"></i>',mov:'<i class="fas fa-file-video"></i>',webm:'<i class="fas fa-file-video"></i>',
+    zip:'<i class="fas fa-file-zipper"></i>',rar:'<i class="fas fa-file-zipper"></i>',gz:'<i class="fas fa-file-zipper"></i>',
+    txt:'<i class="fas fa-file-lines"></i>',md:'<i class="fas fa-file-lines"></i>',
+    js:'<i class="fas fa-file-code"></i>',ts:'<i class="fas fa-file-code"></i>',
+    py:'<i class="fas fa-file-code"></i>',html:'<i class="fas fa-file-code"></i>',
+    css:'<i class="fas fa-file-code"></i>',json:'<i class="fas fa-file-code"></i>',
+    sh:'<i class="fas fa-file-code"></i>',
+  };
+  return map[ext] || '<i class="fas fa-file"></i>';
+}
+
+function humanSize(b) {
+  if (b < 1024) return b + ' B';
+  if (b < 1048576) return (b / 1024).toFixed(1) + ' KB';
+  return (b / 1048576).toFixed(1) + ' MB';
+}
+
+// ══ TABS ══════════════════════════════════════════
+
+function switchTab(name, btn) {
+  activeTab = name;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+// ══ DIGIT INPUTS ══════════════════════════════════
+
+function initDigits() {
+  const ids = ['d0','d1','d2','d3','d4','d5'];
+  ids.forEach((id, i) => {
+    const el = document.getElementById(id);
+    el.addEventListener('input', () => {
+      el.value = el.value.replace(/\D/, '');
+      if (el.value && i < 5) document.getElementById(ids[i + 1]).focus();
+    });
+    el.addEventListener('keydown', e => {
+      if (e.key === 'Backspace' && !el.value && i > 0) document.getElementById(ids[i - 1]).focus();
+      if (e.key === 'Enter') connectWithCode();
+    });
+    el.addEventListener('paste', e => {
+      e.preventDefault();
+      const p = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '');
+      ids.forEach((did, di) => { if (p[di]) document.getElementById(did).value = p[di]; });
+      const last = Math.min(p.length - 1, 5);
+      if (last >= 0) document.getElementById(ids[last]).focus();
+    });
+  });
+}
+
+// ══ HELPERS ═══════════════════════════════════════
+
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function setStatus(dotId, txtId, state, text) {
+  const dot = document.getElementById(dotId);
+  const txt = document.getElementById(txtId);
+  if (dot) dot.className = 's-dot ' + state;
+  if (txt) txt.textContent = text;
+}
+
+async function doCopy(btn, text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    const orig = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+    setTimeout(() => { btn.innerHTML = orig; }, 1800);
+  } catch { toast('fa-circle-exclamation', 'Copy failed'); }
+}
+
+function esc(s) {
+  return String(s)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+
+function toast(icon, msg) {
+  const el = document.getElementById('toast');
+  const ico = el.querySelector('i');
+  ico.className = 'fas ' + icon + ' fa-sm';
+  document.getElementById('toast-txt').textContent = msg;
+  el.classList.add('on');
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.classList.remove('on'), 2800);
+}
+
+const tick  = () => new Promise(r => setTimeout(r, 0));
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+</script>
+</body>
+</html>
