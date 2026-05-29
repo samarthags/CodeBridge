@@ -7,31 +7,36 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
 :root{
-  --bg:#000;
-  --s1:#0a0a0a;
-  --s2:#111;
-  --s3:#171717;
-  --s4:#1e1e1e;
-  --border:#252525;
-  --border2:#323232;
-  --text:#ededed;
-  --text2:#999;
-  --text3:#555;
+  --bg:#050507;
+  --s1:#0c0c0f;
+  --s2:#111115;
+  --s3:#18181d;
+  --s4:#1f1f26;
+  --s5:#27272f;
+  --border:#1e1e26;
+  --border2:#2e2e3a;
+  --border3:#3e3e4e;
+  --text:#eeeef5;
+  --text2:#9999b0;
+  --text3:#55556a;
   --white:#fff;
+  --accent:#6c6cff;
+  --accent2:#a855f7;
   --danger:#e44;
-  --ok:#4d4;
-  --warn:#fa3;
+  --ok:#3dba6e;
+  --warn:#f59e0b;
   --mono:'DM Mono',monospace;
   --sans:'DM Sans',sans-serif;
   --display:'Bebas Neue',cursive;
+  --radius:12px;
 }
 
-html{font-size:16px}
+html{font-size:16px;scroll-behavior:smooth}
 body{
   font-family:var(--sans);
   background:var(--bg);
@@ -42,70 +47,65 @@ body{
   overflow-x:hidden;
 }
 
-/* ── Noise texture overlay ── */
+/* ── Animated gradient bg ── */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse 600px 400px at 20% 10%, rgba(108,108,255,0.04) 0%, transparent 70%),
+    radial-gradient(ellipse 500px 500px at 80% 80%, rgba(168,85,247,0.04) 0%, transparent 70%);
+  pointer-events:none;z-index:0;
+}
+
+/* ── Noise texture ── */
 body::after{
   content:'';
   position:fixed;inset:0;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-  background-repeat:repeat;
-  background-size:256px 256px;
-  pointer-events:none;
-  z-index:9999;
-  opacity:0.6;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  background-repeat:repeat;background-size:256px 256px;
+  pointer-events:none;z-index:9999;opacity:0.5;
 }
 
 /* ── Layout ── */
 .wrap{
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
   padding:20px 16px 32px;
-  position:relative;
-  z-index:1;
+  position:relative;z-index:1;
 }
 
 /* ── Header ── */
 .hd{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  margin-bottom:28px;
-  user-select:none;
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:24px;user-select:none;
 }
 .hd-logo{
-  font-family:var(--display);
-  font-size:2rem;
-  letter-spacing:0.08em;
-  color:var(--white);
-  line-height:1;
+  font-family:var(--display);font-size:2.1rem;
+  letter-spacing:0.1em;color:var(--white);line-height:1;
 }
 .hd-sep{font-family:var(--mono);color:var(--text3);font-size:0.7rem}
 .hd-tag{
-  font-family:var(--mono);
-  font-size:0.62rem;
-  letter-spacing:0.15em;
-  text-transform:uppercase;
-  color:var(--text3);
-  line-height:1;
+  font-family:var(--mono);font-size:0.6rem;
+  letter-spacing:0.18em;text-transform:uppercase;
+  color:var(--text3);line-height:1;
 }
 .hd-pip{
-  width:5px;height:5px;border-radius:50%;
-  background:var(--white);
-  animation:pip 2s ease-in-out infinite;
+  width:6px;height:6px;border-radius:50%;
+  background:var(--accent);
+  box-shadow:0 0 8px var(--accent);
+  animation:pip 2.5s ease-in-out infinite;
 }
-@keyframes pip{0%,100%{opacity:1}50%{opacity:0.2}}
+@keyframes pip{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.3;transform:scale(0.7)}}
 
 /* ── Card ── */
 .card{
   background:var(--s1);
   border:1px solid var(--border);
-  border-radius:12px;
-  width:100%;
-  max-width:500px;
+  border-radius:16px;
+  width:100%;max-width:520px;
   overflow:hidden;
   position:relative;
+  box-shadow:0 24px 64px rgba(0,0,0,0.6),0 1px 0 rgba(255,255,255,0.03) inset;
 }
 .card-body{padding:28px}
 
@@ -113,7 +113,7 @@ body::after{
 .divider{height:1px;background:var(--border);margin:20px 0}
 .divider-label{
   display:flex;align-items:center;gap:10px;
-  font-family:var(--mono);font-size:0.65rem;
+  font-family:var(--mono);font-size:0.62rem;
   color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;
   margin:20px 0;
 }
@@ -127,31 +127,26 @@ body::after{
 .status-row{
   display:flex;align-items:center;justify-content:space-between;
   padding:10px 14px;
-  background:var(--s3);
-  border:1px solid var(--border);
-  border-radius:8px;
-  font-size:0.8rem;
+  background:var(--s3);border:1px solid var(--border);
+  border-radius:10px;font-size:0.8rem;
 }
 .status-row.full{width:100%}
-.s-dot{
-  width:7px;height:7px;border-radius:50%;
-  flex-shrink:0;
-}
+.s-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;transition:background 0.3s}
 .s-dot.idle{background:var(--text3)}
-.s-dot.wait{background:var(--warn);animation:bk 1.2s ease-in-out infinite}
-.s-dot.live{background:var(--ok)}
+.s-dot.wait{background:var(--warn);animation:bk 1.2s ease-in-out infinite;box-shadow:0 0 6px var(--warn)}
+.s-dot.live{background:var(--ok);box-shadow:0 0 8px var(--ok)}
 .s-dot.err{background:var(--danger)}
-@keyframes bk{0%,100%{opacity:.25}50%{opacity:1}}
+@keyframes bk{0%,100%{opacity:.2}50%{opacity:1}}
 
-/* ── Typography helpers ── */
+/* ── Typography ── */
 .lbl{
-  font-family:var(--mono);font-size:0.62rem;
-  font-weight:500;letter-spacing:0.12em;
+  font-family:var(--mono);font-size:0.6rem;
+  font-weight:500;letter-spacing:0.14em;
   text-transform:uppercase;color:var(--text3);
   display:block;margin-bottom:7px;
 }
-.h2{font-weight:600;font-size:1.05rem;line-height:1.3}
-.h3{font-weight:500;font-size:0.9rem;color:var(--text2);line-height:1.5}
+.h2{font-weight:700;font-size:1.1rem;line-height:1.3}
+.h3{font-weight:400;font-size:0.88rem;color:var(--text2);line-height:1.55}
 .mono{font-family:var(--mono)}
 .muted{color:var(--text2)}
 .sm{font-size:0.8rem}
@@ -160,213 +155,226 @@ body::after{
 .row{display:flex;align-items:center;gap:10px}
 .row-sb{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .col{display:flex;flex-direction:column;gap:8px}
-.mt4{margin-top:4px}
-.mt8{margin-top:8px}
-.mt12{margin-top:12px}
-.mt16{margin-top:16px}
+.mt4{margin-top:4px}.mt8{margin-top:8px}.mt12{margin-top:12px}
 
-/* ── Session code big display ── */
+/* ── Session code ── */
 .big-code{
   font-family:var(--display);
-  font-size:3.2rem;
-  letter-spacing:0.25em;
+  font-size:3.4rem;
+  letter-spacing:0.3em;
   color:var(--white);
   text-align:center;
   line-height:1;
+  text-shadow:0 0 30px rgba(108,108,255,0.3);
 }
 
 /* ── QR wrapper ── */
 .qr-wrap{
-  background:#fff;
-  border-radius:10px;
-  padding:14px;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
+  background:#fff;border-radius:12px;padding:14px;
+  display:inline-flex;align-items:center;justify-content:center;
+  box-shadow:0 8px 24px rgba(0,0,0,0.4);
 }
 #qrcode canvas,#qrcode img{display:block;border-radius:4px}
 
 /* ── Buttons ── */
 .btn{
   display:inline-flex;align-items:center;justify-content:center;
-  gap:8px;
-  padding:11px 18px;
-  border:1px solid var(--border2);
-  border-radius:8px;
-  background:transparent;
-  color:var(--text2);
-  font-family:var(--sans);font-size:0.85rem;font-weight:500;
+  gap:7px;padding:10px 16px;
+  border:1px solid var(--border2);border-radius:9px;
+  background:transparent;color:var(--text2);
+  font-family:var(--sans);font-size:0.83rem;font-weight:500;
   cursor:pointer;transition:all 0.15s ease;
   text-decoration:none;white-space:nowrap;
   position:relative;overflow:hidden;
 }
-.btn:hover{border-color:var(--text3);color:var(--text);background:var(--s3)}
-.btn:active{transform:scale(0.98)}
+.btn:hover{border-color:var(--border3);color:var(--text);background:var(--s3)}
+.btn:active{transform:scale(0.97)}
 .btn-w{width:100%}
 .btn-sm{padding:7px 13px;font-size:0.78rem}
-.btn-xs{padding:5px 10px;font-size:0.72rem;gap:5px}
+.btn-xs{padding:5px 10px;font-size:0.71rem;gap:5px;border-radius:7px}
 
 .btn-prime{
-  background:var(--white);color:#000;
-  border-color:var(--white);font-weight:600;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  color:var(--white);border-color:transparent;font-weight:600;
+  box-shadow:0 4px 14px rgba(108,108,255,0.3);
 }
-.btn-prime:hover{background:#ddd;border-color:#ddd;color:#000}
-.btn-prime:disabled{background:var(--s4);color:var(--text3);border-color:var(--border);cursor:not-allowed}
+.btn-prime:hover{filter:brightness(1.1);color:var(--white);border-color:transparent;background:linear-gradient(135deg,var(--accent),var(--accent2))}
+.btn-prime:disabled{background:var(--s4);color:var(--text3);border-color:var(--border);cursor:not-allowed;box-shadow:none;filter:none}
 
 .btn-ghost{border-color:transparent;color:var(--text3)}
 .btn-ghost:hover{border-color:var(--border);color:var(--text2);background:transparent}
-
-.btn-danger{color:#e55;border-color:rgba(238,85,85,.25)}
+.btn-danger{color:#e55;border-color:rgba(238,85,85,.2)}
 .btn-danger:hover{background:rgba(238,85,85,.07);border-color:#e55}
-
-.btn-ok{color:var(--ok);border-color:rgba(68,221,68,.25)}
-.btn-ok:hover{background:rgba(68,221,68,.07);border-color:var(--ok)}
+.btn-ok{color:var(--ok);border-color:rgba(61,186,110,.25)}
+.btn-ok:hover{background:rgba(61,186,110,.07);border-color:var(--ok)}
+.btn-copy{color:var(--accent);border-color:rgba(108,108,255,.25)}
+.btn-copy:hover{background:rgba(108,108,255,.07);border-color:var(--accent)}
 
 /* ── Input / Textarea ── */
 textarea,input.txt-in{
-  width:100%;
-  background:var(--s2);
-  border:1px solid var(--border);
-  border-radius:8px;
-  color:var(--text);
-  font-family:var(--mono);font-size:0.875rem;line-height:1.65;
-  padding:12px 14px;resize:vertical;
-  outline:none;transition:border-color 0.15s;
+  width:100%;background:var(--s2);
+  border:1px solid var(--border);border-radius:9px;
+  color:var(--text);font-family:var(--mono);font-size:0.875rem;line-height:1.65;
+  padding:12px 14px;resize:vertical;outline:none;
+  transition:border-color 0.15s;
 }
-textarea:focus,input.txt-in:focus{border-color:var(--border2)}
+textarea:focus,input.txt-in:focus{border-color:var(--border3)}
 textarea::placeholder,input.txt-in::placeholder{color:var(--text3)}
 
 /* ── Tabs ── */
 .tabs{
   display:flex;background:var(--s2);
-  border:1px solid var(--border);border-radius:8px;
+  border:1px solid var(--border);border-radius:10px;
   padding:3px;gap:2px;
 }
 .tab-btn{
-  flex:1;padding:8px 6px;
+  flex:1;padding:8px 4px;
   border:none;background:transparent;
   color:var(--text3);font-family:var(--sans);
-  font-size:0.78rem;font-weight:500;
-  border-radius:6px;cursor:pointer;
+  font-size:0.73rem;font-weight:500;
+  border-radius:7px;cursor:pointer;
   transition:all 0.15s;
-  display:flex;align-items:center;justify-content:center;gap:5px;
+  display:flex;align-items:center;justify-content:center;gap:4px;
 }
-.tab-btn.active{background:var(--s4);color:var(--text);border:1px solid var(--border)}
+.tab-btn.active{background:var(--s5);color:var(--text);border:1px solid var(--border2)}
 .tab-btn:hover:not(.active){color:var(--text2)}
-
 .tab-panel{display:none;flex-direction:column;gap:14px}
 .tab-panel.active{display:flex}
 
 /* ── Drop zone ── */
 .drop-zone{
-  border:1px dashed var(--border2);border-radius:8px;
+  border:1px dashed var(--border2);border-radius:10px;
   padding:28px 20px;text-align:center;
   cursor:pointer;transition:all 0.15s;
   position:relative;background:var(--s2);
 }
-.drop-zone:hover,.drop-zone.drag-over{
-  border-color:var(--text3);background:var(--s3);
-}
-.drop-zone input[type=file]{
-  position:absolute;inset:0;opacity:0;cursor:pointer;
-  width:100%;height:100%;
-}
-.drop-icon{font-size:1.6rem;color:var(--text3);margin-bottom:10px}
-.drop-txt{font-size:0.82rem;color:var(--text2);line-height:1.6}
-.drop-txt span{color:var(--text)}
+.drop-zone:hover,.drop-zone.drag-over{border-color:var(--accent);background:rgba(108,108,255,0.04)}
+.drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.drop-icon{font-size:1.7rem;color:var(--text3);margin-bottom:10px}
+.drop-txt{font-size:0.8rem;color:var(--text2);line-height:1.65}
+.drop-txt span{color:var(--accent)}
 
 /* ── File list ── */
 .file-list{display:flex;flex-direction:column;gap:6px}
 .file-item{
   display:flex;align-items:center;gap:10px;
   background:var(--s2);border:1px solid var(--border);
-  border-radius:8px;padding:10px 12px;
+  border-radius:9px;padding:10px 12px;
 }
 .fi-icon{font-size:0.95rem;color:var(--text2);width:18px;text-align:center;flex-shrink:0}
-.fi-name{flex:1;font-size:0.8rem;font-family:var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.fi-size{font-size:0.68rem;color:var(--text3);font-family:var(--mono);flex-shrink:0}
+.fi-name{flex:1;font-size:0.78rem;font-family:var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fi-size{font-size:0.66rem;color:var(--text3);font-family:var(--mono);flex-shrink:0}
 .fi-rm{background:none;border:none;color:var(--text3);cursor:pointer;padding:4px 6px;border-radius:4px;transition:color 0.15s;line-height:1}
 .fi-rm:hover{color:var(--danger)}
 
 /* ── Progress ── */
 .prog-wrap{display:none;gap:6px;flex-direction:column}
 .prog-wrap.on{display:flex}
-.prog-bar{height:2px;background:var(--s4);border-radius:2px;overflow:hidden}
-.prog-fill{height:100%;background:var(--white);border-radius:2px;transition:width .15s;width:0%}
-.prog-txt{font-size:0.68rem;color:var(--text3);font-family:var(--mono);text-align:right}
+.prog-bar{height:3px;background:var(--s5);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width .12s;width:0%}
+.prog-txt{font-size:0.67rem;color:var(--text3);font-family:var(--mono);text-align:right}
 
 /* ── Received items ── */
-.rcv-list{display:flex;flex-direction:column;gap:10px;max-height:400px;overflow-y:auto}
+.rcv-list{display:flex;flex-direction:column;gap:10px;max-height:420px;overflow-y:auto;padding-right:2px}
 .rcv-list::-webkit-scrollbar{width:4px}
 .rcv-list::-webkit-scrollbar-track{background:transparent}
 .rcv-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+
 .rcv-item{
   background:var(--s2);border:1px solid var(--border);
-  border-radius:8px;padding:14px;
+  border-radius:10px;padding:14px;
   animation:slideUp .25s ease both;
+  position:relative;overflow:hidden;
 }
-@keyframes slideUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.rcv-item::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+}
+.rcv-item.type-text::before{background:linear-gradient(90deg,var(--accent),transparent)}
+.rcv-item.type-link::before{background:linear-gradient(90deg,#06b6d4,transparent)}
+.rcv-item.type-file::before{background:linear-gradient(90deg,var(--ok),transparent)}
+.rcv-item.type-image::before{background:linear-gradient(90deg,#f59e0b,transparent)}
+.rcv-item.type-audio::before{background:linear-gradient(90deg,#ec4899,transparent)}
+.rcv-item.type-video::before{background:linear-gradient(90deg,#8b5cf6,transparent)}
+
+@keyframes slideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
 .rcv-type{
-  font-family:var(--mono);font-size:0.62rem;
-  letter-spacing:0.1em;text-transform:uppercase;
+  font-family:var(--mono);font-size:0.6rem;
+  letter-spacing:0.12em;text-transform:uppercase;
   color:var(--text3);margin-bottom:8px;
   display:flex;align-items:center;gap:6px;
 }
+.rcv-type-badge{
+  display:inline-flex;align-items:center;gap:4px;
+  padding:2px 8px;border-radius:99px;
+  font-size:0.6rem;font-family:var(--mono);
+  letter-spacing:0.08em;
+  border:1px solid;
+}
+.rcv-type-badge.badge-text{color:var(--accent);border-color:rgba(108,108,255,.3);background:rgba(108,108,255,.08)}
+.rcv-type-badge.badge-link{color:#06b6d4;border-color:rgba(6,182,212,.3);background:rgba(6,182,212,.08)}
+.rcv-type-badge.badge-file{color:var(--ok);border-color:rgba(61,186,110,.3);background:rgba(61,186,110,.08)}
+.rcv-type-badge.badge-image{color:#f59e0b;border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.08)}
+.rcv-type-badge.badge-audio{color:#ec4899;border-color:rgba(236,72,153,.3);background:rgba(236,72,153,.08)}
+.rcv-type-badge.badge-video{color:#8b5cf6;border-color:rgba(139,92,246,.3);background:rgba(139,92,246,.08)}
+
 .rcv-content{
-  font-family:var(--mono);font-size:0.83rem;line-height:1.65;
-  color:var(--text);white-space:pre-wrap;word-break:break-all;
-  max-height:160px;overflow-y:auto;
+  font-family:var(--mono);font-size:0.83rem;line-height:1.7;
+  color:var(--text);
+  white-space:pre-wrap;   /* KEY FIX: render real newlines */
+  word-break:break-word;
+  max-height:180px;overflow-y:auto;
 }
 .rcv-content::-webkit-scrollbar{width:3px}
 .rcv-content::-webkit-scrollbar-thumb{background:var(--border2)}
-.rcv-img{max-width:100%;border-radius:6px;margin-top:8px;display:block;border:1px solid var(--border)}
+
+.rcv-img{max-width:100%;border-radius:8px;margin-top:8px;display:block;border:1px solid var(--border);cursor:zoom-in}
+.rcv-img:hover{opacity:0.9}
 .rcv-actions{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
-.rcv-link{color:var(--text);text-decoration:underline;text-underline-offset:3px;word-break:break-all}
-.rcv-link:hover{color:var(--white)}
+.rcv-link{color:var(--accent);text-decoration:none;word-break:break-all}
+.rcv-link:hover{text-decoration:underline}
+.rcv-ts{font-size:0.6rem;color:var(--text3);font-family:var(--mono);margin-top:8px}
 
 /* ── Badge ── */
 .badge{
   display:inline-flex;align-items:center;justify-content:center;
   padding:2px 8px;border-radius:99px;
-  font-family:var(--mono);font-size:0.62rem;
-  font-weight:500;letter-spacing:0.05em;
+  font-family:var(--mono);font-size:0.6rem;
+  font-weight:500;letter-spacing:0.06em;
   background:var(--s4);border:1px solid var(--border2);
   color:var(--text2);
 }
-.badge.live{background:rgba(68,221,68,.1);border-color:rgba(68,221,68,.3);color:var(--ok)}
+.badge.live{background:rgba(61,186,110,.1);border-color:rgba(61,186,110,.3);color:var(--ok)}
 
-/* ── Code digit inputs ── */
-.digit-row{display:flex;gap:7px;justify-content:center}
+/* ── Digit inputs ── */
+.digit-row{display:flex;gap:8px;justify-content:center}
 .digit{
-  width:44px;height:52px;
-  background:var(--s2);
-  border:1px solid var(--border);border-radius:8px;
-  text-align:center;
-  font-family:var(--display);font-size:1.6rem;
+  width:46px;height:56px;
+  background:var(--s2);border:1px solid var(--border);border-radius:10px;
+  text-align:center;font-family:var(--display);font-size:1.7rem;
   color:var(--white);outline:none;
-  transition:border-color 0.15s;caret-color:var(--white);
-  letter-spacing:0;
+  transition:border-color 0.15s,box-shadow 0.15s;caret-color:var(--accent);letter-spacing:0;
 }
-.digit:focus{border-color:var(--border2)}
-.digit::selection{background:var(--s4)}
+.digit:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(108,108,255,0.15)}
 
 /* ── Copy-link row ── */
 .copy-link-row{
   display:flex;gap:6px;align-items:center;
   background:var(--s2);border:1px solid var(--border);
-  border-radius:8px;padding:8px 12px;overflow:hidden;
+  border-radius:9px;padding:9px 12px;overflow:hidden;
+  width:100%;
 }
 .copy-link-url{
-  flex:1;font-family:var(--mono);font-size:0.72rem;
+  flex:1;font-family:var(--mono);font-size:0.7rem;
   color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
 
-/* ── Received empty state ── */
+/* ── Empty state ── */
 .empty-state{
   display:flex;flex-direction:column;align-items:center;gap:12px;
-  padding:32px 20px;text-align:center;
+  padding:36px 20px;text-align:center;
 }
-.empty-icon{font-size:2rem;color:var(--text3)}
+.empty-icon{font-size:2.2rem;color:var(--text3)}
 
 /* ── Success ── */
 .success-wrap{
@@ -374,10 +382,11 @@ textarea::placeholder,input.txt-in::placeholder{color:var(--text3)}
   gap:14px;padding:20px 0;text-align:center;
 }
 .success-ico{
-  width:56px;height:56px;
-  border-radius:50%;border:1px solid var(--border2);
+  width:60px;height:60px;border-radius:50%;
+  border:1px solid var(--border2);
+  background:rgba(61,186,110,0.1);
   display:flex;align-items:center;justify-content:center;
-  font-size:1.5rem;
+  font-size:1.6rem;color:var(--ok);
   animation:popIn .4s cubic-bezier(.34,1.56,.64,1) both;
 }
 @keyframes popIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
@@ -395,25 +404,68 @@ textarea::placeholder,input.txt-in::placeholder{color:var(--text3)}
   position:fixed;bottom:72px;left:50%;
   transform:translateX(-50%) translateY(14px);
   background:var(--s3);border:1px solid var(--border2);
-  border-radius:8px;padding:9px 16px;
-  font-family:var(--mono);font-size:0.78rem;color:var(--text);
+  border-radius:9px;padding:9px 16px;
+  font-family:var(--mono);font-size:0.77rem;color:var(--text);
   opacity:0;transition:all .22s;pointer-events:none;z-index:9998;
   white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.7);
   display:flex;align-items:center;gap:8px;
 }
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 
+/* ── Image Lightbox ── */
+.lightbox{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,0.92);z-index:10000;
+  align-items:center;justify-content:center;cursor:zoom-out;
+}
+.lightbox.on{display:flex}
+.lightbox img{max-width:92vw;max-height:90vh;border-radius:8px;box-shadow:0 20px 60px rgba(0,0,0,.8)}
+
+/* ── Audio waveform placeholder ── */
+.audio-player{
+  background:var(--s3);border:1px solid var(--border);
+  border-radius:9px;padding:12px;margin-top:8px;
+  display:flex;flex-direction:column;gap:8px;
+}
+.audio-player audio{width:100%;border-radius:6px;outline:none}
+audio::-webkit-media-controls-panel{background:var(--s4)}
+
+/* ── Stats bar ── */
+.stats-bar{
+  display:flex;gap:12px;flex-wrap:wrap;
+}
+.stat-chip{
+  display:flex;align-items:center;gap:5px;
+  background:var(--s3);border:1px solid var(--border);
+  border-radius:8px;padding:5px 10px;
+  font-family:var(--mono);font-size:0.65rem;color:var(--text2);
+}
+.stat-chip i{color:var(--text3);font-size:0.7rem}
+
+/* ── Filter bar ── */
+.filter-bar{
+  display:flex;gap:5px;flex-wrap:wrap;
+}
+.filter-btn{
+  padding:4px 10px;border-radius:99px;
+  background:var(--s3);border:1px solid var(--border);
+  color:var(--text3);font-family:var(--mono);font-size:0.62rem;
+  cursor:pointer;transition:all 0.15s;
+}
+.filter-btn.on{background:var(--s5);border-color:var(--border3);color:var(--text)}
+.filter-btn:hover:not(.on){color:var(--text2)}
+
 /* ── Footer ── */
 footer{
   position:relative;z-index:1;
   border-top:1px solid var(--border);
-  padding:14px 16px;
+  padding:13px 16px;
   display:flex;align-items:center;justify-content:center;gap:6px;
   flex-wrap:wrap;
 }
 .ft-text{
-  font-family:var(--mono);font-size:0.65rem;
-  color:var(--text3);letter-spacing:0.08em;
+  font-family:var(--mono);font-size:0.63rem;
+  color:var(--text3);letter-spacing:0.07em;
   display:flex;align-items:center;gap:5px;
 }
 .ft-sep{color:var(--border2)}
@@ -422,13 +474,14 @@ footer{
 
 /* ── Responsive ── */
 @media(max-width:520px){
-  .card-body{padding:20px 16px}
-  .big-code{font-size:2.4rem;letter-spacing:.2em}
-  .digit{width:40px;height:50px;font-size:1.4rem}
-  .tab-btn{font-size:.72rem;padding:7px 4px;gap:4px}
+  .card-body{padding:18px 14px}
+  .big-code{font-size:2.6rem;letter-spacing:.2em}
+  .digit{width:42px;height:52px;font-size:1.45rem}
+  .tab-btn{font-size:.68rem;padding:7px 3px;gap:3px}
+  .stats-bar{gap:6px}
 }
 @media(max-width:360px){
-  .digit{width:36px;height:46px;font-size:1.25rem}
+  .digit{width:36px;height:46px;font-size:1.2rem}
   .digit-row{gap:5px}
 }
 </style>
@@ -455,18 +508,18 @@ footer{
             <div class="lbl tc mt4">Session Code</div>
           </div>
           <div class="row">
-            <div class="s-dot wait" id="dd-dot"></div>
-            <span class="mono sm muted" id="dd-txt">Waiting for device…</span>
+            <div class="s-dot wait"></div>
+            <span class="mono sm muted">Waiting for device…</span>
           </div>
-          <div id="copy-link-box" class="copy-link-row" style="width:100%;max-width:380px">
-            <i class="fas fa-link" style="color:var(--text3);font-size:.8rem;flex-shrink:0"></i>
+          <div class="copy-link-row">
+            <i class="fas fa-link" style="color:var(--text3);font-size:.78rem;flex-shrink:0"></i>
             <span class="copy-link-url" id="share-url">—</span>
-            <button class="btn btn-xs" onclick="copyShareLink()">
+            <button class="btn btn-xs btn-copy" onclick="copyShareLink()">
               <i class="fas fa-copy"></i> Copy
             </button>
           </div>
           <p class="sm muted tc" style="line-height:1.6;max-width:300px">
-            Scan the QR with your phone or enter the code on any browser to send files, text, and links instantly.
+            Scan the QR with your phone or enter the 6-digit code on any browser to transfer files, text, links, images, and audio instantly.
           </p>
         </div>
       </div>
@@ -478,15 +531,37 @@ footer{
             <div class="h2">Inbox</div>
             <div class="row" style="gap:6px">
               <span class="mono xs muted" id="rcv-count">0 items</span>
-              <span class="badge live" id="live-badge">● LIVE</span>
+              <span class="badge live">● LIVE</span>
             </div>
           </div>
           <div class="row" style="gap:8px">
-            <div class="s-dot live" id="dd-dot2"></div>
-            <span class="mono xs muted" id="dd-txt2">Connected</span>
+            <div class="s-dot live"></div>
+            <span class="mono xs muted">Connected</span>
           </div>
         </div>
-        <div class="divider"></div>
+
+        <!-- Stats bar -->
+        <div class="stats-bar" id="stats-bar" style="display:none">
+          <div class="stat-chip" id="stat-text" style="display:none"><i class="fas fa-font"></i><span id="cnt-text">0</span> text</div>
+          <div class="stat-chip" id="stat-link" style="display:none"><i class="fas fa-link"></i><span id="cnt-link">0</span> links</div>
+          <div class="stat-chip" id="stat-image" style="display:none"><i class="fas fa-image"></i><span id="cnt-image">0</span> images</div>
+          <div class="stat-chip" id="stat-audio" style="display:none"><i class="fas fa-music"></i><span id="cnt-audio">0</span> audio</div>
+          <div class="stat-chip" id="stat-video" style="display:none"><i class="fas fa-video"></i><span id="cnt-video">0</span> video</div>
+          <div class="stat-chip" id="stat-file" style="display:none"><i class="fas fa-file"></i><span id="cnt-file">0</span> files</div>
+        </div>
+
+        <!-- Filter -->
+        <div class="filter-bar" id="filter-bar" style="display:none">
+          <button class="filter-btn on" onclick="setFilter('all',this)">All</button>
+          <button class="filter-btn" id="fb-text" onclick="setFilter('text',this)" style="display:none">Text</button>
+          <button class="filter-btn" id="fb-link" onclick="setFilter('link',this)" style="display:none">Links</button>
+          <button class="filter-btn" id="fb-image" onclick="setFilter('image',this)" style="display:none">Images</button>
+          <button class="filter-btn" id="fb-audio" onclick="setFilter('audio',this)" style="display:none">Audio</button>
+          <button class="filter-btn" id="fb-video" onclick="setFilter('video',this)" style="display:none">Video</button>
+          <button class="filter-btn" id="fb-file" onclick="setFilter('file',this)" style="display:none">Files</button>
+        </div>
+
+        <div class="divider" style="margin:12px 0"></div>
         <div id="rcv-list" class="rcv-list">
           <div class="empty-state" id="empty-msg">
             <div class="empty-icon"><i class="fas fa-inbox"></i></div>
@@ -494,18 +569,23 @@ footer{
           </div>
         </div>
         <div class="divider"></div>
-        <button class="btn btn-w" onclick="resetDesktop()">
-          <i class="fas fa-rotate-right"></i> New Session
-        </button>
+        <div class="row">
+          <button class="btn btn-w" onclick="clearInbox()">
+            <i class="fas fa-trash"></i> Clear Inbox
+          </button>
+          <button class="btn btn-w" onclick="resetDesktop()">
+            <i class="fas fa-rotate-right"></i> New Session
+          </button>
+        </div>
       </div>
 
       <!-- ═══ MOBILE: CODE INPUT ═══ -->
       <div id="vm-code" class="view" style="align-items:center">
         <div class="col" style="align-items:center;gap:6px;width:100%">
-          <i class="fas fa-mobile-screen-button" style="font-size:2rem;color:var(--text3)"></i>
-          <div class="h2 tc">Enter Code</div>
+          <i class="fas fa-mobile-screen-button" style="font-size:2.2rem;color:var(--accent);opacity:.8"></i>
+          <div class="h2 tc">Enter Session Code</div>
           <div class="h3 tc sm" style="max-width:260px">
-            Open SnapShare on your desktop and type the 6-digit session code below.
+            Type the 6-digit code shown on your desktop.
           </div>
         </div>
         <div class="digit-row">
@@ -521,14 +601,14 @@ footer{
         </button>
         <div class="divider-label">or scan QR on desktop</div>
         <p class="mono xs muted tc" style="line-height:1.6">
-          <i class="fas fa-shield-halved"></i> &nbsp;All data is transferred peer-to-peer.<br>Nothing is stored on any server.
+          <i class="fas fa-shield-halved"></i>&nbsp; All data is P2P — nothing stored on any server.
         </p>
       </div>
 
       <!-- ═══ MOBILE: CONNECTING ═══ -->
       <div id="vm-connecting" class="view" style="align-items:center">
         <div class="connecting-wrap">
-          <i class="fas fa-circle-nodes fa-2x muted spin"></i>
+          <i class="fas fa-circle-nodes fa-2x muted spin" style="color:var(--accent)"></i>
           <div class="h2">Connecting…</div>
           <div class="row">
             <div class="s-dot wait"></div>
@@ -553,13 +633,19 @@ footer{
           </button>
         </div>
 
-        <!-- tabs -->
+        <!-- tabs: Text, Image, Audio, File, Link, Clipboard -->
         <div class="tabs">
           <button class="tab-btn active" id="tb-text" onclick="switchTab('text',this)">
             <i class="fas fa-font"></i> Text
           </button>
+          <button class="tab-btn" id="tb-image" onclick="switchTab('image',this)">
+            <i class="fas fa-image"></i> Image
+          </button>
+          <button class="tab-btn" id="tb-audio" onclick="switchTab('audio',this)">
+            <i class="fas fa-music"></i> Song
+          </button>
           <button class="tab-btn" id="tb-file" onclick="switchTab('file',this)">
-            <i class="fas fa-paperclip"></i> Files
+            <i class="fas fa-paperclip"></i> File
           </button>
           <button class="tab-btn" id="tb-link" onclick="switchTab('link',this)">
             <i class="fas fa-link"></i> Link
@@ -572,7 +658,7 @@ footer{
         <!-- ── TEXT TAB ── -->
         <div id="tab-text" class="tab-panel active">
           <div>
-            <span class="lbl">Message / Snippet</span>
+            <span class="lbl">Message / Snippet / Code</span>
             <textarea id="txt-in" rows="6" placeholder="Type or paste text, code, notes, commands…"></textarea>
           </div>
           <div class="row-sb">
@@ -586,6 +672,66 @@ footer{
           </button>
         </div>
 
+        <!-- ── IMAGE TAB ── -->
+        <div id="tab-image" class="tab-panel">
+          <div class="drop-zone" id="drop-zone-img"
+               ondragover="onDragImg(event,true)"
+               ondragleave="onDragImg(event,false)"
+               ondrop="onDropImg(event)">
+            <input type="file" accept="image/*" id="img-input" onchange="onImgChange(event)">
+            <div class="drop-icon"><i class="fas fa-image" style="color:var(--warn)"></i></div>
+            <div class="drop-txt">Tap to pick image &nbsp;·&nbsp; <span>drop here</span><br>
+              <span style="font-size:.7rem;color:var(--text3)">JPG, PNG, GIF, WEBP, SVG · Max 50 MB</span>
+            </div>
+          </div>
+          <div id="img-preview-wrap" style="display:none">
+            <div style="background:var(--s2);border:1px solid var(--border);border-radius:9px;overflow:hidden">
+              <img id="img-preview" style="width:100%;max-height:180px;object-fit:contain;display:block">
+            </div>
+            <div class="row-sb mt8">
+              <span class="mono xs muted" id="img-name-lbl">—</span>
+              <button class="btn btn-xs btn-ghost" onclick="clearImg()"><i class="fas fa-xmark"></i> Remove</button>
+            </div>
+          </div>
+          <div class="prog-wrap" id="prog-wrap-img">
+            <div class="prog-bar"><div class="prog-fill" id="prog-fill-img"></div></div>
+            <div class="prog-txt" id="prog-txt-img">0%</div>
+          </div>
+          <button class="btn btn-prime btn-w" id="send-img-btn" onclick="sendImage()">
+            <i class="fas fa-image"></i> Send Image
+          </button>
+        </div>
+
+        <!-- ── AUDIO / SONG TAB ── -->
+        <div id="tab-audio" class="tab-panel">
+          <div class="drop-zone" id="drop-zone-aud"
+               ondragover="onDragAud(event,true)"
+               ondragleave="onDragAud(event,false)"
+               ondrop="onDropAud(event)">
+            <input type="file" accept="audio/*" id="aud-input" onchange="onAudChange(event)">
+            <div class="drop-icon"><i class="fas fa-music" style="color:#ec4899"></i></div>
+            <div class="drop-txt">Tap to pick audio file &nbsp;·&nbsp; <span>drop here</span><br>
+              <span style="font-size:.7rem;color:var(--text3)">MP3, WAV, OGG, M4A, FLAC · Max 50 MB</span>
+            </div>
+          </div>
+          <div id="aud-preview-wrap" style="display:none">
+            <div class="audio-player">
+              <audio id="aud-preview" controls></audio>
+            </div>
+            <div class="row-sb mt8">
+              <span class="mono xs muted" id="aud-name-lbl">—</span>
+              <button class="btn btn-xs btn-ghost" onclick="clearAud()"><i class="fas fa-xmark"></i> Remove</button>
+            </div>
+          </div>
+          <div class="prog-wrap" id="prog-wrap-aud">
+            <div class="prog-bar"><div class="prog-fill" id="prog-fill-aud"></div></div>
+            <div class="prog-txt" id="prog-txt-aud">0%</div>
+          </div>
+          <button class="btn btn-prime btn-w" id="send-aud-btn" onclick="sendAudio()">
+            <i class="fas fa-music"></i> Send Song
+          </button>
+        </div>
+
         <!-- ── FILE TAB ── -->
         <div id="tab-file" class="tab-panel">
           <div class="drop-zone" id="drop-zone"
@@ -593,9 +739,9 @@ footer{
                ondragleave="onDrag(event,false)"
                ondrop="onDrop(event)">
             <input type="file" multiple id="file-input" onchange="onFileChange(event)">
-            <div class="drop-icon"><i class="fas fa-cloud-arrow-up"></i></div>
+            <div class="drop-icon"><i class="fas fa-cloud-arrow-up" style="color:var(--ok)"></i></div>
             <div class="drop-txt">Tap to pick files &nbsp;·&nbsp; <span>drop here</span><br>
-              <span style="font-size:.72rem;color:var(--text3)">Any type · Multiple · Max 50 MB each</span>
+              <span style="font-size:.7rem;color:var(--text3)">Any type · Multiple · Max 50 MB each</span>
             </div>
           </div>
           <div id="file-list" class="file-list"></div>
@@ -621,16 +767,14 @@ footer{
 
         <!-- ── CLIPBOARD TAB ── -->
         <div id="tab-clip" class="tab-panel">
-          <div style="text-align:center;padding:20px 0 10px">
-            <i class="fas fa-clipboard" style="font-size:2rem;color:var(--text3);margin-bottom:12px;display:block"></i>
-            <div class="sm muted" style="line-height:1.65">
-              Reads your clipboard and sends it<br>to the desktop instantly.
-            </div>
+          <div style="text-align:center;padding:18px 0 8px">
+            <i class="fas fa-clipboard" style="font-size:2.2rem;color:var(--text3);margin-bottom:12px;display:block"></i>
+            <div class="sm muted" style="line-height:1.65">Reads your clipboard and sends it<br>to the desktop instantly.</div>
           </div>
-          <div id="clip-preview" style="display:none">
+          <div id="clip-preview" style="display:none;flex-direction:column;gap:6px">
             <span class="lbl">Preview</span>
             <div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px;
-              font-family:var(--mono);font-size:.78rem;line-height:1.6;max-height:100px;overflow:hidden;
+              font-family:var(--mono);font-size:.77rem;line-height:1.6;max-height:100px;overflow:hidden;
               color:var(--text2);" id="clip-txt"></div>
           </div>
           <button class="btn btn-prime btn-w" onclick="sendClipboard()">
@@ -661,25 +805,29 @@ footer{
 </div><!-- /wrap -->
 
 <footer>
-  <span class="ft-text"><i class="fas fa-bolt"></i> CodeBridge</span>
+  <span class="ft-text"><i class="fas fa-bolt" style="color:var(--accent)"></i> CodeBridge</span>
   <span class="ft-sep">·</span>
   <span class="ft-text">Built by <a class="ft-a" href="#"><strong>samartha gs</strong></a></span>
   <span class="ft-sep">·</span>
   <span class="ft-text"><i class="fas fa-lock"></i> P2P Encrypted</span>
   <span class="ft-sep">·</span>
-  <span class="ft-text"><i class="fas fa-server" style="opacity:.4"></i> <span style="opacity:.4">No server storage</span></span>
-  <span class="ft-sep">·</span>
-  <span class="ft-text"><i class="fab fa-github" style="opacity:.5"></i></span>
+  <span class="ft-text" style="opacity:.4"><i class="fas fa-server"></i> No server storage</span>
 </footer>
 
+<!-- Toast -->
 <div class="toast" id="toast">
-  <i class="fas fa-circle-info" style="opacity:.6;flex-shrink:0"></i>
+  <i class="fas fa-circle-info fa-sm" style="opacity:.6;flex-shrink:0"></i>
   <span id="toast-txt"></span>
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <img id="lb-img" src="" alt="Preview">
 </div>
 
 <script>
 // ══════════════════════════════════════════════════
-//  SnapShare v2 — Real P2P via PeerJS WebRTC
+//  CodeBridge v3 — Fixed + Enhanced P2P via PeerJS
 // ══════════════════════════════════════════════════
 
 const CHUNK = 16 * 1024; // 16 KB chunks
@@ -690,16 +838,22 @@ let peer = null,
     session = '',
     activeTab = 'text',
     pendingFiles = [],
-    rcvCount = 0;
+    pendingImg = null,
+    pendingAud = null,
+    rcvCount = 0,
+    activeFilter = 'all';
+
+// counters per type
+const typeCounts = {text:0,link:0,image:0,audio:0,video:0,file:0};
 
 // incoming file assembly
 let inFile = null, inChunks = [], inRcv = 0;
 
-// ── Detect device ────────────────────────────────
+// ── Detect device ─────────────────────────────────
 const detectMobile = () =>
   /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || window.innerWidth <= 768;
 
-// ── 6-digit code ─────────────────────────────────
+// ── 6-digit code ──────────────────────────────────
 const genCode = () => String(Math.floor(100000 + Math.random() * 900000));
 
 // ── Boot ──────────────────────────────────────────
@@ -719,24 +873,23 @@ window.addEventListener('load', () => {
     initDesktop();
   }
 
-  // char counter for text area
   document.getElementById('txt-in').addEventListener('input', function () {
     document.getElementById('char-count').textContent = this.value.length + ' chars';
   });
 });
 
-// ══ DESKTOP ══════════════════════════════════════
+// ══ DESKTOP ═══════════════════════════════════════
 
 function initDesktop() {
   session = genCode();
   showView('vd-wait');
 
   peer = new Peer(session, {
-    config: {
-      iceServers: [
-        { urls: 'stun:stun.l.google.com:19302' },
-        { urls: 'stun:stun1.l.google.com:19302' },
-        { urls: 'stun:stun2.l.google.com:19302' }
+    config:{
+      iceServers:[
+        {urls:'stun:stun.l.google.com:19302'},
+        {urls:'stun:stun1.l.google.com:19302'},
+        {urls:'stun:stun2.l.google.com:19302'}
       ]
     }
   });
@@ -751,21 +904,18 @@ function initDesktop() {
   peer.on('connection', c => {
     conn = c;
     bindConn();
-    // switch desktop to received view
     showView('vd-rcv');
-    setStatus('dd-dot2', 'dd-txt2', 'live', 'Connected');
-    toast('fa-plug', 'Device connected');
+    toast('fa-plug','Device connected');
   });
 
   peer.on('error', err => {
     console.error('[peer]', err.type, err);
     if (err.type === 'unavailable-id') {
-      peer.destroy();
-      initDesktop(); // regenerate code
+      peer.destroy(); initDesktop();
     } else if (err.type === 'network' || err.type === 'server-error') {
-      toast('fa-triangle-exclamation', 'Peer server unreachable. Check internet.');
+      toast('fa-triangle-exclamation','Peer server unreachable. Check internet.');
     } else {
-      toast('fa-circle-exclamation', 'Error: ' + err.type);
+      toast('fa-circle-exclamation','Error: ' + err.type);
     }
   });
 }
@@ -782,17 +932,21 @@ function renderQR(code) {
 
 function copyShareLink() {
   const url = location.origin + location.pathname + '?code=' + session;
-  navigator.clipboard.writeText(url).then(() => toast('fa-check', 'Link copied!'));
+  navigator.clipboard.writeText(url).then(() => toast('fa-check','Link copied!'));
 }
 
 function resetDesktop() {
   rcvCount = 0;
+  Object.keys(typeCounts).forEach(k => typeCounts[k] = 0);
+  activeFilter = 'all';
   document.getElementById('rcv-list').innerHTML = `
     <div class="empty-state" id="empty-msg">
       <div class="empty-icon"><i class="fas fa-inbox"></i></div>
       <div class="mono xs muted">Send something from your phone</div>
     </div>`;
   document.getElementById('rcv-count').textContent = '0 items';
+  document.getElementById('stats-bar').style.display = 'none';
+  document.getElementById('filter-bar').style.display = 'none';
   if (conn) conn.close();
   if (peer) peer.destroy();
   conn = null; peer = null;
@@ -800,11 +954,27 @@ function resetDesktop() {
   initDesktop();
 }
 
-// ══ MOBILE ═══════════════════════════════════════
+function clearInbox() {
+  if (!confirm('Clear all received items?')) return;
+  rcvCount = 0;
+  Object.keys(typeCounts).forEach(k => typeCounts[k] = 0);
+  activeFilter = 'all';
+  document.getElementById('rcv-list').innerHTML = `
+    <div class="empty-state" id="empty-msg">
+      <div class="empty-icon"><i class="fas fa-inbox"></i></div>
+      <div class="mono xs muted">Send something from your phone</div>
+    </div>`;
+  document.getElementById('rcv-count').textContent = '0 items';
+  document.getElementById('stats-bar').style.display = 'none';
+  document.getElementById('filter-bar').style.display = 'none';
+  updateStatsUI();
+}
+
+// ══ MOBILE ════════════════════════════════════════
 
 function connectWithCode() {
-  const digits = ['d0','d1','d2','d3','d4','d5'].map(id => (document.getElementById(id).value || '')).join('');
-  if (!/^\d{6}$/.test(digits)) { toast('fa-triangle-exclamation', 'Enter all 6 digits'); return; }
+  const digits = ['d0','d1','d2','d3','d4','d5'].map(id => document.getElementById(id).value || '').join('');
+  if (!/^\d{6}$/.test(digits)) { toast('fa-triangle-exclamation','Enter all 6 digits'); return; }
   connectAsMobile(digits);
 }
 
@@ -814,25 +984,25 @@ function connectAsMobile(code) {
   document.getElementById('mob-sess-lbl').textContent = 'Session ' + code;
 
   peer = new Peer({
-    config: {
-      iceServers: [
-        { urls: 'stun:stun.l.google.com:19302' },
-        { urls: 'stun:stun1.l.google.com:19302' }
+    config:{
+      iceServers:[
+        {urls:'stun:stun.l.google.com:19302'},
+        {urls:'stun:stun1.l.google.com:19302'}
       ]
     }
   });
 
   peer.on('open', () => {
-    conn = peer.connect(code, { reliable: true });
+    conn = peer.connect(code, {reliable:true});
     bindConn();
   });
 
   peer.on('error', err => {
     console.error('[mobile-peer]', err.type, err);
     if (err.type === 'peer-unavailable') {
-      toast('fa-circle-exclamation', 'Session not found. Check the code.');
+      toast('fa-circle-exclamation','Session not found. Check the code.');
     } else {
-      toast('fa-triangle-exclamation', 'Error: ' + err.type);
+      toast('fa-triangle-exclamation','Error: ' + err.type);
     }
     showView('vm-code');
   });
@@ -851,7 +1021,7 @@ function bindConn() {
   conn.on('open', () => {
     if (isMobile) {
       showView('vm-send');
-      toast('fa-check', 'Connected to desktop!');
+      toast('fa-check','Connected to desktop!');
     }
   });
 
@@ -859,17 +1029,16 @@ function bindConn() {
 
   conn.on('close', () => {
     if (isMobile) {
-      toast('fa-power-off', 'Disconnected');
+      toast('fa-power-off','Disconnected');
       showView('vm-code');
     } else {
-      setStatus('dd-dot2', 'dd-txt2', 'err', 'Disconnected');
-      document.getElementById('live-badge').style.display = 'none';
+      toast('fa-power-off','Device disconnected');
     }
   });
 
   conn.on('error', err => {
     console.error('[conn]', err);
-    toast('fa-circle-exclamation', 'Connection error');
+    toast('fa-circle-exclamation','Connection error');
   });
 }
 
@@ -878,8 +1047,8 @@ function bindConn() {
 function handleData(data) {
   if (!data || isMobile) return;
 
-  if (data.type === 'TEXT')       appendRcv('text', data);
-  else if (data.type === 'LINK')  appendRcv('link', data);
+  if (data.type === 'TEXT') appendRcv('text', data);
+  else if (data.type === 'LINK') appendRcv('link', data);
   else if (data.type === 'FILE_META') {
     inFile = data;
     inChunks = new Array(data.totalChunks);
@@ -891,9 +1060,14 @@ function handleData(data) {
     }
   } else if (data.type === 'FILE_END') {
     if (inFile) {
-      const blob = new Blob(inChunks, { type: inFile.mime });
+      const blob = new Blob(inChunks, {type: inFile.mime});
       const url = URL.createObjectURL(blob);
-      appendRcv('file', { name: inFile.name, size: inFile.size, mime: inFile.mime, url });
+      // determine visual kind
+      let kind = 'file';
+      if (/^image\//.test(inFile.mime)) kind = 'image';
+      else if (/^audio\//.test(inFile.mime)) kind = 'audio';
+      else if (/^video\//.test(inFile.mime)) kind = 'video';
+      appendRcv(kind, {name: inFile.name, size: inFile.size, mime: inFile.mime, url});
       inFile = null; inChunks = []; inRcv = 0;
     }
   }
@@ -901,72 +1075,187 @@ function handleData(data) {
 
 function appendRcv(kind, payload) {
   rcvCount++;
+  typeCounts[kind] = (typeCounts[kind] || 0) + 1;
   document.getElementById('rcv-count').textContent = rcvCount + (rcvCount === 1 ? ' item' : ' items');
 
-  // remove empty state
   const em = document.getElementById('empty-msg');
   if (em) em.remove();
 
+  updateStatsUI();
+
   const list = document.getElementById('rcv-list');
+  const ts = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+
   const el = document.createElement('div');
-  el.className = 'rcv-item';
+  el.className = 'rcv-item type-' + kind;
+  el.dataset.kind = kind;
 
   if (kind === 'text') {
+    // FIX: use textContent assignment instead of innerHTML for content
+    const pre = document.createElement('div');
+    pre.className = 'rcv-content';
+    pre.textContent = payload.content; // ← real newlines, no \n bug
+
     el.innerHTML = `
-      <div class="rcv-type"><i class="fas fa-font"></i> Text snippet</div>
-      <div class="rcv-content">${esc(payload.content)}</div>
-      <div class="rcv-actions">
-        <button class="btn btn-xs" onclick="doCopy(this,${JSON.stringify(payload.content)})">
-          <i class="fas fa-copy"></i> Copy
-        </button>
+      <div class="rcv-type">
+        <span class="rcv-type-badge badge-text"><i class="fas fa-font"></i> Text</span>
       </div>`;
+    el.appendChild(pre);
+    const actions = document.createElement('div');
+    actions.className = 'rcv-actions';
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'btn btn-xs btn-copy';
+    copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copy';
+    copyBtn.onclick = () => doCopyBtn(copyBtn, payload.content);
+    actions.appendChild(copyBtn);
+    const ts_div = document.createElement('div');
+    ts_div.className = 'rcv-ts';
+    ts_div.textContent = ts;
+    el.appendChild(actions);
+    el.appendChild(ts_div);
+
   } else if (kind === 'link') {
+    const linkEsc = esc(payload.content);
     el.innerHTML = `
-      <div class="rcv-type"><i class="fas fa-link"></i> Link</div>
+      <div class="rcv-type">
+        <span class="rcv-type-badge badge-link"><i class="fas fa-link"></i> Link</span>
+      </div>
       <div class="rcv-content">
-        <a class="rcv-link" href="${esc(payload.content)}" target="_blank" rel="noopener">
-          ${esc(payload.content)}
-        </a>
+        <a class="rcv-link" href="${linkEsc}" target="_blank" rel="noopener">${linkEsc}</a>
       </div>
       <div class="rcv-actions">
-        <button class="btn btn-xs" onclick="doCopy(this,${JSON.stringify(payload.content)})">
+        <button class="btn btn-xs btn-copy" onclick="doCopy(this,${JSON.stringify(payload.content)})">
           <i class="fas fa-copy"></i> Copy
         </button>
-        <a class="btn btn-xs btn-ok" href="${esc(payload.content)}" target="_blank" rel="noopener">
+        <a class="btn btn-xs btn-ok" href="${linkEsc}" target="_blank" rel="noopener">
           <i class="fas fa-arrow-up-right-from-square"></i> Open
         </a>
-      </div>`;
-  } else if (kind === 'file') {
-    const isImg = /^image\//.test(payload.mime);
-    const isAudio = /^audio\//.test(payload.mime);
-    const isVideo = /^video\//.test(payload.mime);
+      </div>
+      <div class="rcv-ts">${ts}</div>`;
+
+  } else if (kind === 'image') {
+    const nameEsc = esc(payload.name);
     el.innerHTML = `
-      <div class="rcv-type">${fileIconFA(payload.name)} &nbsp;${esc(payload.name)}</div>
+      <div class="rcv-type">
+        <span class="rcv-type-badge badge-image"><i class="fas fa-image"></i> Image</span>
+        <span class="mono xs muted">${nameEsc}</span>
+      </div>
       <div class="mono xs muted">${humanSize(payload.size)}</div>
-      ${isImg ? `<img class="rcv-img" src="${payload.url}" alt="${esc(payload.name)}">` : ''}
-      ${isAudio ? `<audio controls style="width:100%;margin-top:8px;border-radius:6px"><source src="${payload.url}" type="${payload.mime}"></audio>` : ''}
-      ${isVideo ? `<video controls style="width:100%;max-height:200px;margin-top:8px;border-radius:6px;background:#000"><source src="${payload.url}" type="${payload.mime}"></video>` : ''}
+      <img class="rcv-img" src="${payload.url}" alt="${nameEsc}" onclick="openLightbox('${payload.url}')">
       <div class="rcv-actions">
-        <a class="btn btn-xs btn-prime" href="${payload.url}" download="${esc(payload.name)}">
+        <a class="btn btn-xs btn-prime" href="${payload.url}" download="${nameEsc}">
           <i class="fas fa-download"></i> Download
         </a>
-        <button class="btn btn-xs" onclick="doCopy(this,${JSON.stringify(payload.name)})">
+        <button class="btn btn-xs" onclick="openLightbox('${payload.url}')">
+          <i class="fas fa-expand"></i> Fullscreen
+        </button>
+      </div>
+      <div class="rcv-ts">${ts}</div>`;
+
+  } else if (kind === 'audio') {
+    const nameEsc = esc(payload.name);
+    el.innerHTML = `
+      <div class="rcv-type">
+        <span class="rcv-type-badge badge-audio"><i class="fas fa-music"></i> Song / Audio</span>
+        <span class="mono xs muted">${nameEsc}</span>
+      </div>
+      <div class="mono xs muted">${humanSize(payload.size)}</div>
+      <div class="audio-player">
+        <audio controls style="width:100%"><source src="${payload.url}" type="${payload.mime}"></audio>
+      </div>
+      <div class="rcv-actions">
+        <a class="btn btn-xs btn-prime" href="${payload.url}" download="${nameEsc}">
+          <i class="fas fa-download"></i> Download
+        </a>
+      </div>
+      <div class="rcv-ts">${ts}</div>`;
+
+  } else if (kind === 'video') {
+    const nameEsc = esc(payload.name);
+    el.innerHTML = `
+      <div class="rcv-type">
+        <span class="rcv-type-badge badge-video"><i class="fas fa-video"></i> Video</span>
+        <span class="mono xs muted">${nameEsc}</span>
+      </div>
+      <div class="mono xs muted">${humanSize(payload.size)}</div>
+      <video controls style="width:100%;max-height:200px;border-radius:8px;background:#000;margin-top:8px;display:block">
+        <source src="${payload.url}" type="${payload.mime}">
+      </video>
+      <div class="rcv-actions">
+        <a class="btn btn-xs btn-prime" href="${payload.url}" download="${nameEsc}">
+          <i class="fas fa-download"></i> Download
+        </a>
+      </div>
+      <div class="rcv-ts">${ts}</div>`;
+
+  } else { // generic file
+    const nameEsc = esc(payload.name);
+    el.innerHTML = `
+      <div class="rcv-type">
+        <span class="rcv-type-badge badge-file">${fileIconFA(payload.name)} File</span>
+        <span class="mono xs muted">${nameEsc}</span>
+      </div>
+      <div class="mono xs muted">${humanSize(payload.size)}</div>
+      <div class="rcv-actions">
+        <a class="btn btn-xs btn-prime" href="${payload.url}" download="${nameEsc}">
+          <i class="fas fa-download"></i> Download
+        </a>
+        <button class="btn btn-xs btn-copy" onclick="doCopy(this,${JSON.stringify(payload.name)})">
           <i class="fas fa-copy"></i> Filename
         </button>
-      </div>`;
+      </div>
+      <div class="rcv-ts">${ts}</div>`;
   }
 
+  // apply filter visibility
+  el.style.display = (activeFilter === 'all' || activeFilter === kind) ? '' : 'none';
   list.insertBefore(el, list.firstChild);
-  toast('fa-inbox', kind === 'file' ? 'File received: ' + payload.name : kind + ' received');
+  toast('fa-inbox', kind === 'file' || kind === 'image' || kind === 'audio' || kind === 'video'
+    ? payload.name + ' received'
+    : kind + ' received');
+}
+
+// ══ STATS & FILTER UI ═════════════════════════════
+
+function updateStatsUI() {
+  const bar = document.getElementById('stats-bar');
+  const fbar = document.getElementById('filter-bar');
+  bar.style.display = rcvCount > 0 ? 'flex' : 'none';
+  fbar.style.display = rcvCount > 0 ? 'flex' : 'none';
+
+  const types = ['text','link','image','audio','video','file'];
+  let hasMultiple = 0;
+  types.forEach(t => {
+    const v = typeCounts[t] || 0;
+    const chip = document.getElementById('stat-' + t);
+    const fb = document.getElementById('fb-' + t);
+    if (chip) chip.style.display = v > 0 ? '' : 'none';
+    if (fb) fb.style.display = v > 0 ? '' : 'none';
+    const cnt = document.getElementById('cnt-' + t);
+    if (cnt) cnt.textContent = v;
+    if (v > 0) hasMultiple++;
+  });
+  // hide filter bar if only one type
+  fbar.style.display = (rcvCount > 0 && hasMultiple > 1) ? 'flex' : 'none';
+}
+
+function setFilter(type, btn) {
+  activeFilter = type;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelectorAll('.rcv-item').forEach(el => {
+    const k = el.dataset.kind;
+    el.style.display = (type === 'all' || type === k) ? '' : 'none';
+  });
 }
 
 // ══ SEND FUNCTIONS (mobile) ════════════════════════
 
 function sendText() {
-  if (!conn?.open) { toast('fa-triangle-exclamation', 'Not connected'); return; }
+  if (!conn?.open) { toast('fa-triangle-exclamation','Not connected'); return; }
   const v = document.getElementById('txt-in').value.trim();
-  if (!v) { toast('fa-triangle-exclamation', 'Nothing to send'); return; }
-  conn.send({ type: 'TEXT', content: v });
+  if (!v) { toast('fa-triangle-exclamation','Nothing to send'); return; }
+  conn.send({type:'TEXT', content:v});
   document.getElementById('txt-in').value = '';
   document.getElementById('char-count').textContent = '0 chars';
   showView('vm-success');
@@ -978,22 +1267,77 @@ function clearText() {
 }
 
 function sendLink() {
-  if (!conn?.open) { toast('fa-triangle-exclamation', 'Not connected'); return; }
+  if (!conn?.open) { toast('fa-triangle-exclamation','Not connected'); return; }
   let v = document.getElementById('link-in').value.trim();
-  if (!v) { toast('fa-triangle-exclamation', 'Enter a URL'); return; }
+  if (!v) { toast('fa-triangle-exclamation','Enter a URL'); return; }
   if (!/^https?:\/\//i.test(v)) v = 'https://' + v;
-  conn.send({ type: 'LINK', content: v });
+  conn.send({type:'LINK', content:v});
   document.getElementById('link-in').value = '';
   showView('vm-success');
 }
 
+// ── Single file sender (image / audio) ──
+async function sendSingleFile(file, progFill, progTxt, progWrap) {
+  if (file.size > 50 * 1024 * 1024) {
+    toast('fa-triangle-exclamation', file.name + ' exceeds 50 MB');
+    return false;
+  }
+  const buf = await file.arrayBuffer();
+  const total = Math.ceil(buf.byteLength / CHUNK);
+  if (total === 0) return false;
+  progWrap.classList.add('on');
+
+  conn.send({type:'FILE_META', name:file.name, size:file.size, mime:file.type, totalChunks:total});
+  for (let i = 0; i < total; i++) {
+    conn.send({type:'FILE_CHUNK', idx:i, chunk:buf.slice(i * CHUNK, (i + 1) * CHUNK)});
+    const pct = Math.round(((i + 1) / total) * 100);
+    progFill.style.width = pct + '%';
+    progTxt.textContent = pct + '%';
+    if (i % 8 === 0) await tick();
+  }
+  conn.send({type:'FILE_END'});
+  await sleep(600);
+  progWrap.classList.remove('on');
+  progFill.style.width = '0%';
+  return true;
+}
+
+async function sendImage() {
+  if (!conn?.open) { toast('fa-triangle-exclamation','Not connected'); return; }
+  if (!pendingImg) { toast('fa-triangle-exclamation','No image selected'); return; }
+  const btn = document.getElementById('send-img-btn');
+  btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Sending…';
+  const ok = await sendSingleFile(
+    pendingImg,
+    document.getElementById('prog-fill-img'),
+    document.getElementById('prog-txt-img'),
+    document.getElementById('prog-wrap-img')
+  );
+  btn.disabled = false; btn.innerHTML = '<i class="fas fa-image"></i> Send Image';
+  if (ok) { clearImg(); showView('vm-success'); }
+}
+
+async function sendAudio() {
+  if (!conn?.open) { toast('fa-triangle-exclamation','Not connected'); return; }
+  if (!pendingAud) { toast('fa-triangle-exclamation','No audio file selected'); return; }
+  const btn = document.getElementById('send-aud-btn');
+  btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Sending…';
+  const ok = await sendSingleFile(
+    pendingAud,
+    document.getElementById('prog-fill-aud'),
+    document.getElementById('prog-txt-aud'),
+    document.getElementById('prog-wrap-aud')
+  );
+  btn.disabled = false; btn.innerHTML = '<i class="fas fa-music"></i> Send Song';
+  if (ok) { clearAud(); showView('vm-success'); }
+}
+
 async function sendFiles() {
-  if (!conn?.open) { toast('fa-triangle-exclamation', 'Not connected'); return; }
-  if (!pendingFiles.length) { toast('fa-triangle-exclamation', 'No files selected'); return; }
+  if (!conn?.open) { toast('fa-triangle-exclamation','Not connected'); return; }
+  if (!pendingFiles.length) { toast('fa-triangle-exclamation','No files selected'); return; }
 
   const btn = document.getElementById('send-files-btn');
-  btn.disabled = true;
-  btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Sending…';
+  btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Sending…';
 
   const prog = document.getElementById('prog-wrap');
   const fill = document.getElementById('prog-fill');
@@ -1002,62 +1346,107 @@ async function sendFiles() {
 
   for (let fi = 0; fi < pendingFiles.length; fi++) {
     const file = pendingFiles[fi];
-
     if (file.size > 50 * 1024 * 1024) {
-      toast('fa-triangle-exclamation', file.name + ' exceeds 50 MB limit, skipped');
+      toast('fa-triangle-exclamation', file.name + ' exceeds 50 MB, skipped');
       continue;
     }
-
     const buf = await file.arrayBuffer();
     const total = Math.ceil(buf.byteLength / CHUNK);
     if (total === 0) continue;
 
-    conn.send({ type: 'FILE_META', name: file.name, size: file.size, mime: file.type, totalChunks: total });
+    conn.send({type:'FILE_META', name:file.name, size:file.size, mime:file.type, totalChunks:total});
 
     for (let i = 0; i < total; i++) {
-      conn.send({ type: 'FILE_CHUNK', idx: i, chunk: buf.slice(i * CHUNK, (i + 1) * CHUNK) });
+      conn.send({type:'FILE_CHUNK', idx:i, chunk:buf.slice(i * CHUNK, (i + 1) * CHUNK)});
       const pct = Math.round(((fi / pendingFiles.length) + ((i + 1) / total / pendingFiles.length)) * 100);
       fill.style.width = pct + '%';
       ptxt.textContent = pct + '% — ' + file.name;
       if (i % 8 === 0) await tick();
     }
-
-    conn.send({ type: 'FILE_END' });
+    conn.send({type:'FILE_END'});
   }
 
-  fill.style.width = '100%';
-  ptxt.textContent = 'Complete!';
-
+  fill.style.width = '100%'; ptxt.textContent = 'Complete!';
   await sleep(700);
-  prog.classList.remove('on');
-  fill.style.width = '0%';
-  pendingFiles = [];
-  renderFileList();
-  btn.disabled = false;
-  btn.innerHTML = '<i class="fas fa-cloud-arrow-up"></i> Send Files';
+  prog.classList.remove('on'); fill.style.width = '0%';
+  pendingFiles = []; renderFileList();
+  btn.disabled = false; btn.innerHTML = '<i class="fas fa-cloud-arrow-up"></i> Send Files';
   showView('vm-success');
 }
 
 async function sendClipboard() {
-  if (!conn?.open) { toast('fa-triangle-exclamation', 'Not connected'); return; }
+  if (!conn?.open) { toast('fa-triangle-exclamation','Not connected'); return; }
   try {
     const txt = await navigator.clipboard.readText();
-    if (!txt?.trim()) { toast('fa-triangle-exclamation', 'Clipboard is empty'); return; }
+    if (!txt?.trim()) { toast('fa-triangle-exclamation','Clipboard is empty'); return; }
     const prev = document.getElementById('clip-preview');
-    const ptxt = document.getElementById('clip-txt');
-    ptxt.textContent = txt.slice(0, 200) + (txt.length > 200 ? '…' : '');
+    document.getElementById('clip-txt').textContent = txt.slice(0, 200) + (txt.length > 200 ? '…' : '');
     prev.style.display = 'flex';
-    prev.style.flexDirection = 'column';
-    prev.style.gap = '6px';
-    conn.send({ type: 'TEXT', content: txt });
+    conn.send({type:'TEXT', content:txt});
     showView('vm-success');
   } catch (e) {
-    toast('fa-triangle-exclamation', 'Clipboard access denied — try HTTPS');
+    toast('fa-triangle-exclamation','Clipboard access denied — try HTTPS');
   }
 }
 
-function backToSend() {
-  showView('vm-send');
+function backToSend() { showView('vm-send'); }
+
+// ══ IMAGE HANDLING ═════════════════════════════════
+
+function onDragImg(e, over) {
+  e.preventDefault();
+  document.getElementById('drop-zone-img').classList.toggle('drag-over', over);
+}
+function onDropImg(e) {
+  e.preventDefault(); onDragImg(e, false);
+  const f = e.dataTransfer.files[0];
+  if (f && /^image\//.test(f.type)) setImg(f);
+  else toast('fa-triangle-exclamation','Please drop an image file');
+}
+function onImgChange(e) {
+  if (e.target.files[0]) setImg(e.target.files[0]);
+  e.target.value = '';
+}
+function setImg(file) {
+  pendingImg = file;
+  const url = URL.createObjectURL(file);
+  document.getElementById('img-preview').src = url;
+  document.getElementById('img-name-lbl').textContent = file.name + ' — ' + humanSize(file.size);
+  document.getElementById('img-preview-wrap').style.display = 'block';
+}
+function clearImg() {
+  pendingImg = null;
+  document.getElementById('img-preview').src = '';
+  document.getElementById('img-preview-wrap').style.display = 'none';
+}
+
+// ══ AUDIO HANDLING ════════════════════════════════
+
+function onDragAud(e, over) {
+  e.preventDefault();
+  document.getElementById('drop-zone-aud').classList.toggle('drag-over', over);
+}
+function onDropAud(e) {
+  e.preventDefault(); onDragAud(e, false);
+  const f = e.dataTransfer.files[0];
+  if (f && /^audio\//.test(f.type)) setAud(f);
+  else toast('fa-triangle-exclamation','Please drop an audio file');
+}
+function onAudChange(e) {
+  if (e.target.files[0]) setAud(e.target.files[0]);
+  e.target.value = '';
+}
+function setAud(file) {
+  pendingAud = file;
+  const url = URL.createObjectURL(file);
+  document.getElementById('aud-preview').src = url;
+  document.getElementById('aud-name-lbl').textContent = file.name + ' — ' + humanSize(file.size);
+  document.getElementById('aud-preview-wrap').style.display = 'block';
+}
+function clearAud() {
+  pendingAud = null;
+  document.getElementById('aud-preview').src = '';
+  document.getElementById('aud-preview-wrap').style.display = 'none';
 }
 
 // ══ FILE HANDLING ══════════════════════════════════
@@ -1067,22 +1456,15 @@ function onDrag(e, over) {
   document.getElementById('drop-zone').classList.toggle('drag-over', over);
 }
 function onDrop(e) {
-  e.preventDefault();
-  onDrag(e, false);
+  e.preventDefault(); onDrag(e, false);
   addFiles(e.dataTransfer.files);
 }
-function onFileChange(e) {
-  addFiles(e.target.files);
-  e.target.value = '';
-}
+function onFileChange(e) { addFiles(e.target.files); e.target.value = ''; }
 function addFiles(list) {
   Array.from(list).forEach(f => pendingFiles.push(f));
   renderFileList();
 }
-function removeFile(i) {
-  pendingFiles.splice(i, 1);
-  renderFileList();
-}
+function removeFile(i) { pendingFiles.splice(i, 1); renderFileList(); }
 function renderFileList() {
   document.getElementById('file-list').innerHTML =
     pendingFiles.map((f, i) => `
@@ -1090,9 +1472,7 @@ function renderFileList() {
         <span class="fi-icon">${fileIconFA(f.name)}</span>
         <span class="fi-name">${esc(f.name)}</span>
         <span class="fi-size">${humanSize(f.size)}</span>
-        <button class="fi-rm" onclick="removeFile(${i})" title="Remove">
-          <i class="fas fa-xmark"></i>
-        </button>
+        <button class="fi-rm" onclick="removeFile(${i})" title="Remove"><i class="fas fa-xmark"></i></button>
       </div>`).join('');
 }
 
@@ -1107,9 +1487,12 @@ function fileIconFA(name) {
     png:'<i class="fas fa-file-image"></i>',gif:'<i class="fas fa-file-image"></i>',
     webp:'<i class="fas fa-file-image"></i>',svg:'<i class="fas fa-file-image"></i>',
     mp3:'<i class="fas fa-file-audio"></i>',wav:'<i class="fas fa-file-audio"></i>',
-    ogg:'<i class="fas fa-file-audio"></i>',
-    mp4:'<i class="fas fa-file-video"></i>',mov:'<i class="fas fa-file-video"></i>',webm:'<i class="fas fa-file-video"></i>',
-    zip:'<i class="fas fa-file-zipper"></i>',rar:'<i class="fas fa-file-zipper"></i>',gz:'<i class="fas fa-file-zipper"></i>',
+    ogg:'<i class="fas fa-file-audio"></i>',m4a:'<i class="fas fa-file-audio"></i>',
+    flac:'<i class="fas fa-file-audio"></i>',
+    mp4:'<i class="fas fa-file-video"></i>',mov:'<i class="fas fa-file-video"></i>',
+    webm:'<i class="fas fa-file-video"></i>',
+    zip:'<i class="fas fa-file-zipper"></i>',rar:'<i class="fas fa-file-zipper"></i>',
+    gz:'<i class="fas fa-file-zipper"></i>',
     txt:'<i class="fas fa-file-lines"></i>',md:'<i class="fas fa-file-lines"></i>',
     js:'<i class="fas fa-file-code"></i>',ts:'<i class="fas fa-file-code"></i>',
     py:'<i class="fas fa-file-code"></i>',html:'<i class="fas fa-file-code"></i>',
@@ -1159,18 +1542,24 @@ function initDigits() {
   });
 }
 
+// ══ LIGHTBOX ══════════════════════════════════════
+
+function openLightbox(src) {
+  document.getElementById('lb-img').src = src;
+  document.getElementById('lightbox').classList.add('on');
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('on');
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeLightbox();
+});
+
 // ══ HELPERS ═══════════════════════════════════════
 
 function showView(id) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-}
-
-function setStatus(dotId, txtId, state, text) {
-  const dot = document.getElementById(dotId);
-  const txt = document.getElementById(txtId);
-  if (dot) dot.className = 's-dot ' + state;
-  if (txt) txt.textContent = text;
 }
 
 async function doCopy(btn, text) {
@@ -1179,7 +1568,16 @@ async function doCopy(btn, text) {
     const orig = btn.innerHTML;
     btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
     setTimeout(() => { btn.innerHTML = orig; }, 1800);
-  } catch { toast('fa-circle-exclamation', 'Copy failed'); }
+  } catch { toast('fa-circle-exclamation','Copy failed'); }
+}
+
+async function doCopyBtn(btn, text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    const orig = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+    setTimeout(() => { btn.innerHTML = orig; }, 1800);
+  } catch { toast('fa-circle-exclamation','Copy failed'); }
 }
 
 function esc(s) {
