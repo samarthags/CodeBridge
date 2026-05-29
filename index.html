@@ -3,390 +3,349 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CodeBridge — P2P Transfer</title>
+<title>Bridge — P2P Transfer</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist+Mono:wght@300;400;500;600&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 
 :root{
-  --bg:#050507;
-  --s1:#0c0c0f;
-  --s2:#111115;
-  --s3:#18181d;
-  --s4:#1f1f26;
-  --s5:#27272f;
-  --border:#1e1e26;
-  --border2:#2e2e3a;
-  --border3:#3e3e4e;
-  --text:#eeeef5;
-  --text2:#9999b0;
-  --text3:#55556a;
+  --black:#000;
+  --off-black:#0a0a0a;
+  --gray-950:#0f0f0f;
+  --gray-900:#141414;
+  --gray-800:#1c1c1c;
+  --gray-700:#252525;
+  --gray-600:#333;
+  --gray-500:#555;
+  --gray-400:#888;
+  --gray-300:#aaa;
+  --gray-200:#ccc;
+  --gray-100:#e5e5e5;
+  --gray-50:#f5f5f5;
   --white:#fff;
-  --accent:#6c6cff;
-  --accent2:#a855f7;
-  --danger:#e44;
-  --ok:#3dba6e;
+  --ok:#22c55e;
   --warn:#f59e0b;
-  --mono:'DM Mono',monospace;
-  --sans:'DM Sans',sans-serif;
-  --display:'Bebas Neue',cursive;
-  --radius:12px;
+  --danger:#ef4444;
+  --mono:'Geist Mono',monospace;
+  --sans:'Geist',sans-serif;
+  --serif:'Instrument Serif',serif;
+  --r:8px;
 }
 
-html{font-size:16px;scroll-behavior:smooth}
+html{font-size:16px}
 body{
   font-family:var(--sans);
-  background:var(--bg);
-  color:var(--text);
+  background:var(--black);
+  color:var(--white);
   min-height:100vh;
-  display:flex;
-  flex-direction:column;
+  display:flex;flex-direction:column;
   overflow-x:hidden;
 }
 
-/* ── Animated gradient bg ── */
-body::before{
-  content:'';
-  position:fixed;inset:0;
-  background:
-    radial-gradient(ellipse 600px 400px at 20% 10%, rgba(108,108,255,0.04) 0%, transparent 70%),
-    radial-gradient(ellipse 500px 500px at 80% 80%, rgba(168,85,247,0.04) 0%, transparent 70%);
-  pointer-events:none;z-index:0;
-}
-
-/* ── Noise texture ── */
+/* ── Grain ── */
 body::after{
-  content:'';
-  position:fixed;inset:0;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
-  background-repeat:repeat;background-size:256px 256px;
-  pointer-events:none;z-index:9999;opacity:0.5;
+  content:'';position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  background-size:200px 200px;pointer-events:none;z-index:9999;
 }
 
 /* ── Layout ── */
 .wrap{
   flex:1;display:flex;flex-direction:column;
   align-items:center;justify-content:center;
-  padding:20px 16px 32px;
+  padding:24px 16px 32px;
   position:relative;z-index:1;
 }
 
 /* ── Header ── */
 .hd{
-  display:flex;align-items:center;gap:10px;
-  margin-bottom:24px;user-select:none;
+  display:flex;align-items:center;gap:12px;
+  margin-bottom:28px;user-select:none;
 }
 .hd-logo{
-  font-family:var(--display);font-size:2.1rem;
-  letter-spacing:0.1em;color:var(--white);line-height:1;
+  font-family:var(--serif);
+  font-size:1.5rem;
+  color:var(--white);
+  font-style:italic;
+  letter-spacing:-0.01em;
 }
-.hd-sep{font-family:var(--mono);color:var(--text3);font-size:0.7rem}
+.hd-sep{color:var(--gray-700);font-family:var(--mono);font-size:0.75rem}
 .hd-tag{
   font-family:var(--mono);font-size:0.6rem;
-  letter-spacing:0.18em;text-transform:uppercase;
-  color:var(--text3);line-height:1;
+  letter-spacing:0.2em;text-transform:uppercase;color:var(--gray-500);
 }
-.hd-pip{
-  width:6px;height:6px;border-radius:50%;
-  background:var(--accent);
-  box-shadow:0 0 8px var(--accent);
-  animation:pip 2.5s ease-in-out infinite;
+.hd-dot{
+  width:5px;height:5px;border-radius:50%;
+  background:var(--white);
+  animation:pulse 3s ease-in-out infinite;
 }
-@keyframes pip{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.3;transform:scale(0.7)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.2}}
 
 /* ── Card ── */
 .card{
-  background:var(--s1);
-  border:1px solid var(--border);
+  background:var(--gray-950);
+  border:1px solid var(--gray-800);
   border-radius:16px;
-  width:100%;max-width:520px;
+  width:100%;max-width:500px;
   overflow:hidden;
-  position:relative;
-  box-shadow:0 24px 64px rgba(0,0,0,0.6),0 1px 0 rgba(255,255,255,0.03) inset;
+  box-shadow:0 32px 80px rgba(0,0,0,0.8),0 1px 0 rgba(255,255,255,0.04) inset;
 }
-.card-body{padding:28px}
-
-/* ── Divider ── */
-.divider{height:1px;background:var(--border);margin:20px 0}
-.divider-label{
-  display:flex;align-items:center;gap:10px;
-  font-family:var(--mono);font-size:0.62rem;
-  color:var(--text3);text-transform:uppercase;letter-spacing:0.1em;
-  margin:20px 0;
-}
-.divider-label::before,.divider-label::after{content:'';flex:1;height:1px;background:var(--border)}
+.card-body{padding:32px}
 
 /* ── Views ── */
-.view{display:none;flex-direction:column;gap:18px}
+.view{display:none;flex-direction:column;gap:20px}
 .view.active{display:flex}
-
-/* ── Status bar ── */
-.status-row{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:10px 14px;
-  background:var(--s3);border:1px solid var(--border);
-  border-radius:10px;font-size:0.8rem;
-}
-.status-row.full{width:100%}
-.s-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;transition:background 0.3s}
-.s-dot.idle{background:var(--text3)}
-.s-dot.wait{background:var(--warn);animation:bk 1.2s ease-in-out infinite;box-shadow:0 0 6px var(--warn)}
-.s-dot.live{background:var(--ok);box-shadow:0 0 8px var(--ok)}
-.s-dot.err{background:var(--danger)}
-@keyframes bk{0%,100%{opacity:.2}50%{opacity:1}}
 
 /* ── Typography ── */
 .lbl{
   font-family:var(--mono);font-size:0.6rem;
-  font-weight:500;letter-spacing:0.14em;
-  text-transform:uppercase;color:var(--text3);
-  display:block;margin-bottom:7px;
+  letter-spacing:0.18em;text-transform:uppercase;color:var(--gray-500);
+  display:block;margin-bottom:8px;
 }
-.h2{font-weight:700;font-size:1.1rem;line-height:1.3}
-.h3{font-weight:400;font-size:0.88rem;color:var(--text2);line-height:1.55}
+.h1{font-family:var(--serif);font-size:2.2rem;font-style:italic;font-weight:400;line-height:1.1}
+.h2{font-weight:600;font-size:1.05rem;line-height:1.3}
+.h3{font-weight:400;font-size:0.88rem;color:var(--gray-400);line-height:1.6}
 .mono{font-family:var(--mono)}
-.muted{color:var(--text2)}
-.sm{font-size:0.8rem}
-.xs{font-size:0.72rem}
+.muted{color:var(--gray-400)}
+.sm{font-size:0.82rem}.xs{font-size:0.71rem}
 .tc{text-align:center}
 .row{display:flex;align-items:center;gap:10px}
 .row-sb{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .col{display:flex;flex-direction:column;gap:8px}
-.mt4{margin-top:4px}.mt8{margin-top:8px}.mt12{margin-top:12px}
 
-/* ── Session code ── */
-.big-code{
-  font-family:var(--display);
-  font-size:3.4rem;
-  letter-spacing:0.3em;
-  color:var(--white);
-  text-align:center;
-  line-height:1;
-  text-shadow:0 0 30px rgba(108,108,255,0.3);
+/* ── Status ── */
+.status-pill{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:5px 11px;border-radius:99px;
+  background:var(--gray-900);border:1px solid var(--gray-800);
+  font-family:var(--mono);font-size:0.63rem;color:var(--gray-400);
 }
+.sdot{width:6px;height:6px;border-radius:50%;flex-shrink:0;transition:background 0.3s}
+.sdot.idle{background:var(--gray-600)}
+.sdot.wait{background:var(--warn);animation:bk 1.2s ease-in-out infinite;box-shadow:0 0 6px var(--warn)}
+.sdot.live{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+.sdot.err{background:var(--danger)}
+@keyframes bk{0%,100%{opacity:.15}50%{opacity:1}}
 
-/* ── QR wrapper ── */
-.qr-wrap{
-  background:#fff;border-radius:12px;padding:14px;
-  display:inline-flex;align-items:center;justify-content:center;
-  box-shadow:0 8px 24px rgba(0,0,0,0.4);
+/* ── QR ── */
+.qr-outer{
+  position:relative;
+  display:inline-flex;
+  border-radius:16px;
+  overflow:hidden;
+  padding:2px;
+  background:linear-gradient(135deg,var(--gray-700),var(--gray-800),var(--gray-700));
 }
-#qrcode canvas,#qrcode img{display:block;border-radius:4px}
+.qr-inner{
+  background:var(--white);
+  border-radius:14px;
+  padding:16px;
+  display:flex;align-items:center;justify-content:center;
+}
+#qrcode canvas,#qrcode img{display:block}
 
 /* ── Buttons ── */
 .btn{
   display:inline-flex;align-items:center;justify-content:center;
   gap:7px;padding:10px 16px;
-  border:1px solid var(--border2);border-radius:9px;
-  background:transparent;color:var(--text2);
+  border:1px solid var(--gray-700);border-radius:var(--r);
+  background:transparent;color:var(--gray-300);
   font-family:var(--sans);font-size:0.83rem;font-weight:500;
   cursor:pointer;transition:all 0.15s ease;
   text-decoration:none;white-space:nowrap;
-  position:relative;overflow:hidden;
 }
-.btn:hover{border-color:var(--border3);color:var(--text);background:var(--s3)}
+.btn:hover{border-color:var(--gray-500);color:var(--white);background:var(--gray-900)}
 .btn:active{transform:scale(0.97)}
 .btn-w{width:100%}
 .btn-sm{padding:7px 13px;font-size:0.78rem}
-.btn-xs{padding:5px 10px;font-size:0.71rem;gap:5px;border-radius:7px}
+.btn-xs{padding:5px 10px;font-size:0.71rem;gap:5px;border-radius:6px}
 
-.btn-prime{
-  background:linear-gradient(135deg,var(--accent),var(--accent2));
-  color:var(--white);border-color:transparent;font-weight:600;
-  box-shadow:0 4px 14px rgba(108,108,255,0.3);
+.btn-white{
+  background:var(--white);color:var(--black);
+  border-color:transparent;font-weight:600;
+  box-shadow:0 2px 12px rgba(255,255,255,0.12);
 }
-.btn-prime:hover{filter:brightness(1.1);color:var(--white);border-color:transparent;background:linear-gradient(135deg,var(--accent),var(--accent2))}
-.btn-prime:disabled{background:var(--s4);color:var(--text3);border-color:var(--border);cursor:not-allowed;box-shadow:none;filter:none}
+.btn-white:hover{background:var(--gray-100);color:var(--black);border-color:transparent}
+.btn-white:disabled{background:var(--gray-800);color:var(--gray-600);border-color:transparent;cursor:not-allowed;box-shadow:none}
 
-.btn-ghost{border-color:transparent;color:var(--text3)}
-.btn-ghost:hover{border-color:var(--border);color:var(--text2);background:transparent}
-.btn-danger{color:#e55;border-color:rgba(238,85,85,.2)}
-.btn-danger:hover{background:rgba(238,85,85,.07);border-color:#e55}
-.btn-ok{color:var(--ok);border-color:rgba(61,186,110,.25)}
-.btn-ok:hover{background:rgba(61,186,110,.07);border-color:var(--ok)}
-.btn-copy{color:var(--accent);border-color:rgba(108,108,255,.25)}
-.btn-copy:hover{background:rgba(108,108,255,.07);border-color:var(--accent)}
+.btn-ghost{border-color:transparent;color:var(--gray-500)}
+.btn-ghost:hover{border-color:var(--gray-700);color:var(--gray-300);background:transparent}
+.btn-danger{color:#ef4444;border-color:rgba(239,68,68,.2)}
+.btn-danger:hover{background:rgba(239,68,68,.06);border-color:#ef4444}
+.btn-ok{color:var(--ok);border-color:rgba(34,197,94,.25)}
+.btn-ok:hover{background:rgba(34,197,94,.06);border-color:var(--ok)}
+.btn-copy{color:var(--gray-200);border-color:var(--gray-700)}
+.btn-copy:hover{color:var(--white);border-color:var(--gray-500)}
 
-/* ── Input / Textarea ── */
+/* ── Inputs ── */
 textarea,input.txt-in{
-  width:100%;background:var(--s2);
-  border:1px solid var(--border);border-radius:9px;
-  color:var(--text);font-family:var(--mono);font-size:0.875rem;line-height:1.65;
+  width:100%;background:var(--gray-900);
+  border:1px solid var(--gray-800);border-radius:var(--r);
+  color:var(--white);font-family:var(--mono);font-size:0.875rem;line-height:1.7;
   padding:12px 14px;resize:vertical;outline:none;
   transition:border-color 0.15s;
 }
-textarea:focus,input.txt-in:focus{border-color:var(--border3)}
-textarea::placeholder,input.txt-in::placeholder{color:var(--text3)}
+textarea:focus,input.txt-in:focus{border-color:var(--gray-600)}
+textarea::placeholder,input.txt-in::placeholder{color:var(--gray-600)}
+
+/* ── Divider ── */
+.divider{height:1px;background:var(--gray-800);margin:4px 0}
+.divider-label{
+  display:flex;align-items:center;gap:10px;
+  font-family:var(--mono);font-size:0.6rem;
+  color:var(--gray-600);text-transform:uppercase;letter-spacing:0.1em;
+  margin:4px 0;
+}
+.divider-label::before,.divider-label::after{content:'';flex:1;height:1px;background:var(--gray-800)}
 
 /* ── Tabs ── */
 .tabs{
-  display:flex;background:var(--s2);
-  border:1px solid var(--border);border-radius:10px;
-  padding:3px;gap:2px;
+  display:flex;background:var(--gray-900);
+  border:1px solid var(--gray-800);border-radius:10px;
+  padding:3px;gap:2px;flex-wrap:wrap;
 }
 .tab-btn{
-  flex:1;padding:8px 4px;
+  flex:1;padding:8px 6px;
   border:none;background:transparent;
-  color:var(--text3);font-family:var(--sans);
-  font-size:0.73rem;font-weight:500;
+  color:var(--gray-500);font-family:var(--sans);
+  font-size:0.7rem;font-weight:500;
   border-radius:7px;cursor:pointer;
   transition:all 0.15s;
   display:flex;align-items:center;justify-content:center;gap:4px;
+  min-width:50px;
 }
-.tab-btn.active{background:var(--s5);color:var(--text);border:1px solid var(--border2)}
-.tab-btn:hover:not(.active){color:var(--text2)}
+.tab-btn.active{background:var(--gray-800);color:var(--white);border:1px solid var(--gray-700)}
+.tab-btn:hover:not(.active){color:var(--gray-300)}
 .tab-panel{display:none;flex-direction:column;gap:14px}
 .tab-panel.active{display:flex}
 
 /* ── Drop zone ── */
 .drop-zone{
-  border:1px dashed var(--border2);border-radius:10px;
+  border:1px dashed var(--gray-700);border-radius:var(--r);
   padding:28px 20px;text-align:center;
   cursor:pointer;transition:all 0.15s;
-  position:relative;background:var(--s2);
+  position:relative;background:var(--gray-900);
 }
-.drop-zone:hover,.drop-zone.drag-over{border-color:var(--accent);background:rgba(108,108,255,0.04)}
+.drop-zone:hover,.drop-zone.drag-over{border-color:var(--gray-400);background:var(--gray-900)}
 .drop-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
-.drop-icon{font-size:1.7rem;color:var(--text3);margin-bottom:10px}
-.drop-txt{font-size:0.8rem;color:var(--text2);line-height:1.65}
-.drop-txt span{color:var(--accent)}
+.drop-icon{font-size:1.6rem;color:var(--gray-600);margin-bottom:10px}
+.drop-txt{font-size:0.78rem;color:var(--gray-500);line-height:1.7}
+.drop-txt span{color:var(--gray-200)}
 
 /* ── File list ── */
-.file-list{display:flex;flex-direction:column;gap:6px}
+.file-list{display:flex;flex-direction:column;gap:5px;max-height:200px;overflow-y:auto}
+.file-list::-webkit-scrollbar{width:3px}
+.file-list::-webkit-scrollbar-thumb{background:var(--gray-700);border-radius:3px}
 .file-item{
   display:flex;align-items:center;gap:10px;
-  background:var(--s2);border:1px solid var(--border);
-  border-radius:9px;padding:10px 12px;
+  background:var(--gray-900);border:1px solid var(--gray-800);
+  border-radius:7px;padding:9px 12px;
 }
-.fi-icon{font-size:0.95rem;color:var(--text2);width:18px;text-align:center;flex-shrink:0}
-.fi-name{flex:1;font-size:0.78rem;font-family:var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.fi-size{font-size:0.66rem;color:var(--text3);font-family:var(--mono);flex-shrink:0}
-.fi-rm{background:none;border:none;color:var(--text3);cursor:pointer;padding:4px 6px;border-radius:4px;transition:color 0.15s;line-height:1}
+.fi-icon{font-size:0.9rem;color:var(--gray-500);width:18px;text-align:center;flex-shrink:0}
+.fi-name{flex:1;font-size:0.76rem;font-family:var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--gray-200)}
+.fi-size{font-size:0.64rem;color:var(--gray-500);font-family:var(--mono);flex-shrink:0}
+.fi-rm{background:none;border:none;color:var(--gray-600);cursor:pointer;padding:4px 6px;border-radius:4px;transition:color 0.15s;line-height:1}
 .fi-rm:hover{color:var(--danger)}
 
 /* ── Progress ── */
 .prog-wrap{display:none;gap:6px;flex-direction:column}
 .prog-wrap.on{display:flex}
-.prog-bar{height:3px;background:var(--s5);border-radius:3px;overflow:hidden}
-.prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width .12s;width:0%}
-.prog-txt{font-size:0.67rem;color:var(--text3);font-family:var(--mono);text-align:right}
+.prog-bar{height:2px;background:var(--gray-800);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:var(--white);border-radius:2px;transition:width .12s;width:0%}
+.prog-txt{font-size:0.65rem;color:var(--gray-500);font-family:var(--mono);text-align:right}
 
-/* ── Received items ── */
-.rcv-list{display:flex;flex-direction:column;gap:10px;max-height:420px;overflow-y:auto;padding-right:2px}
-.rcv-list::-webkit-scrollbar{width:4px}
-.rcv-list::-webkit-scrollbar-track{background:transparent}
-.rcv-list::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
-
-.rcv-item{
-  background:var(--s2);border:1px solid var(--border);
-  border-radius:10px;padding:14px;
-  animation:slideUp .25s ease both;
-  position:relative;overflow:hidden;
-}
-.rcv-item::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:2px;
-}
-.rcv-item.type-text::before{background:linear-gradient(90deg,var(--accent),transparent)}
-.rcv-item.type-link::before{background:linear-gradient(90deg,#06b6d4,transparent)}
-.rcv-item.type-file::before{background:linear-gradient(90deg,var(--ok),transparent)}
-.rcv-item.type-image::before{background:linear-gradient(90deg,#f59e0b,transparent)}
-.rcv-item.type-audio::before{background:linear-gradient(90deg,#ec4899,transparent)}
-.rcv-item.type-video::before{background:linear-gradient(90deg,#8b5cf6,transparent)}
-
-@keyframes slideUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-
-.rcv-type{
-  font-family:var(--mono);font-size:0.6rem;
-  letter-spacing:0.12em;text-transform:uppercase;
-  color:var(--text3);margin-bottom:8px;
-  display:flex;align-items:center;gap:6px;
-}
-.rcv-type-badge{
-  display:inline-flex;align-items:center;gap:4px;
-  padding:2px 8px;border-radius:99px;
-  font-size:0.6rem;font-family:var(--mono);
-  letter-spacing:0.08em;
-  border:1px solid;
-}
-.rcv-type-badge.badge-text{color:var(--accent);border-color:rgba(108,108,255,.3);background:rgba(108,108,255,.08)}
-.rcv-type-badge.badge-link{color:#06b6d4;border-color:rgba(6,182,212,.3);background:rgba(6,182,212,.08)}
-.rcv-type-badge.badge-file{color:var(--ok);border-color:rgba(61,186,110,.3);background:rgba(61,186,110,.08)}
-.rcv-type-badge.badge-image{color:#f59e0b;border-color:rgba(245,158,11,.3);background:rgba(245,158,11,.08)}
-.rcv-type-badge.badge-audio{color:#ec4899;border-color:rgba(236,72,153,.3);background:rgba(236,72,153,.08)}
-.rcv-type-badge.badge-video{color:#8b5cf6;border-color:rgba(139,92,246,.3);background:rgba(139,92,246,.08)}
-
-.rcv-content{
-  font-family:var(--mono);font-size:0.83rem;line-height:1.7;
-  color:var(--text);
-  white-space:pre-wrap;   /* KEY FIX: render real newlines */
-  word-break:break-word;
-  max-height:180px;overflow-y:auto;
-}
-.rcv-content::-webkit-scrollbar{width:3px}
-.rcv-content::-webkit-scrollbar-thumb{background:var(--border2)}
-
-.rcv-img{max-width:100%;border-radius:8px;margin-top:8px;display:block;border:1px solid var(--border);cursor:zoom-in}
-.rcv-img:hover{opacity:0.9}
-.rcv-actions{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
-.rcv-link{color:var(--accent);text-decoration:none;word-break:break-all}
-.rcv-link:hover{text-decoration:underline}
-.rcv-ts{font-size:0.6rem;color:var(--text3);font-family:var(--mono);margin-top:8px}
-
-/* ── Badge ── */
-.badge{
-  display:inline-flex;align-items:center;justify-content:center;
-  padding:2px 8px;border-radius:99px;
-  font-family:var(--mono);font-size:0.6rem;
-  font-weight:500;letter-spacing:0.06em;
-  background:var(--s4);border:1px solid var(--border2);
-  color:var(--text2);
-}
-.badge.live{background:rgba(61,186,110,.1);border-color:rgba(61,186,110,.3);color:var(--ok)}
-
-/* ── Digit inputs ── */
-.digit-row{display:flex;gap:8px;justify-content:center}
-.digit{
-  width:46px;height:56px;
-  background:var(--s2);border:1px solid var(--border);border-radius:10px;
-  text-align:center;font-family:var(--display);font-size:1.7rem;
-  color:var(--white);outline:none;
-  transition:border-color 0.15s,box-shadow 0.15s;caret-color:var(--accent);letter-spacing:0;
-}
-.digit:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(108,108,255,0.15)}
-
-/* ── Copy-link row ── */
+/* ── Copy link row ── */
 .copy-link-row{
   display:flex;gap:6px;align-items:center;
-  background:var(--s2);border:1px solid var(--border);
-  border-radius:9px;padding:9px 12px;overflow:hidden;
+  background:var(--gray-900);border:1px solid var(--gray-800);
+  border-radius:var(--r);padding:9px 12px;
   width:100%;
 }
 .copy-link-url{
-  flex:1;font-family:var(--mono);font-size:0.7rem;
-  color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  flex:1;font-family:var(--mono);font-size:0.68rem;
+  color:var(--gray-500);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
+
+/* ── Received ── */
+.rcv-list{display:flex;flex-direction:column;gap:10px;max-height:450px;overflow-y:auto;padding-right:2px}
+.rcv-list::-webkit-scrollbar{width:3px}
+.rcv-list::-webkit-scrollbar-track{background:transparent}
+.rcv-list::-webkit-scrollbar-thumb{background:var(--gray-700);border-radius:3px}
+
+.rcv-item{
+  background:var(--gray-900);border:1px solid var(--gray-800);
+  border-radius:10px;padding:16px;
+  animation:slideUp .2s ease both;
+  position:relative;overflow:hidden;
+}
+.rcv-item::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:var(--gray-700);
+}
+@keyframes slideUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+.rcv-type-badge{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:2px 8px;border-radius:99px;
+  font-size:0.6rem;font-family:var(--mono);
+  letter-spacing:0.08em;
+  border:1px solid var(--gray-700);
+  color:var(--gray-400);background:var(--gray-800);
+  margin-bottom:10px;
+}
+.rcv-content{
+  font-family:var(--mono);font-size:0.82rem;line-height:1.75;
+  color:var(--gray-200);
+  white-space:pre-wrap;word-break:break-word;
+  max-height:200px;overflow-y:auto;
+}
+.rcv-content::-webkit-scrollbar{width:3px}
+.rcv-content::-webkit-scrollbar-thumb{background:var(--gray-700)}
+.rcv-img{max-width:100%;border-radius:8px;margin-top:8px;display:block;border:1px solid var(--gray-800);cursor:zoom-in}
+.rcv-img:hover{opacity:0.85;transition:opacity 0.15s}
+.rcv-actions{display:flex;gap:6px;margin-top:12px;flex-wrap:wrap}
+.rcv-link{color:var(--gray-200);text-decoration:none;word-break:break-all;font-family:var(--mono);font-size:0.82rem}
+.rcv-link:hover{color:var(--white);text-decoration:underline}
+.rcv-ts{font-size:0.59rem;color:var(--gray-600);font-family:var(--mono);margin-top:10px}
+
+/* ── Stats ── */
+.stats-bar{display:flex;gap:8px;flex-wrap:wrap}
+.stat-chip{
+  display:flex;align-items:center;gap:5px;
+  background:var(--gray-900);border:1px solid var(--gray-800);
+  border-radius:6px;padding:4px 9px;
+  font-family:var(--mono);font-size:0.63rem;color:var(--gray-400);
+}
+.filter-bar{display:flex;gap:5px;flex-wrap:wrap}
+.filter-btn{
+  padding:4px 10px;border-radius:99px;
+  background:transparent;border:1px solid var(--gray-800);
+  color:var(--gray-500);font-family:var(--mono);font-size:0.6rem;
+  cursor:pointer;transition:all 0.15s;letter-spacing:0.05em;
+}
+.filter-btn.on{background:var(--gray-800);border-color:var(--gray-600);color:var(--white)}
+.filter-btn:hover:not(.on){color:var(--gray-300);border-color:var(--gray-700)}
 
 /* ── Empty state ── */
 .empty-state{
-  display:flex;flex-direction:column;align-items:center;gap:12px;
-  padding:36px 20px;text-align:center;
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  padding:40px 20px;text-align:center;
 }
-.empty-icon{font-size:2.2rem;color:var(--text3)}
+.empty-icon{font-size:2rem;color:var(--gray-700)}
 
 /* ── Success ── */
 .success-wrap{
   display:flex;flex-direction:column;align-items:center;
-  gap:14px;padding:20px 0;text-align:center;
+  gap:14px;padding:16px 0;text-align:center;
 }
 .success-ico{
-  width:60px;height:60px;border-radius:50%;
-  border:1px solid var(--border2);
-  background:rgba(61,186,110,0.1);
+  width:56px;height:56px;border-radius:50%;
+  border:1px solid var(--gray-700);background:var(--gray-900);
   display:flex;align-items:center;justify-content:center;
-  font-size:1.6rem;color:var(--ok);
+  font-size:1.4rem;color:var(--ok);
   animation:popIn .4s cubic-bezier(.34,1.56,.64,1) both;
 }
 @keyframes popIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
@@ -394,95 +353,131 @@ textarea::placeholder,input.txt-in::placeholder{color:var(--text3)}
 /* ── Connecting ── */
 .connecting-wrap{
   display:flex;flex-direction:column;align-items:center;
-  gap:16px;padding:24px 0;text-align:center;
+  gap:16px;padding:32px 0;text-align:center;
 }
 .spin{animation:spin 1s linear infinite}
 @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 
+/* ── Mobile wait view ── */
+.mobile-gate{
+  display:flex;flex-direction:column;align-items:center;
+  gap:24px;padding:20px 0;text-align:center;
+}
+.big-lock{
+  font-size:3.5rem;
+  color:var(--gray-700);
+  margin-bottom:4px;
+}
+.gate-title{
+  font-family:var(--serif);
+  font-style:italic;
+  font-size:1.8rem;
+  color:var(--white);
+  line-height:1.2;
+}
+.gate-sub{
+  font-family:var(--mono);
+  font-size:0.78rem;
+  color:var(--gray-500);
+  line-height:1.8;
+  max-width:280px;
+}
+.gate-steps{
+  display:flex;flex-direction:column;gap:10px;
+  width:100%;
+  background:var(--gray-900);
+  border:1px solid var(--gray-800);
+  border-radius:12px;
+  padding:18px;
+  text-align:left;
+}
+.gate-step{
+  display:flex;align-items:flex-start;gap:12px;
+}
+.gate-step-num{
+  width:22px;height:22px;border-radius:50%;
+  background:var(--gray-800);border:1px solid var(--gray-700);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-size:0.65rem;color:var(--gray-400);
+  flex-shrink:0;margin-top:1px;
+}
+.gate-step-txt{
+  font-family:var(--mono);font-size:0.76rem;color:var(--gray-300);
+  line-height:1.6;
+}
+
 /* ── Toast ── */
 .toast{
-  position:fixed;bottom:72px;left:50%;
-  transform:translateX(-50%) translateY(14px);
-  background:var(--s3);border:1px solid var(--border2);
-  border-radius:9px;padding:9px 16px;
-  font-family:var(--mono);font-size:0.77rem;color:var(--text);
-  opacity:0;transition:all .22s;pointer-events:none;z-index:9998;
-  white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.7);
-  display:flex;align-items:center;gap:8px;
+  position:fixed;bottom:68px;left:50%;
+  transform:translateX(-50%) translateY(12px);
+  background:var(--gray-900);border:1px solid var(--gray-700);
+  border-radius:8px;padding:8px 14px;
+  font-family:var(--mono);font-size:0.75rem;color:var(--white);
+  opacity:0;transition:all .2s;pointer-events:none;z-index:9998;
+  white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.8);
+  display:flex;align-items:center;gap:7px;
 }
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 
-/* ── Image Lightbox ── */
+/* ── Lightbox ── */
 .lightbox{
   display:none;position:fixed;inset:0;
-  background:rgba(0,0,0,0.92);z-index:10000;
+  background:rgba(0,0,0,0.96);z-index:10000;
   align-items:center;justify-content:center;cursor:zoom-out;
+  flex-direction:column;gap:16px;
 }
 .lightbox.on{display:flex}
-.lightbox img{max-width:92vw;max-height:90vh;border-radius:8px;box-shadow:0 20px 60px rgba(0,0,0,.8)}
+.lightbox img{max-width:94vw;max-height:88vh;border-radius:6px}
+.lightbox-close{
+  position:fixed;top:20px;right:20px;
+  width:36px;height:36px;border-radius:50%;
+  background:var(--gray-800);border:1px solid var(--gray-700);
+  color:var(--gray-300);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.85rem;transition:all 0.15s;
+}
+.lightbox-close:hover{background:var(--gray-700);color:var(--white)}
 
-/* ── Audio waveform placeholder ── */
+/* ── Audio player ── */
 .audio-player{
-  background:var(--s3);border:1px solid var(--border);
-  border-radius:9px;padding:12px;margin-top:8px;
-  display:flex;flex-direction:column;gap:8px;
+  background:var(--gray-800);border:1px solid var(--gray-700);
+  border-radius:var(--r);padding:12px;margin-top:8px;
 }
-.audio-player audio{width:100%;border-radius:6px;outline:none}
-audio::-webkit-media-controls-panel{background:var(--s4)}
+.audio-player audio{width:100%;outline:none}
 
-/* ── Stats bar ── */
-.stats-bar{
-  display:flex;gap:12px;flex-wrap:wrap;
+/* ── Batch send summary ── */
+.batch-info{
+  background:var(--gray-900);border:1px solid var(--gray-800);
+  border-radius:var(--r);padding:10px 14px;
+  font-family:var(--mono);font-size:0.73rem;color:var(--gray-400);
+  display:flex;align-items:center;gap:8px;
 }
-.stat-chip{
-  display:flex;align-items:center;gap:5px;
-  background:var(--s3);border:1px solid var(--border);
-  border-radius:8px;padding:5px 10px;
-  font-family:var(--mono);font-size:0.65rem;color:var(--text2);
-}
-.stat-chip i{color:var(--text3);font-size:0.7rem}
-
-/* ── Filter bar ── */
-.filter-bar{
-  display:flex;gap:5px;flex-wrap:wrap;
-}
-.filter-btn{
-  padding:4px 10px;border-radius:99px;
-  background:var(--s3);border:1px solid var(--border);
-  color:var(--text3);font-family:var(--mono);font-size:0.62rem;
-  cursor:pointer;transition:all 0.15s;
-}
-.filter-btn.on{background:var(--s5);border-color:var(--border3);color:var(--text)}
-.filter-btn:hover:not(.on){color:var(--text2)}
 
 /* ── Footer ── */
 footer{
   position:relative;z-index:1;
-  border-top:1px solid var(--border);
-  padding:13px 16px;
-  display:flex;align-items:center;justify-content:center;gap:6px;
+  border-top:1px solid var(--gray-900);
+  padding:12px 16px;
+  display:flex;align-items:center;justify-content:center;gap:8px;
   flex-wrap:wrap;
 }
 .ft-text{
-  font-family:var(--mono);font-size:0.63rem;
-  color:var(--text3);letter-spacing:0.07em;
+  font-family:var(--mono);font-size:0.6rem;
+  color:var(--gray-600);letter-spacing:0.07em;
   display:flex;align-items:center;gap:5px;
 }
-.ft-sep{color:var(--border2)}
-.ft-a{color:var(--text2);text-decoration:none}
-.ft-a:hover{color:var(--text)}
+.ft-sep{color:var(--gray-800)}
+
+/* ── Scrollbar global ── */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--gray-700);border-radius:4px}
 
 /* ── Responsive ── */
 @media(max-width:520px){
-  .card-body{padding:18px 14px}
-  .big-code{font-size:2.6rem;letter-spacing:.2em}
-  .digit{width:42px;height:52px;font-size:1.45rem}
-  .tab-btn{font-size:.68rem;padding:7px 3px;gap:3px}
-  .stats-bar{gap:6px}
-}
-@media(max-width:360px){
-  .digit{width:36px;height:46px;font-size:1.2rem}
-  .digit-row{gap:5px}
+  .card-body{padding:20px 16px}
+  .h1{font-size:1.8rem}
+  .tab-btn{font-size:.66rem;padding:7px 4px;gap:3px}
 }
 </style>
 </head>
@@ -490,36 +485,44 @@ footer{
 
 <div class="wrap">
   <div class="hd">
-    <div class="hd-pip"></div>
-    <div class="hd-logo">CodeBridge</div>
+    <div class="hd-dot"></div>
+    <div class="hd-logo">Bridge</div>
     <div class="hd-sep">/</div>
-    <div class="hd-tag">P2P&nbsp;Transfer</div>
+    <div class="hd-tag">P2P Transfer</div>
   </div>
 
   <div class="card">
     <div class="card-body">
 
-      <!-- ═══ DESKTOP: QR WAIT ═══ -->
+      <!-- ═══ DESKTOP: WAITING ═══ -->
       <div id="vd-wait" class="view" style="align-items:center">
-        <div class="col" style="align-items:center;gap:14px;width:100%">
-          <div class="qr-wrap"><div id="qrcode"></div></div>
-          <div>
-            <div class="big-code" id="s-code">──────</div>
-            <div class="lbl tc mt4">Session Code</div>
+        <div class="col" style="align-items:center;gap:20px;width:100%">
+
+          <div class="col" style="gap:6px;align-items:center">
+            <span class="lbl tc">Scan QR or share link</span>
+            <div class="h1 tc" style="font-size:1.6rem">Open on your phone to send files</div>
           </div>
-          <div class="row">
-            <div class="s-dot wait"></div>
-            <span class="mono sm muted">Waiting for device…</span>
+
+          <div class="qr-outer">
+            <div class="qr-inner"><div id="qrcode"></div></div>
           </div>
+
+          <div class="status-pill">
+            <div class="sdot wait"></div>
+            <span>Waiting for connection…</span>
+          </div>
+
           <div class="copy-link-row">
-            <i class="fas fa-link" style="color:var(--text3);font-size:.78rem;flex-shrink:0"></i>
-            <span class="copy-link-url" id="share-url">—</span>
+            <i class="fas fa-link" style="color:var(--gray-600);font-size:.75rem;flex-shrink:0"></i>
+            <span class="copy-link-url" id="share-url">Generating…</span>
             <button class="btn btn-xs btn-copy" onclick="copyShareLink()">
               <i class="fas fa-copy"></i> Copy
             </button>
           </div>
-          <p class="sm muted tc" style="line-height:1.6;max-width:300px">
-            Scan the QR with your phone or enter the 6-digit code on any browser to transfer files, text, links, images, and audio instantly.
+
+          <p class="xs tc" style="color:var(--gray-600);font-family:var(--mono);line-height:1.7;max-width:280px">
+            <i class="fas fa-lock" style="margin-right:4px"></i>
+            Private session · No server storage · P2P encrypted
           </p>
         </div>
       </div>
@@ -527,30 +530,25 @@ footer{
       <!-- ═══ DESKTOP: RECEIVED ═══ -->
       <div id="vd-rcv" class="view">
         <div class="row-sb">
-          <div class="col" style="gap:3px">
+          <div class="col" style="gap:4px">
             <div class="h2">Inbox</div>
-            <div class="row" style="gap:6px">
-              <span class="mono xs muted" id="rcv-count">0 items</span>
-              <span class="badge live">● LIVE</span>
-            </div>
+            <span class="mono xs muted" id="rcv-count">0 items received</span>
           </div>
-          <div class="row" style="gap:8px">
-            <div class="s-dot live"></div>
-            <span class="mono xs muted">Connected</span>
+          <div class="status-pill">
+            <div class="sdot live"></div>
+            <span style="color:var(--ok)">Live</span>
           </div>
         </div>
 
-        <!-- Stats bar -->
         <div class="stats-bar" id="stats-bar" style="display:none">
           <div class="stat-chip" id="stat-text" style="display:none"><i class="fas fa-font"></i><span id="cnt-text">0</span> text</div>
           <div class="stat-chip" id="stat-link" style="display:none"><i class="fas fa-link"></i><span id="cnt-link">0</span> links</div>
-          <div class="stat-chip" id="stat-image" style="display:none"><i class="fas fa-image"></i><span id="cnt-image">0</span> images</div>
+          <div class="stat-chip" id="stat-image" style="display:none"><i class="fas fa-image"></i><span id="cnt-image">0</span> img</div>
           <div class="stat-chip" id="stat-audio" style="display:none"><i class="fas fa-music"></i><span id="cnt-audio">0</span> audio</div>
           <div class="stat-chip" id="stat-video" style="display:none"><i class="fas fa-video"></i><span id="cnt-video">0</span> video</div>
           <div class="stat-chip" id="stat-file" style="display:none"><i class="fas fa-file"></i><span id="cnt-file">0</span> files</div>
         </div>
 
-        <!-- Filter -->
         <div class="filter-bar" id="filter-bar" style="display:none">
           <button class="filter-btn on" onclick="setFilter('all',this)">All</button>
           <button class="filter-btn" id="fb-text" onclick="setFilter('text',this)" style="display:none">Text</button>
@@ -561,224 +559,229 @@ footer{
           <button class="filter-btn" id="fb-file" onclick="setFilter('file',this)" style="display:none">Files</button>
         </div>
 
-        <div class="divider" style="margin:12px 0"></div>
+        <div class="divider"></div>
+
         <div id="rcv-list" class="rcv-list">
           <div class="empty-state" id="empty-msg">
             <div class="empty-icon"><i class="fas fa-inbox"></i></div>
-            <div class="mono xs muted">Send something from your phone</div>
+            <div class="mono xs" style="color:var(--gray-600)">Nothing yet — send from your phone</div>
           </div>
         </div>
+
         <div class="divider"></div>
+
         <div class="row">
-          <button class="btn btn-w" onclick="clearInbox()">
-            <i class="fas fa-trash"></i> Clear Inbox
+          <button class="btn btn-w btn-sm" onclick="clearInbox()">
+            <i class="fas fa-trash-can"></i> Clear
           </button>
-          <button class="btn btn-w" onclick="resetDesktop()">
+          <button class="btn btn-w btn-sm" onclick="downloadAll()" id="dl-all-btn" style="display:none">
+            <i class="fas fa-download"></i> Download All
+          </button>
+          <button class="btn btn-w btn-sm" onclick="resetDesktop()">
             <i class="fas fa-rotate-right"></i> New Session
           </button>
         </div>
       </div>
 
-      <!-- ═══ MOBILE: CODE INPUT ═══ -->
-      <div id="vm-code" class="view" style="align-items:center">
-        <div class="col" style="align-items:center;gap:6px;width:100%">
-          <i class="fas fa-mobile-screen-button" style="font-size:2.2rem;color:var(--accent);opacity:.8"></i>
-          <div class="h2 tc">Enter Session Code</div>
-          <div class="h3 tc sm" style="max-width:260px">
-            Type the 6-digit code shown on your desktop.
+      <!-- ═══ MOBILE: GATE (no code entry — QR/link only) ═══ -->
+      <div id="vm-gate" class="view" style="align-items:center">
+        <div class="mobile-gate">
+          <div class="big-lock"><i class="fas fa-qrcode"></i></div>
+          <div class="gate-title">Access via QR or Link</div>
+          <div class="gate-sub">
+            This session is private. To connect, scan the QR code or open the shared link from a desktop.
           </div>
+          <div class="gate-steps">
+            <div class="gate-step">
+              <div class="gate-step-num">1</div>
+              <div class="gate-step-txt">Open Bridge on a desktop or laptop browser</div>
+            </div>
+            <div class="gate-step">
+              <div class="gate-step-num">2</div>
+              <div class="gate-step-txt">Scan the QR code with your phone camera, or tap <strong style="color:var(--white)">Copy Link</strong> and open it here</div>
+            </div>
+            <div class="gate-step">
+              <div class="gate-step-num">3</div>
+              <div class="gate-step-txt">Send files, text, images, links — instantly</div>
+            </div>
+          </div>
+          <p class="xs" style="color:var(--gray-600);font-family:var(--mono);text-align:center;line-height:1.7">
+            <i class="fas fa-shield-halved" style="margin-right:4px"></i>
+            P2P encrypted · No server · Nothing stored
+          </p>
         </div>
-        <div class="digit-row">
-          <input class="digit" maxlength="1" id="d0" inputmode="numeric" autocomplete="off">
-          <input class="digit" maxlength="1" id="d1" inputmode="numeric" autocomplete="off">
-          <input class="digit" maxlength="1" id="d2" inputmode="numeric" autocomplete="off">
-          <input class="digit" maxlength="1" id="d3" inputmode="numeric" autocomplete="off">
-          <input class="digit" maxlength="1" id="d4" inputmode="numeric" autocomplete="off">
-          <input class="digit" maxlength="1" id="d5" inputmode="numeric" autocomplete="off">
-        </div>
-        <button class="btn btn-prime btn-w" onclick="connectWithCode()">
-          <i class="fas fa-plug"></i> Connect
-        </button>
-        <div class="divider-label">or scan QR on desktop</div>
-        <p class="mono xs muted tc" style="line-height:1.6">
-          <i class="fas fa-shield-halved"></i>&nbsp; All data is P2P — nothing stored on any server.
-        </p>
       </div>
 
       <!-- ═══ MOBILE: CONNECTING ═══ -->
       <div id="vm-connecting" class="view" style="align-items:center">
         <div class="connecting-wrap">
-          <i class="fas fa-circle-nodes fa-2x muted spin" style="color:var(--accent)"></i>
+          <i class="fas fa-circle-nodes fa-2x spin" style="color:var(--gray-400)"></i>
           <div class="h2">Connecting…</div>
-          <div class="row">
-            <div class="s-dot wait"></div>
-            <span class="mono xs muted">Establishing P2P connection</span>
+          <div class="status-pill">
+            <div class="sdot wait"></div>
+            <span>Establishing P2P tunnel</span>
           </div>
-          <button class="btn btn-sm btn-ghost" onclick="showView('vm-code')">
-            <i class="fas fa-xmark"></i> Cancel
-          </button>
         </div>
       </div>
 
       <!-- ═══ MOBILE: SENDER ═══ -->
       <div id="vm-send" class="view">
         <!-- connection banner -->
-        <div class="status-row full">
+        <div class="row-sb" style="padding:10px 14px;background:var(--gray-900);border:1px solid var(--gray-800);border-radius:var(--r)">
           <div class="row" style="gap:8px">
-            <div class="s-dot live"></div>
-            <span class="mono xs" id="mob-sess-lbl">Session ——</span>
+            <div class="sdot live"></div>
+            <span class="mono xs" id="mob-sess-lbl" style="color:var(--gray-300)">Connected</span>
           </div>
           <button class="btn btn-xs btn-danger" onclick="disconnectMobile()">
-            <i class="fas fa-power-off"></i> Disconnect
+            <i class="fas fa-power-off"></i> End
           </button>
         </div>
 
-        <!-- tabs: Text, Image, Audio, File, Link, Clipboard -->
+        <!-- tabs -->
         <div class="tabs">
-          <button class="tab-btn active" id="tb-text" onclick="switchTab('text',this)">
+          <button class="tab-btn active" onclick="switchTab('text',this)">
             <i class="fas fa-font"></i> Text
           </button>
-          <button class="tab-btn" id="tb-image" onclick="switchTab('image',this)">
+          <button class="tab-btn" onclick="switchTab('image',this)">
             <i class="fas fa-image"></i> Image
           </button>
-          <button class="tab-btn" id="tb-audio" onclick="switchTab('audio',this)">
-            <i class="fas fa-music"></i> Song
+          <button class="tab-btn" onclick="switchTab('audio',this)">
+            <i class="fas fa-music"></i> Audio
           </button>
-          <button class="tab-btn" id="tb-file" onclick="switchTab('file',this)">
-            <i class="fas fa-paperclip"></i> File
+          <button class="tab-btn" onclick="switchTab('file',this)">
+            <i class="fas fa-paperclip"></i> Files
           </button>
-          <button class="tab-btn" id="tb-link" onclick="switchTab('link',this)">
+          <button class="tab-btn" onclick="switchTab('link',this)">
             <i class="fas fa-link"></i> Link
           </button>
-          <button class="tab-btn" id="tb-clip" onclick="switchTab('clip',this)">
+          <button class="tab-btn" onclick="switchTab('clip',this)">
             <i class="fas fa-clipboard"></i> Paste
           </button>
         </div>
 
-        <!-- ── TEXT TAB ── -->
+        <!-- TEXT -->
         <div id="tab-text" class="tab-panel active">
           <div>
-            <span class="lbl">Message / Snippet / Code</span>
-            <textarea id="txt-in" rows="6" placeholder="Type or paste text, code, notes, commands…"></textarea>
+            <span class="lbl">Message / Code / Notes</span>
+            <textarea id="txt-in" rows="6" placeholder="Type or paste anything…"></textarea>
           </div>
           <div class="row-sb">
             <span class="mono xs muted" id="char-count">0 chars</span>
-            <button class="btn btn-xs btn-ghost" onclick="clearText()">
-              <i class="fas fa-eraser"></i> Clear
-            </button>
+            <button class="btn btn-xs btn-ghost" onclick="clearText()"><i class="fas fa-eraser"></i></button>
           </div>
-          <button class="btn btn-prime btn-w" onclick="sendText()">
+          <button class="btn btn-white btn-w" onclick="sendText()">
             <i class="fas fa-paper-plane"></i> Send Text
           </button>
         </div>
 
-        <!-- ── IMAGE TAB ── -->
+        <!-- IMAGE -->
         <div id="tab-image" class="tab-panel">
           <div class="drop-zone" id="drop-zone-img"
-               ondragover="onDragImg(event,true)"
-               ondragleave="onDragImg(event,false)"
-               ondrop="onDropImg(event)">
+               ondragover="onDragImg(event,true)" ondragleave="onDragImg(event,false)" ondrop="onDropImg(event)">
             <input type="file" accept="image/*" id="img-input" onchange="onImgChange(event)">
-            <div class="drop-icon"><i class="fas fa-image" style="color:var(--warn)"></i></div>
-            <div class="drop-txt">Tap to pick image &nbsp;·&nbsp; <span>drop here</span><br>
-              <span style="font-size:.7rem;color:var(--text3)">JPG, PNG, GIF, WEBP, SVG · Max 50 MB</span>
+            <div class="drop-icon"><i class="fas fa-image"></i></div>
+            <div class="drop-txt">Tap to select · <span>drop here</span><br>
+              <span style="font-size:.68rem;color:var(--gray-600)">JPG PNG GIF WEBP SVG · up to 50 MB</span>
             </div>
           </div>
           <div id="img-preview-wrap" style="display:none">
-            <div style="background:var(--s2);border:1px solid var(--border);border-radius:9px;overflow:hidden">
+            <div style="background:var(--gray-900);border:1px solid var(--gray-800);border-radius:var(--r);overflow:hidden">
               <img id="img-preview" style="width:100%;max-height:180px;object-fit:contain;display:block">
             </div>
-            <div class="row-sb mt8">
+            <div class="row-sb" style="margin-top:8px">
               <span class="mono xs muted" id="img-name-lbl">—</span>
-              <button class="btn btn-xs btn-ghost" onclick="clearImg()"><i class="fas fa-xmark"></i> Remove</button>
+              <button class="btn btn-xs btn-ghost" onclick="clearImg()"><i class="fas fa-xmark"></i></button>
             </div>
           </div>
           <div class="prog-wrap" id="prog-wrap-img">
             <div class="prog-bar"><div class="prog-fill" id="prog-fill-img"></div></div>
             <div class="prog-txt" id="prog-txt-img">0%</div>
           </div>
-          <button class="btn btn-prime btn-w" id="send-img-btn" onclick="sendImage()">
+          <button class="btn btn-white btn-w" id="send-img-btn" onclick="sendImage()">
             <i class="fas fa-image"></i> Send Image
           </button>
         </div>
 
-        <!-- ── AUDIO / SONG TAB ── -->
+        <!-- AUDIO -->
         <div id="tab-audio" class="tab-panel">
           <div class="drop-zone" id="drop-zone-aud"
-               ondragover="onDragAud(event,true)"
-               ondragleave="onDragAud(event,false)"
-               ondrop="onDropAud(event)">
+               ondragover="onDragAud(event,true)" ondragleave="onDragAud(event,false)" ondrop="onDropAud(event)">
             <input type="file" accept="audio/*" id="aud-input" onchange="onAudChange(event)">
-            <div class="drop-icon"><i class="fas fa-music" style="color:#ec4899"></i></div>
-            <div class="drop-txt">Tap to pick audio file &nbsp;·&nbsp; <span>drop here</span><br>
-              <span style="font-size:.7rem;color:var(--text3)">MP3, WAV, OGG, M4A, FLAC · Max 50 MB</span>
+            <div class="drop-icon"><i class="fas fa-music"></i></div>
+            <div class="drop-txt">Tap to select · <span>drop here</span><br>
+              <span style="font-size:.68rem;color:var(--gray-600)">MP3 WAV OGG M4A FLAC · up to 50 MB</span>
             </div>
           </div>
           <div id="aud-preview-wrap" style="display:none">
-            <div class="audio-player">
-              <audio id="aud-preview" controls></audio>
-            </div>
-            <div class="row-sb mt8">
+            <div class="audio-player"><audio id="aud-preview" controls></audio></div>
+            <div class="row-sb" style="margin-top:8px">
               <span class="mono xs muted" id="aud-name-lbl">—</span>
-              <button class="btn btn-xs btn-ghost" onclick="clearAud()"><i class="fas fa-xmark"></i> Remove</button>
+              <button class="btn btn-xs btn-ghost" onclick="clearAud()"><i class="fas fa-xmark"></i></button>
             </div>
           </div>
           <div class="prog-wrap" id="prog-wrap-aud">
             <div class="prog-bar"><div class="prog-fill" id="prog-fill-aud"></div></div>
             <div class="prog-txt" id="prog-txt-aud">0%</div>
           </div>
-          <button class="btn btn-prime btn-w" id="send-aud-btn" onclick="sendAudio()">
-            <i class="fas fa-music"></i> Send Song
+          <button class="btn btn-white btn-w" id="send-aud-btn" onclick="sendAudio()">
+            <i class="fas fa-music"></i> Send Audio
           </button>
         </div>
 
-        <!-- ── FILE TAB ── -->
+        <!-- FILES (unlimited, multiple) -->
         <div id="tab-file" class="tab-panel">
           <div class="drop-zone" id="drop-zone"
-               ondragover="onDrag(event,true)"
-               ondragleave="onDrag(event,false)"
-               ondrop="onDrop(event)">
+               ondragover="onDrag(event,true)" ondragleave="onDrag(event,false)" ondrop="onDrop(event)">
             <input type="file" multiple id="file-input" onchange="onFileChange(event)">
-            <div class="drop-icon"><i class="fas fa-cloud-arrow-up" style="color:var(--ok)"></i></div>
-            <div class="drop-txt">Tap to pick files &nbsp;·&nbsp; <span>drop here</span><br>
-              <span style="font-size:.7rem;color:var(--text3)">Any type · Multiple · Max 50 MB each</span>
+            <div class="drop-icon"><i class="fas fa-cloud-arrow-up"></i></div>
+            <div class="drop-txt">Tap to select files · <span>drop here</span><br>
+              <span style="font-size:.68rem;color:var(--gray-600)">Any type · Unlimited files · 50 MB each</span>
             </div>
           </div>
           <div id="file-list" class="file-list"></div>
+          <div id="batch-info" class="batch-info" style="display:none">
+            <i class="fas fa-layer-group" style="color:var(--gray-500)"></i>
+            <span id="batch-txt"></span>
+          </div>
           <div class="prog-wrap" id="prog-wrap">
             <div class="prog-bar"><div class="prog-fill" id="prog-fill"></div></div>
             <div class="prog-txt" id="prog-txt">0%</div>
           </div>
-          <button class="btn btn-prime btn-w" id="send-files-btn" onclick="sendFiles()">
-            <i class="fas fa-cloud-arrow-up"></i> Send Files
-          </button>
+          <div class="row">
+            <button class="btn btn-xs btn-ghost" onclick="clearFiles()" style="flex-shrink:0">
+              <i class="fas fa-trash-can"></i> Clear
+            </button>
+            <button class="btn btn-white btn-w" id="send-files-btn" onclick="sendFiles()">
+              <i class="fas fa-cloud-arrow-up"></i> Send All Files
+            </button>
+          </div>
         </div>
 
-        <!-- ── LINK TAB ── -->
+        <!-- LINK -->
         <div id="tab-link" class="tab-panel">
           <div>
             <span class="lbl">URL</span>
             <textarea id="link-in" rows="3" placeholder="https://…"></textarea>
           </div>
-          <button class="btn btn-prime btn-w" onclick="sendLink()">
+          <button class="btn btn-white btn-w" onclick="sendLink()">
             <i class="fas fa-arrow-up-right-from-square"></i> Send Link
           </button>
         </div>
 
-        <!-- ── CLIPBOARD TAB ── -->
+        <!-- CLIPBOARD -->
         <div id="tab-clip" class="tab-panel">
-          <div style="text-align:center;padding:18px 0 8px">
-            <i class="fas fa-clipboard" style="font-size:2.2rem;color:var(--text3);margin-bottom:12px;display:block"></i>
-            <div class="sm muted" style="line-height:1.65">Reads your clipboard and sends it<br>to the desktop instantly.</div>
+          <div style="text-align:center;padding:16px 0 4px">
+            <i class="fas fa-clipboard" style="font-size:2rem;color:var(--gray-600);margin-bottom:12px;display:block"></i>
+            <div class="sm" style="color:var(--gray-400);line-height:1.7">Reads your clipboard and sends<br>it directly to the desktop.</div>
           </div>
           <div id="clip-preview" style="display:none;flex-direction:column;gap:6px">
             <span class="lbl">Preview</span>
-            <div style="background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px;
-              font-family:var(--mono);font-size:.77rem;line-height:1.6;max-height:100px;overflow:hidden;
-              color:var(--text2);" id="clip-txt"></div>
+            <div style="background:var(--gray-900);border:1px solid var(--gray-800);border-radius:var(--r);padding:12px;
+              font-family:var(--mono);font-size:.76rem;line-height:1.65;max-height:90px;overflow:hidden;
+              color:var(--gray-400);" id="clip-txt"></div>
           </div>
-          <button class="btn btn-prime btn-w" onclick="sendClipboard()">
-            <i class="fas fa-clipboard-check"></i> Read &amp; Send Clipboard
+          <button class="btn btn-white btn-w" onclick="sendClipboard()">
+            <i class="fas fa-clipboard-check"></i> Read &amp; Send
           </button>
         </div>
       </div>
@@ -787,76 +790,65 @@ footer{
       <div id="vm-success" class="view" style="align-items:center">
         <div class="success-wrap">
           <div class="success-ico"><i class="fas fa-check"></i></div>
-          <div class="h2">Delivered!</div>
-          <div class="mono xs muted">Check your desktop — it's there.</div>
-          <div class="row" style="gap:8px;margin-top:6px">
-            <button class="btn" onclick="backToSend()">
+          <div class="h2">Sent</div>
+          <div class="mono xs muted">It's on your desktop now.</div>
+          <div class="row" style="gap:8px;margin-top:8px">
+            <button class="btn btn-sm" onclick="backToSend()">
               <i class="fas fa-arrow-left"></i> Send More
             </button>
-            <button class="btn btn-ghost" onclick="disconnectMobile()">
+            <button class="btn btn-sm btn-ghost" onclick="disconnectMobile()">
               <i class="fas fa-power-off"></i> Done
             </button>
           </div>
         </div>
       </div>
 
-    </div><!-- /card-body -->
-  </div><!-- /card -->
-</div><!-- /wrap -->
+    </div>
+  </div>
+</div>
 
 <footer>
-  <span class="ft-text"><i class="fas fa-bolt" style="color:var(--accent)"></i> CodeBridge</span>
-  <span class="ft-sep">·</span>
-  <span class="ft-text">Built by <a class="ft-a" href="#"><strong>samartha gs</strong></a></span>
+  <span class="ft-text">Bridge</span>
   <span class="ft-sep">·</span>
   <span class="ft-text"><i class="fas fa-lock"></i> P2P Encrypted</span>
   <span class="ft-sep">·</span>
-  <span class="ft-text" style="opacity:.4"><i class="fas fa-server"></i> No server storage</span>
+  <span class="ft-text"><i class="fas fa-server"></i> No server storage</span>
 </footer>
 
-<!-- Toast -->
 <div class="toast" id="toast">
-  <i class="fas fa-circle-info fa-sm" style="opacity:.6;flex-shrink:0"></i>
+  <i class="fas fa-circle-info fa-sm" style="opacity:.5;flex-shrink:0"></i>
   <span id="toast-txt"></span>
 </div>
 
-<!-- Lightbox -->
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
-  <img id="lb-img" src="" alt="Preview">
+  <button class="lightbox-close" onclick="closeLightbox()"><i class="fas fa-xmark"></i></button>
+  <img id="lb-img" src="" alt="">
 </div>
 
 <script>
-// ══════════════════════════════════════════════════
-//  CodeBridge v3 — Fixed + Enhanced P2P via PeerJS
-// ══════════════════════════════════════════════════
+// ══════════════════════════════════════════════
+//  Bridge v4 — QR/Link-only access, B&W design
+// ══════════════════════════════════════════════
 
-const CHUNK = 16 * 1024; // 16 KB chunks
+const CHUNK = 16 * 1024;
 
-let peer = null,
-    conn = null,
-    isMobile = false,
-    session = '',
-    activeTab = 'text',
-    pendingFiles = [],
-    pendingImg = null,
-    pendingAud = null,
-    rcvCount = 0,
-    activeFilter = 'all';
+let peer=null, conn=null, isMobile=false, session='',
+    activeTab='text', pendingFiles=[], pendingImg=null, pendingAud=null,
+    rcvCount=0, activeFilter='all';
 
-// counters per type
 const typeCounts = {text:0,link:0,image:0,audio:0,video:0,file:0};
+let inFile=null, inChunks=[], inRcv=0;
 
-// incoming file assembly
-let inFile = null, inChunks = [], inRcv = 0;
+// all received blobs for "download all"
+const allReceived = [];
 
-// ── Detect device ─────────────────────────────────
+// ── Detect ─────────────────────────────────
 const detectMobile = () =>
   /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || window.innerWidth <= 768;
 
-// ── 6-digit code ──────────────────────────────────
 const genCode = () => String(Math.floor(100000 + Math.random() * 900000));
 
-// ── Boot ──────────────────────────────────────────
+// ── Boot ────────────────────────────────────
 window.addEventListener('load', () => {
   isMobile = detectMobile();
   const params = new URLSearchParams(location.search);
@@ -866,8 +858,8 @@ window.addEventListener('load', () => {
     if (codeParam && /^\d{6}$/.test(codeParam)) {
       connectAsMobile(codeParam);
     } else {
-      showView('vm-code');
-      initDigits();
+      // Show gate — no manual code entry allowed
+      showView('vm-gate');
     }
   } else {
     initDesktop();
@@ -878,7 +870,7 @@ window.addEventListener('load', () => {
   });
 });
 
-// ══ DESKTOP ═══════════════════════════════════════
+// ══ DESKTOP ════════════════════════════════
 
 function initDesktop() {
   session = genCode();
@@ -889,13 +881,14 @@ function initDesktop() {
       iceServers:[
         {urls:'stun:stun.l.google.com:19302'},
         {urls:'stun:stun1.l.google.com:19302'},
-        {urls:'stun:stun2.l.google.com:19302'}
+        {urls:'stun:stun2.l.google.com:19302'},
+        {urls:'stun:global.stun.twilio.com:3478'},
       ]
     }
   });
 
   peer.on('open', id => {
-    document.getElementById('s-code').textContent = id;
+    document.getElementById('s-code') && (document.getElementById('s-code').textContent = id);
     renderQR(id);
     const url = location.origin + location.pathname + '?code=' + id;
     document.getElementById('share-url').textContent = url;
@@ -909,14 +902,8 @@ function initDesktop() {
   });
 
   peer.on('error', err => {
-    console.error('[peer]', err.type, err);
-    if (err.type === 'unavailable-id') {
-      peer.destroy(); initDesktop();
-    } else if (err.type === 'network' || err.type === 'server-error') {
-      toast('fa-triangle-exclamation','Peer server unreachable. Check internet.');
-    } else {
-      toast('fa-circle-exclamation','Error: ' + err.type);
-    }
+    if (err.type === 'unavailable-id') { peer.destroy(); initDesktop(); }
+    else toast('fa-triangle-exclamation','Error: ' + err.type);
   });
 }
 
@@ -924,9 +911,9 @@ function renderQR(code) {
   const url = location.origin + location.pathname + '?code=' + code;
   document.getElementById('qrcode').innerHTML = '';
   new QRCode(document.getElementById('qrcode'), {
-    text: url, width: 180, height: 180,
-    colorDark: '#000', colorLight: '#fff',
-    correctLevel: QRCode.CorrectLevel.M
+    text:url, width:188, height:188,
+    colorDark:'#000', colorLight:'#fff',
+    correctLevel:QRCode.CorrectLevel.M
   });
 }
 
@@ -936,47 +923,51 @@ function copyShareLink() {
 }
 
 function resetDesktop() {
-  rcvCount = 0;
-  Object.keys(typeCounts).forEach(k => typeCounts[k] = 0);
-  activeFilter = 'all';
+  rcvCount=0; Object.keys(typeCounts).forEach(k=>typeCounts[k]=0);
+  activeFilter='all'; allReceived.length=0;
   document.getElementById('rcv-list').innerHTML = `
     <div class="empty-state" id="empty-msg">
       <div class="empty-icon"><i class="fas fa-inbox"></i></div>
-      <div class="mono xs muted">Send something from your phone</div>
+      <div class="mono xs" style="color:var(--gray-600)">Nothing yet — send from your phone</div>
     </div>`;
-  document.getElementById('rcv-count').textContent = '0 items';
-  document.getElementById('stats-bar').style.display = 'none';
-  document.getElementById('filter-bar').style.display = 'none';
-  if (conn) conn.close();
-  if (peer) peer.destroy();
-  conn = null; peer = null;
-  inFile = null; inChunks = []; inRcv = 0;
+  document.getElementById('rcv-count').textContent='0 items received';
+  document.getElementById('stats-bar').style.display='none';
+  document.getElementById('filter-bar').style.display='none';
+  document.getElementById('dl-all-btn').style.display='none';
+  if(conn){try{conn.close()}catch(e){}}
+  if(peer){try{peer.destroy()}catch(e){}}
+  conn=null;peer=null;inFile=null;inChunks=[];inRcv=0;
   initDesktop();
 }
 
 function clearInbox() {
-  if (!confirm('Clear all received items?')) return;
-  rcvCount = 0;
-  Object.keys(typeCounts).forEach(k => typeCounts[k] = 0);
-  activeFilter = 'all';
-  document.getElementById('rcv-list').innerHTML = `
+  if(!confirm('Clear all received items?')) return;
+  rcvCount=0; Object.keys(typeCounts).forEach(k=>typeCounts[k]=0);
+  activeFilter='all'; allReceived.length=0;
+  document.getElementById('rcv-list').innerHTML=`
     <div class="empty-state" id="empty-msg">
       <div class="empty-icon"><i class="fas fa-inbox"></i></div>
-      <div class="mono xs muted">Send something from your phone</div>
+      <div class="mono xs" style="color:var(--gray-600)">Nothing yet — send from your phone</div>
     </div>`;
-  document.getElementById('rcv-count').textContent = '0 items';
-  document.getElementById('stats-bar').style.display = 'none';
-  document.getElementById('filter-bar').style.display = 'none';
+  document.getElementById('rcv-count').textContent='0 items received';
+  document.getElementById('stats-bar').style.display='none';
+  document.getElementById('filter-bar').style.display='none';
+  document.getElementById('dl-all-btn').style.display='none';
   updateStatsUI();
 }
 
-// ══ MOBILE ════════════════════════════════════════
-
-function connectWithCode() {
-  const digits = ['d0','d1','d2','d3','d4','d5'].map(id => document.getElementById(id).value || '').join('');
-  if (!/^\d{6}$/.test(digits)) { toast('fa-triangle-exclamation','Enter all 6 digits'); return; }
-  connectAsMobile(digits);
+async function downloadAll() {
+  if(!allReceived.length){ toast('fa-triangle-exclamation','Nothing to download'); return; }
+  for(const item of allReceived){
+    const a=document.createElement('a');
+    a.href=item.url; a.download=item.name||'file';
+    a.click();
+    await sleep(200);
+  }
+  toast('fa-download',`Downloading ${allReceived.length} file(s)…`);
 }
+
+// ══ MOBILE ═════════════════════════════════
 
 function connectAsMobile(code) {
   session = code;
@@ -987,7 +978,7 @@ function connectAsMobile(code) {
     config:{
       iceServers:[
         {urls:'stun:stun.l.google.com:19302'},
-        {urls:'stun:stun1.l.google.com:19302'}
+        {urls:'stun:stun1.l.google.com:19302'},
       ]
     }
   });
@@ -998,131 +989,103 @@ function connectAsMobile(code) {
   });
 
   peer.on('error', err => {
-    console.error('[mobile-peer]', err.type, err);
-    if (err.type === 'peer-unavailable') {
-      toast('fa-circle-exclamation','Session not found. Check the code.');
-    } else {
-      toast('fa-triangle-exclamation','Error: ' + err.type);
-    }
-    showView('vm-code');
+    if(err.type==='peer-unavailable') toast('fa-circle-exclamation','Session not found. Try opening a fresh link.');
+    else toast('fa-triangle-exclamation','Error: '+err.type);
+    showView('vm-gate');
   });
 }
 
 function disconnectMobile() {
-  if (conn) { try { conn.close(); } catch(e){} }
-  if (peer) { try { peer.destroy(); } catch(e){} }
-  conn = null; peer = null;
-  showView('vm-code');
+  if(conn){try{conn.close()}catch(e){}}
+  if(peer){try{peer.destroy()}catch(e){}}
+  conn=null;peer=null;
+  showView('vm-gate');
 }
 
-// ══ CONNECTION BINDING ════════════════════════════
+// ══ CONNECTION ══════════════════════════════
 
 function bindConn() {
   conn.on('open', () => {
-    if (isMobile) {
-      showView('vm-send');
-      toast('fa-check','Connected to desktop!');
-    }
+    if(isMobile){ showView('vm-send'); toast('fa-check','Connected!'); }
   });
-
   conn.on('data', handleData);
-
   conn.on('close', () => {
-    if (isMobile) {
-      toast('fa-power-off','Disconnected');
-      showView('vm-code');
-    } else {
-      toast('fa-power-off','Device disconnected');
-    }
+    if(isMobile){ toast('fa-power-off','Disconnected'); showView('vm-gate'); }
+    else toast('fa-power-off','Device disconnected');
   });
-
   conn.on('error', err => {
-    console.error('[conn]', err);
     toast('fa-circle-exclamation','Connection error');
   });
 }
 
-// ══ DATA HANDLER (desktop receives) ══════════════
+// ══ DATA HANDLER ════════════════════════════
 
 function handleData(data) {
-  if (!data || isMobile) return;
-
-  if (data.type === 'TEXT') appendRcv('text', data);
-  else if (data.type === 'LINK') appendRcv('link', data);
-  else if (data.type === 'FILE_META') {
-    inFile = data;
-    inChunks = new Array(data.totalChunks);
-    inRcv = 0;
-  } else if (data.type === 'FILE_CHUNK') {
-    if (inFile) {
-      inChunks[data.idx] = data.chunk;
-      inRcv++;
-    }
-  } else if (data.type === 'FILE_END') {
-    if (inFile) {
-      const blob = new Blob(inChunks, {type: inFile.mime});
-      const url = URL.createObjectURL(blob);
-      // determine visual kind
-      let kind = 'file';
-      if (/^image\//.test(inFile.mime)) kind = 'image';
-      else if (/^audio\//.test(inFile.mime)) kind = 'audio';
-      else if (/^video\//.test(inFile.mime)) kind = 'video';
-      appendRcv(kind, {name: inFile.name, size: inFile.size, mime: inFile.mime, url});
-      inFile = null; inChunks = []; inRcv = 0;
+  if(!data || isMobile) return;
+  if(data.type==='TEXT') appendRcv('text', data);
+  else if(data.type==='LINK') appendRcv('link', data);
+  else if(data.type==='FILE_META'){
+    inFile=data; inChunks=new Array(data.totalChunks); inRcv=0;
+  } else if(data.type==='FILE_CHUNK'){
+    if(inFile){ inChunks[data.idx]=data.chunk; inRcv++; }
+  } else if(data.type==='FILE_END'){
+    if(inFile){
+      const blob=new Blob(inChunks,{type:inFile.mime});
+      const url=URL.createObjectURL(blob);
+      let kind='file';
+      if(/^image\//.test(inFile.mime)) kind='image';
+      else if(/^audio\//.test(inFile.mime)) kind='audio';
+      else if(/^video\//.test(inFile.mime)) kind='video';
+      appendRcv(kind,{name:inFile.name,size:inFile.size,mime:inFile.mime,url});
+      inFile=null; inChunks=[]; inRcv=0;
     }
   }
 }
 
 function appendRcv(kind, payload) {
   rcvCount++;
-  typeCounts[kind] = (typeCounts[kind] || 0) + 1;
-  document.getElementById('rcv-count').textContent = rcvCount + (rcvCount === 1 ? ' item' : ' items');
+  typeCounts[kind]=(typeCounts[kind]||0)+1;
+  document.getElementById('rcv-count').textContent = rcvCount + (rcvCount===1?' item received':' items received');
 
-  const em = document.getElementById('empty-msg');
-  if (em) em.remove();
+  const em=document.getElementById('empty-msg');
+  if(em) em.remove();
+
+  // track for download-all
+  if(payload.url && payload.name){
+    allReceived.push({url:payload.url, name:payload.name});
+    document.getElementById('dl-all-btn').style.display='';
+  }
 
   updateStatsUI();
 
-  const list = document.getElementById('rcv-list');
-  const ts = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  const list=document.getElementById('rcv-list');
+  const ts=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  const el=document.createElement('div');
+  el.className='rcv-item type-'+kind;
+  el.dataset.kind=kind;
 
-  const el = document.createElement('div');
-  el.className = 'rcv-item type-' + kind;
-  el.dataset.kind = kind;
-
-  if (kind === 'text') {
-    // FIX: use textContent assignment instead of innerHTML for content
-    const pre = document.createElement('div');
-    pre.className = 'rcv-content';
-    pre.textContent = payload.content; // ← real newlines, no \n bug
-
-    el.innerHTML = `
-      <div class="rcv-type">
-        <span class="rcv-type-badge badge-text"><i class="fas fa-font"></i> Text</span>
-      </div>`;
+  if(kind==='text'){
+    const pre=document.createElement('div');
+    pre.className='rcv-content';
+    pre.textContent=payload.content;
+    el.innerHTML=`<div class="rcv-type-badge"><i class="fas fa-font"></i> Text</div>`;
     el.appendChild(pre);
-    const actions = document.createElement('div');
-    actions.className = 'rcv-actions';
-    const copyBtn = document.createElement('button');
-    copyBtn.className = 'btn btn-xs btn-copy';
-    copyBtn.innerHTML = '<i class="fas fa-copy"></i> Copy';
-    copyBtn.onclick = () => doCopyBtn(copyBtn, payload.content);
+    const actions=document.createElement('div');
+    actions.className='rcv-actions';
+    const copyBtn=document.createElement('button');
+    copyBtn.className='btn btn-xs btn-copy';
+    copyBtn.innerHTML='<i class="fas fa-copy"></i> Copy';
+    copyBtn.onclick=()=>doCopyBtn(copyBtn,payload.content);
     actions.appendChild(copyBtn);
-    const ts_div = document.createElement('div');
-    ts_div.className = 'rcv-ts';
-    ts_div.textContent = ts;
-    el.appendChild(actions);
-    el.appendChild(ts_div);
+    const ts_div=document.createElement('div');
+    ts_div.className='rcv-ts'; ts_div.textContent=ts;
+    el.appendChild(actions); el.appendChild(ts_div);
 
-  } else if (kind === 'link') {
-    const linkEsc = esc(payload.content);
-    el.innerHTML = `
-      <div class="rcv-type">
-        <span class="rcv-type-badge badge-link"><i class="fas fa-link"></i> Link</span>
-      </div>
-      <div class="rcv-content">
-        <a class="rcv-link" href="${linkEsc}" target="_blank" rel="noopener">${linkEsc}</a>
-      </div>
+  } else if(kind==='link'){
+    const linkEsc=esc(payload.content);
+    el.innerHTML=`
+      <div class="rcv-type-badge"><i class="fas fa-link"></i> Link</div>
+      <div class="rcv-content"><a class="rcv-link" href="${linkEsc}" target="_blank" rel="noopener">${linkEsc}</a></div>
       <div class="rcv-actions">
         <button class="btn btn-xs btn-copy" onclick="doCopy(this,${JSON.stringify(payload.content)})">
           <i class="fas fa-copy"></i> Copy
@@ -1133,17 +1096,14 @@ function appendRcv(kind, payload) {
       </div>
       <div class="rcv-ts">${ts}</div>`;
 
-  } else if (kind === 'image') {
-    const nameEsc = esc(payload.name);
-    el.innerHTML = `
-      <div class="rcv-type">
-        <span class="rcv-type-badge badge-image"><i class="fas fa-image"></i> Image</span>
-        <span class="mono xs muted">${nameEsc}</span>
-      </div>
-      <div class="mono xs muted">${humanSize(payload.size)}</div>
+  } else if(kind==='image'){
+    const nameEsc=esc(payload.name);
+    el.innerHTML=`
+      <div class="rcv-type-badge"><i class="fas fa-image"></i> Image · ${humanSize(payload.size)}</div>
+      <div class="mono xs muted">${nameEsc}</div>
       <img class="rcv-img" src="${payload.url}" alt="${nameEsc}" onclick="openLightbox('${payload.url}')">
       <div class="rcv-actions">
-        <a class="btn btn-xs btn-prime" href="${payload.url}" download="${nameEsc}">
+        <a class="btn btn-xs btn-white" href="${payload.url}" download="${nameEsc}">
           <i class="fas fa-download"></i> Download
         </a>
         <button class="btn btn-xs" onclick="openLightbox('${payload.url}')">
@@ -1152,333 +1112,310 @@ function appendRcv(kind, payload) {
       </div>
       <div class="rcv-ts">${ts}</div>`;
 
-  } else if (kind === 'audio') {
-    const nameEsc = esc(payload.name);
-    el.innerHTML = `
-      <div class="rcv-type">
-        <span class="rcv-type-badge badge-audio"><i class="fas fa-music"></i> Song / Audio</span>
-        <span class="mono xs muted">${nameEsc}</span>
-      </div>
-      <div class="mono xs muted">${humanSize(payload.size)}</div>
-      <div class="audio-player">
-        <audio controls style="width:100%"><source src="${payload.url}" type="${payload.mime}"></audio>
-      </div>
+  } else if(kind==='audio'){
+    const nameEsc=esc(payload.name);
+    el.innerHTML=`
+      <div class="rcv-type-badge"><i class="fas fa-music"></i> Audio · ${humanSize(payload.size)}</div>
+      <div class="mono xs muted">${nameEsc}</div>
+      <div class="audio-player"><audio controls style="width:100%"><source src="${payload.url}" type="${payload.mime}"></audio></div>
       <div class="rcv-actions">
-        <a class="btn btn-xs btn-prime" href="${payload.url}" download="${nameEsc}">
+        <a class="btn btn-xs btn-white" href="${payload.url}" download="${nameEsc}">
           <i class="fas fa-download"></i> Download
         </a>
       </div>
       <div class="rcv-ts">${ts}</div>`;
 
-  } else if (kind === 'video') {
-    const nameEsc = esc(payload.name);
-    el.innerHTML = `
-      <div class="rcv-type">
-        <span class="rcv-type-badge badge-video"><i class="fas fa-video"></i> Video</span>
-        <span class="mono xs muted">${nameEsc}</span>
-      </div>
-      <div class="mono xs muted">${humanSize(payload.size)}</div>
-      <video controls style="width:100%;max-height:200px;border-radius:8px;background:#000;margin-top:8px;display:block">
+  } else if(kind==='video'){
+    const nameEsc=esc(payload.name);
+    el.innerHTML=`
+      <div class="rcv-type-badge"><i class="fas fa-video"></i> Video · ${humanSize(payload.size)}</div>
+      <div class="mono xs muted">${nameEsc}</div>
+      <video controls style="width:100%;max-height:210px;border-radius:8px;background:#000;margin-top:8px;display:block;border:1px solid var(--gray-800)">
         <source src="${payload.url}" type="${payload.mime}">
       </video>
       <div class="rcv-actions">
-        <a class="btn btn-xs btn-prime" href="${payload.url}" download="${nameEsc}">
+        <a class="btn btn-xs btn-white" href="${payload.url}" download="${nameEsc}">
           <i class="fas fa-download"></i> Download
         </a>
       </div>
       <div class="rcv-ts">${ts}</div>`;
 
-  } else { // generic file
-    const nameEsc = esc(payload.name);
-    el.innerHTML = `
-      <div class="rcv-type">
-        <span class="rcv-type-badge badge-file">${fileIconFA(payload.name)} File</span>
-        <span class="mono xs muted">${nameEsc}</span>
-      </div>
-      <div class="mono xs muted">${humanSize(payload.size)}</div>
+  } else {
+    const nameEsc=esc(payload.name);
+    el.innerHTML=`
+      <div class="rcv-type-badge">${fileIconFA(payload.name)} File · ${humanSize(payload.size)}</div>
+      <div class="mono xs muted">${nameEsc}</div>
       <div class="rcv-actions">
-        <a class="btn btn-xs btn-prime" href="${payload.url}" download="${nameEsc}">
+        <a class="btn btn-xs btn-white" href="${payload.url}" download="${nameEsc}">
           <i class="fas fa-download"></i> Download
         </a>
         <button class="btn btn-xs btn-copy" onclick="doCopy(this,${JSON.stringify(payload.name)})">
-          <i class="fas fa-copy"></i> Filename
+          <i class="fas fa-copy"></i> Name
         </button>
       </div>
       <div class="rcv-ts">${ts}</div>`;
   }
 
-  // apply filter visibility
-  el.style.display = (activeFilter === 'all' || activeFilter === kind) ? '' : 'none';
-  list.insertBefore(el, list.firstChild);
-  toast('fa-inbox', kind === 'file' || kind === 'image' || kind === 'audio' || kind === 'video'
-    ? payload.name + ' received'
-    : kind + ' received');
+  el.style.display=(activeFilter==='all'||activeFilter===kind)?'':'none';
+  list.insertBefore(el,list.firstChild);
+  toast('fa-inbox', (payload.name||kind)+' received');
 }
 
-// ══ STATS & FILTER UI ═════════════════════════════
+// ══ STATS & FILTER ══════════════════════════
 
-function updateStatsUI() {
-  const bar = document.getElementById('stats-bar');
-  const fbar = document.getElementById('filter-bar');
-  bar.style.display = rcvCount > 0 ? 'flex' : 'none';
-  fbar.style.display = rcvCount > 0 ? 'flex' : 'none';
+function updateStatsUI(){
+  const bar=document.getElementById('stats-bar');
+  const fbar=document.getElementById('filter-bar');
+  bar.style.display=rcvCount>0?'flex':'none';
 
-  const types = ['text','link','image','audio','video','file'];
-  let hasMultiple = 0;
-  types.forEach(t => {
-    const v = typeCounts[t] || 0;
-    const chip = document.getElementById('stat-' + t);
-    const fb = document.getElementById('fb-' + t);
-    if (chip) chip.style.display = v > 0 ? '' : 'none';
-    if (fb) fb.style.display = v > 0 ? '' : 'none';
-    const cnt = document.getElementById('cnt-' + t);
-    if (cnt) cnt.textContent = v;
-    if (v > 0) hasMultiple++;
+  const types=['text','link','image','audio','video','file'];
+  let hasMultiple=0;
+  types.forEach(t=>{
+    const v=typeCounts[t]||0;
+    const chip=document.getElementById('stat-'+t);
+    const fb=document.getElementById('fb-'+t);
+    if(chip) chip.style.display=v>0?'':'none';
+    if(fb) fb.style.display=v>0?'':'none';
+    const cnt=document.getElementById('cnt-'+t);
+    if(cnt) cnt.textContent=v;
+    if(v>0) hasMultiple++;
   });
-  // hide filter bar if only one type
-  fbar.style.display = (rcvCount > 0 && hasMultiple > 1) ? 'flex' : 'none';
+  fbar.style.display=(rcvCount>0&&hasMultiple>1)?'flex':'none';
 }
 
-function setFilter(type, btn) {
-  activeFilter = type;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('on'));
+function setFilter(type,btn){
+  activeFilter=type;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
-  document.querySelectorAll('.rcv-item').forEach(el => {
-    const k = el.dataset.kind;
-    el.style.display = (type === 'all' || type === k) ? '' : 'none';
+  document.querySelectorAll('.rcv-item').forEach(el=>{
+    const k=el.dataset.kind;
+    el.style.display=(type==='all'||type===k)?'':'none';
   });
 }
 
-// ══ SEND FUNCTIONS (mobile) ════════════════════════
+// ══ SEND (mobile) ═══════════════════════════
 
-function sendText() {
-  if (!conn?.open) { toast('fa-triangle-exclamation','Not connected'); return; }
-  const v = document.getElementById('txt-in').value.trim();
-  if (!v) { toast('fa-triangle-exclamation','Nothing to send'); return; }
-  conn.send({type:'TEXT', content:v});
-  document.getElementById('txt-in').value = '';
-  document.getElementById('char-count').textContent = '0 chars';
+function sendText(){
+  if(!conn?.open){toast('fa-triangle-exclamation','Not connected');return}
+  const v=document.getElementById('txt-in').value.trim();
+  if(!v){toast('fa-triangle-exclamation','Nothing to send');return}
+  conn.send({type:'TEXT',content:v});
+  document.getElementById('txt-in').value='';
+  document.getElementById('char-count').textContent='0 chars';
   showView('vm-success');
 }
 
-function clearText() {
-  document.getElementById('txt-in').value = '';
-  document.getElementById('char-count').textContent = '0 chars';
+function clearText(){
+  document.getElementById('txt-in').value='';
+  document.getElementById('char-count').textContent='0 chars';
 }
 
-function sendLink() {
-  if (!conn?.open) { toast('fa-triangle-exclamation','Not connected'); return; }
-  let v = document.getElementById('link-in').value.trim();
-  if (!v) { toast('fa-triangle-exclamation','Enter a URL'); return; }
-  if (!/^https?:\/\//i.test(v)) v = 'https://' + v;
-  conn.send({type:'LINK', content:v});
-  document.getElementById('link-in').value = '';
+function sendLink(){
+  if(!conn?.open){toast('fa-triangle-exclamation','Not connected');return}
+  let v=document.getElementById('link-in').value.trim();
+  if(!v){toast('fa-triangle-exclamation','Enter a URL');return}
+  if(!/^https?:\/\//i.test(v)) v='https://'+v;
+  conn.send({type:'LINK',content:v});
+  document.getElementById('link-in').value='';
   showView('vm-success');
 }
 
-// ── Single file sender (image / audio) ──
-async function sendSingleFile(file, progFill, progTxt, progWrap) {
-  if (file.size > 50 * 1024 * 1024) {
-    toast('fa-triangle-exclamation', file.name + ' exceeds 50 MB');
-    return false;
-  }
-  const buf = await file.arrayBuffer();
-  const total = Math.ceil(buf.byteLength / CHUNK);
-  if (total === 0) return false;
+async function sendSingleFile(file,progFill,progTxt,progWrap){
+  if(file.size>50*1024*1024){toast('fa-triangle-exclamation',file.name+' exceeds 50 MB');return false}
+  const buf=await file.arrayBuffer();
+  const total=Math.ceil(buf.byteLength/CHUNK);
+  if(total===0) return false;
   progWrap.classList.add('on');
-
-  conn.send({type:'FILE_META', name:file.name, size:file.size, mime:file.type, totalChunks:total});
-  for (let i = 0; i < total; i++) {
-    conn.send({type:'FILE_CHUNK', idx:i, chunk:buf.slice(i * CHUNK, (i + 1) * CHUNK)});
-    const pct = Math.round(((i + 1) / total) * 100);
-    progFill.style.width = pct + '%';
-    progTxt.textContent = pct + '%';
-    if (i % 8 === 0) await tick();
+  conn.send({type:'FILE_META',name:file.name,size:file.size,mime:file.type,totalChunks:total});
+  for(let i=0;i<total;i++){
+    conn.send({type:'FILE_CHUNK',idx:i,chunk:buf.slice(i*CHUNK,(i+1)*CHUNK)});
+    const pct=Math.round(((i+1)/total)*100);
+    progFill.style.width=pct+'%'; progTxt.textContent=pct+'%';
+    if(i%8===0) await tick();
   }
   conn.send({type:'FILE_END'});
-  await sleep(600);
-  progWrap.classList.remove('on');
-  progFill.style.width = '0%';
+  await sleep(500);
+  progWrap.classList.remove('on'); progFill.style.width='0%';
   return true;
 }
 
-async function sendImage() {
-  if (!conn?.open) { toast('fa-triangle-exclamation','Not connected'); return; }
-  if (!pendingImg) { toast('fa-triangle-exclamation','No image selected'); return; }
-  const btn = document.getElementById('send-img-btn');
-  btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Sending…';
-  const ok = await sendSingleFile(
-    pendingImg,
+async function sendImage(){
+  if(!conn?.open){toast('fa-triangle-exclamation','Not connected');return}
+  if(!pendingImg){toast('fa-triangle-exclamation','No image selected');return}
+  const btn=document.getElementById('send-img-btn');
+  btn.disabled=true; btn.innerHTML='<i class="fas fa-circle-notch fa-spin"></i> Sending…';
+  const ok=await sendSingleFile(pendingImg,
     document.getElementById('prog-fill-img'),
     document.getElementById('prog-txt-img'),
-    document.getElementById('prog-wrap-img')
-  );
-  btn.disabled = false; btn.innerHTML = '<i class="fas fa-image"></i> Send Image';
-  if (ok) { clearImg(); showView('vm-success'); }
+    document.getElementById('prog-wrap-img'));
+  btn.disabled=false; btn.innerHTML='<i class="fas fa-image"></i> Send Image';
+  if(ok){clearImg();showView('vm-success')}
 }
 
-async function sendAudio() {
-  if (!conn?.open) { toast('fa-triangle-exclamation','Not connected'); return; }
-  if (!pendingAud) { toast('fa-triangle-exclamation','No audio file selected'); return; }
-  const btn = document.getElementById('send-aud-btn');
-  btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Sending…';
-  const ok = await sendSingleFile(
-    pendingAud,
+async function sendAudio(){
+  if(!conn?.open){toast('fa-triangle-exclamation','Not connected');return}
+  if(!pendingAud){toast('fa-triangle-exclamation','No audio selected');return}
+  const btn=document.getElementById('send-aud-btn');
+  btn.disabled=true; btn.innerHTML='<i class="fas fa-circle-notch fa-spin"></i> Sending…';
+  const ok=await sendSingleFile(pendingAud,
     document.getElementById('prog-fill-aud'),
     document.getElementById('prog-txt-aud'),
-    document.getElementById('prog-wrap-aud')
-  );
-  btn.disabled = false; btn.innerHTML = '<i class="fas fa-music"></i> Send Song';
-  if (ok) { clearAud(); showView('vm-success'); }
+    document.getElementById('prog-wrap-aud'));
+  btn.disabled=false; btn.innerHTML='<i class="fas fa-music"></i> Send Audio';
+  if(ok){clearAud();showView('vm-success')}
 }
 
-async function sendFiles() {
-  if (!conn?.open) { toast('fa-triangle-exclamation','Not connected'); return; }
-  if (!pendingFiles.length) { toast('fa-triangle-exclamation','No files selected'); return; }
-
-  const btn = document.getElementById('send-files-btn');
-  btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Sending…';
-
-  const prog = document.getElementById('prog-wrap');
-  const fill = document.getElementById('prog-fill');
-  const ptxt = document.getElementById('prog-txt');
+async function sendFiles(){
+  if(!conn?.open){toast('fa-triangle-exclamation','Not connected');return}
+  if(!pendingFiles.length){toast('fa-triangle-exclamation','No files selected');return}
+  const btn=document.getElementById('send-files-btn');
+  btn.disabled=true; btn.innerHTML='<i class="fas fa-circle-notch fa-spin"></i> Sending…';
+  const prog=document.getElementById('prog-wrap');
+  const fill=document.getElementById('prog-fill');
+  const ptxt=document.getElementById('prog-txt');
   prog.classList.add('on');
 
-  for (let fi = 0; fi < pendingFiles.length; fi++) {
-    const file = pendingFiles[fi];
-    if (file.size > 50 * 1024 * 1024) {
-      toast('fa-triangle-exclamation', file.name + ' exceeds 50 MB, skipped');
-      continue;
-    }
-    const buf = await file.arrayBuffer();
-    const total = Math.ceil(buf.byteLength / CHUNK);
-    if (total === 0) continue;
-
-    conn.send({type:'FILE_META', name:file.name, size:file.size, mime:file.type, totalChunks:total});
-
-    for (let i = 0; i < total; i++) {
-      conn.send({type:'FILE_CHUNK', idx:i, chunk:buf.slice(i * CHUNK, (i + 1) * CHUNK)});
-      const pct = Math.round(((fi / pendingFiles.length) + ((i + 1) / total / pendingFiles.length)) * 100);
-      fill.style.width = pct + '%';
-      ptxt.textContent = pct + '% — ' + file.name;
-      if (i % 8 === 0) await tick();
+  for(let fi=0;fi<pendingFiles.length;fi++){
+    const file=pendingFiles[fi];
+    if(file.size>50*1024*1024){toast('fa-triangle-exclamation',file.name+' over 50 MB — skipped');continue}
+    const buf=await file.arrayBuffer();
+    const total=Math.ceil(buf.byteLength/CHUNK);
+    if(total===0) continue;
+    conn.send({type:'FILE_META',name:file.name,size:file.size,mime:file.type,totalChunks:total});
+    for(let i=0;i<total;i++){
+      conn.send({type:'FILE_CHUNK',idx:i,chunk:buf.slice(i*CHUNK,(i+1)*CHUNK)});
+      const pct=Math.round((fi/pendingFiles.length+((i+1)/total/pendingFiles.length))*100);
+      fill.style.width=pct+'%';
+      ptxt.textContent=`${pct}% — ${file.name} (${fi+1}/${pendingFiles.length})`;
+      if(i%8===0) await tick();
     }
     conn.send({type:'FILE_END'});
+    await sleep(100);
   }
 
-  fill.style.width = '100%'; ptxt.textContent = 'Complete!';
+  fill.style.width='100%'; ptxt.textContent='All files sent!';
   await sleep(700);
-  prog.classList.remove('on'); fill.style.width = '0%';
-  pendingFiles = []; renderFileList();
-  btn.disabled = false; btn.innerHTML = '<i class="fas fa-cloud-arrow-up"></i> Send Files';
+  prog.classList.remove('on'); fill.style.width='0%';
+  pendingFiles=[];renderFileList();updateBatchInfo();
+  btn.disabled=false; btn.innerHTML='<i class="fas fa-cloud-arrow-up"></i> Send All Files';
   showView('vm-success');
 }
 
-async function sendClipboard() {
-  if (!conn?.open) { toast('fa-triangle-exclamation','Not connected'); return; }
-  try {
-    const txt = await navigator.clipboard.readText();
-    if (!txt?.trim()) { toast('fa-triangle-exclamation','Clipboard is empty'); return; }
-    const prev = document.getElementById('clip-preview');
-    document.getElementById('clip-txt').textContent = txt.slice(0, 200) + (txt.length > 200 ? '…' : '');
-    prev.style.display = 'flex';
-    conn.send({type:'TEXT', content:txt});
+async function sendClipboard(){
+  if(!conn?.open){toast('fa-triangle-exclamation','Not connected');return}
+  try{
+    const txt=await navigator.clipboard.readText();
+    if(!txt?.trim()){toast('fa-triangle-exclamation','Clipboard is empty');return}
+    document.getElementById('clip-txt').textContent=txt.slice(0,200)+(txt.length>200?'…':'');
+    document.getElementById('clip-preview').style.display='flex';
+    conn.send({type:'TEXT',content:txt});
     showView('vm-success');
-  } catch (e) {
-    toast('fa-triangle-exclamation','Clipboard access denied — try HTTPS');
+  }catch(e){
+    toast('fa-triangle-exclamation','Clipboard denied — needs HTTPS');
   }
 }
 
-function backToSend() { showView('vm-send'); }
+function backToSend(){ showView('vm-send'); }
 
-// ══ IMAGE HANDLING ═════════════════════════════════
+// ══ IMAGE ════════════════════════════════════
+function onDragImg(e,over){e.preventDefault();document.getElementById('drop-zone-img').classList.toggle('drag-over',over)}
+function onDropImg(e){e.preventDefault();onDragImg(e,false);const f=e.dataTransfer.files[0];if(f&&/^image\//.test(f.type))setImg(f);else toast('fa-triangle-exclamation','Not an image')}
+function onImgChange(e){if(e.target.files[0])setImg(e.target.files[0]);e.target.value=''}
+function setImg(file){pendingImg=file;const url=URL.createObjectURL(file);document.getElementById('img-preview').src=url;document.getElementById('img-name-lbl').textContent=file.name+' — '+humanSize(file.size);document.getElementById('img-preview-wrap').style.display='block'}
+function clearImg(){pendingImg=null;document.getElementById('img-preview').src='';document.getElementById('img-preview-wrap').style.display='none'}
 
-function onDragImg(e, over) {
-  e.preventDefault();
-  document.getElementById('drop-zone-img').classList.toggle('drag-over', over);
-}
-function onDropImg(e) {
-  e.preventDefault(); onDragImg(e, false);
-  const f = e.dataTransfer.files[0];
-  if (f && /^image\//.test(f.type)) setImg(f);
-  else toast('fa-triangle-exclamation','Please drop an image file');
-}
-function onImgChange(e) {
-  if (e.target.files[0]) setImg(e.target.files[0]);
-  e.target.value = '';
-}
-function setImg(file) {
-  pendingImg = file;
-  const url = URL.createObjectURL(file);
-  document.getElementById('img-preview').src = url;
-  document.getElementById('img-name-lbl').textContent = file.name + ' — ' + humanSize(file.size);
-  document.getElementById('img-preview-wrap').style.display = 'block';
-}
-function clearImg() {
-  pendingImg = null;
-  document.getElementById('img-preview').src = '';
-  document.getElementById('img-preview-wrap').style.display = 'none';
-}
+// ══ AUDIO ════════════════════════════════════
+function onDragAud(e,over){e.preventDefault();document.getElementById('drop-zone-aud').classList.toggle('drag-over',over)}
+function onDropAud(e){e.preventDefault();onDragAud(e,false);const f=e.dataTransfer.files[0];if(f&&/^audio\//.test(f.type))setAud(f);else toast('fa-triangle-exclamation','Not an audio file')}
+function onAudChange(e){if(e.target.files[0])setAud(e.target.files[0]);e.target.value=''}
+function setAud(file){pendingAud=file;const url=URL.createObjectURL(file);document.getElementById('aud-preview').src=url;document.getElementById('aud-name-lbl').textContent=file.name+' — '+humanSize(file.size);document.getElementById('aud-preview-wrap').style.display='block'}
+function clearAud(){pendingAud=null;document.getElementById('aud-preview').src='';document.getElementById('aud-preview-wrap').style.display='none'}
 
-// ══ AUDIO HANDLING ════════════════════════════════
+// ══ FILES ════════════════════════════════════
+function onDrag(e,over){e.preventDefault();document.getElementById('drop-zone').classList.toggle('drag-over',over)}
+function onDrop(e){e.preventDefault();onDrag(e,false);addFiles(e.dataTransfer.files)}
+function onFileChange(e){addFiles(e.target.files);e.target.value=''}
+function addFiles(list){Array.from(list).forEach(f=>pendingFiles.push(f));renderFileList();updateBatchInfo()}
+function removeFile(i){pendingFiles.splice(i,1);renderFileList();updateBatchInfo()}
+function clearFiles(){pendingFiles=[];renderFileList();updateBatchInfo()}
 
-function onDragAud(e, over) {
-  e.preventDefault();
-  document.getElementById('drop-zone-aud').classList.toggle('drag-over', over);
-}
-function onDropAud(e) {
-  e.preventDefault(); onDragAud(e, false);
-  const f = e.dataTransfer.files[0];
-  if (f && /^audio\//.test(f.type)) setAud(f);
-  else toast('fa-triangle-exclamation','Please drop an audio file');
-}
-function onAudChange(e) {
-  if (e.target.files[0]) setAud(e.target.files[0]);
-  e.target.value = '';
-}
-function setAud(file) {
-  pendingAud = file;
-  const url = URL.createObjectURL(file);
-  document.getElementById('aud-preview').src = url;
-  document.getElementById('aud-name-lbl').textContent = file.name + ' — ' + humanSize(file.size);
-  document.getElementById('aud-preview-wrap').style.display = 'block';
-}
-function clearAud() {
-  pendingAud = null;
-  document.getElementById('aud-preview').src = '';
-  document.getElementById('aud-preview-wrap').style.display = 'none';
-}
-
-// ══ FILE HANDLING ══════════════════════════════════
-
-function onDrag(e, over) {
-  e.preventDefault();
-  document.getElementById('drop-zone').classList.toggle('drag-over', over);
-}
-function onDrop(e) {
-  e.preventDefault(); onDrag(e, false);
-  addFiles(e.dataTransfer.files);
-}
-function onFileChange(e) { addFiles(e.target.files); e.target.value = ''; }
-function addFiles(list) {
-  Array.from(list).forEach(f => pendingFiles.push(f));
-  renderFileList();
-}
-function removeFile(i) { pendingFiles.splice(i, 1); renderFileList(); }
-function renderFileList() {
-  document.getElementById('file-list').innerHTML =
-    pendingFiles.map((f, i) => `
+function renderFileList(){
+  document.getElementById('file-list').innerHTML=
+    pendingFiles.map((f,i)=>`
       <div class="file-item">
         <span class="fi-icon">${fileIconFA(f.name)}</span>
         <span class="fi-name">${esc(f.name)}</span>
         <span class="fi-size">${humanSize(f.size)}</span>
-        <button class="fi-rm" onclick="removeFile(${i})" title="Remove"><i class="fas fa-xmark"></i></button>
+        <button class="fi-rm" onclick="removeFile(${i})"><i class="fas fa-xmark"></i></button>
       </div>`).join('');
 }
 
-function fileIconFA(name) {
-  const ext = (name.split('.').pop() || '').toLowerCase();
-  const map = {
+function updateBatchInfo(){
+  const bi=document.getElementById('batch-info');
+  const bt=document.getElementById('batch-txt');
+  if(pendingFiles.length>0){
+    const total=pendingFiles.reduce((a,f)=>a+f.size,0);
+    bt.textContent=`${pendingFiles.length} file${pendingFiles.length>1?'s':''} · ${humanSize(total)} total`;
+    bi.style.display='flex';
+  } else {
+    bi.style.display='none';
+  }
+}
+
+// ══ TABS ═════════════════════════════════════
+function switchTab(name,btn){
+  activeTab=name;
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+}
+
+// ══ LIGHTBOX ═════════════════════════════════
+function openLightbox(src){document.getElementById('lb-img').src=src;document.getElementById('lightbox').classList.add('on')}
+function closeLightbox(){document.getElementById('lightbox').classList.remove('on')}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLightbox()});
+
+// ══ HELPERS ══════════════════════════════════
+function showView(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+async function doCopy(btn,text){
+  try{
+    await navigator.clipboard.writeText(text);
+    const orig=btn.innerHTML;
+    btn.innerHTML='<i class="fas fa-check"></i> Copied';
+    setTimeout(()=>{btn.innerHTML=orig},1800);
+  }catch{toast('fa-circle-exclamation','Copy failed')}
+}
+
+async function doCopyBtn(btn,text){
+  try{
+    await navigator.clipboard.writeText(text);
+    const orig=btn.innerHTML;
+    btn.innerHTML='<i class="fas fa-check"></i> Copied';
+    setTimeout(()=>{btn.innerHTML=orig},1800);
+  }catch{toast('fa-circle-exclamation','Copy failed')}
+}
+
+function esc(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function toast(icon,msg){
+  const el=document.getElementById('toast');
+  el.querySelector('i').className='fas '+icon+' fa-sm';
+  document.getElementById('toast-txt').textContent=msg;
+  el.classList.add('on');
+  clearTimeout(el._t);
+  el._t=setTimeout(()=>el.classList.remove('on'),2800);
+}
+
+function fileIconFA(name){
+  const ext=(name.split('.').pop()||'').toLowerCase();
+  const map={
     pdf:'<i class="fas fa-file-pdf"></i>',
     doc:'<i class="fas fa-file-word"></i>',docx:'<i class="fas fa-file-word"></i>',
     xls:'<i class="fas fa-file-excel"></i>',xlsx:'<i class="fas fa-file-excel"></i>',
@@ -1487,119 +1424,25 @@ function fileIconFA(name) {
     png:'<i class="fas fa-file-image"></i>',gif:'<i class="fas fa-file-image"></i>',
     webp:'<i class="fas fa-file-image"></i>',svg:'<i class="fas fa-file-image"></i>',
     mp3:'<i class="fas fa-file-audio"></i>',wav:'<i class="fas fa-file-audio"></i>',
-    ogg:'<i class="fas fa-file-audio"></i>',m4a:'<i class="fas fa-file-audio"></i>',
-    flac:'<i class="fas fa-file-audio"></i>',
-    mp4:'<i class="fas fa-file-video"></i>',mov:'<i class="fas fa-file-video"></i>',
-    webm:'<i class="fas fa-file-video"></i>',
-    zip:'<i class="fas fa-file-zipper"></i>',rar:'<i class="fas fa-file-zipper"></i>',
-    gz:'<i class="fas fa-file-zipper"></i>',
+    ogg:'<i class="fas fa-file-audio"></i>',m4a:'<i class="fas fa-file-audio"></i>',flac:'<i class="fas fa-file-audio"></i>',
+    mp4:'<i class="fas fa-file-video"></i>',mov:'<i class="fas fa-file-video"></i>',webm:'<i class="fas fa-file-video"></i>',
+    zip:'<i class="fas fa-file-zipper"></i>',rar:'<i class="fas fa-file-zipper"></i>',gz:'<i class="fas fa-file-zipper"></i>',
     txt:'<i class="fas fa-file-lines"></i>',md:'<i class="fas fa-file-lines"></i>',
     js:'<i class="fas fa-file-code"></i>',ts:'<i class="fas fa-file-code"></i>',
     py:'<i class="fas fa-file-code"></i>',html:'<i class="fas fa-file-code"></i>',
-    css:'<i class="fas fa-file-code"></i>',json:'<i class="fas fa-file-code"></i>',
-    sh:'<i class="fas fa-file-code"></i>',
+    css:'<i class="fas fa-file-code"></i>',json:'<i class="fas fa-file-code"></i>',sh:'<i class="fas fa-file-code"></i>',
   };
-  return map[ext] || '<i class="fas fa-file"></i>';
+  return map[ext]||'<i class="fas fa-file"></i>';
 }
 
-function humanSize(b) {
-  if (b < 1024) return b + ' B';
-  if (b < 1048576) return (b / 1024).toFixed(1) + ' KB';
-  return (b / 1048576).toFixed(1) + ' MB';
+function humanSize(b){
+  if(b<1024) return b+' B';
+  if(b<1048576) return (b/1024).toFixed(1)+' KB';
+  return (b/1048576).toFixed(1)+' MB';
 }
 
-// ══ TABS ══════════════════════════════════════════
-
-function switchTab(name, btn) {
-  activeTab = name;
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('tab-' + name).classList.add('active');
-}
-
-// ══ DIGIT INPUTS ══════════════════════════════════
-
-function initDigits() {
-  const ids = ['d0','d1','d2','d3','d4','d5'];
-  ids.forEach((id, i) => {
-    const el = document.getElementById(id);
-    el.addEventListener('input', () => {
-      el.value = el.value.replace(/\D/, '');
-      if (el.value && i < 5) document.getElementById(ids[i + 1]).focus();
-    });
-    el.addEventListener('keydown', e => {
-      if (e.key === 'Backspace' && !el.value && i > 0) document.getElementById(ids[i - 1]).focus();
-      if (e.key === 'Enter') connectWithCode();
-    });
-    el.addEventListener('paste', e => {
-      e.preventDefault();
-      const p = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '');
-      ids.forEach((did, di) => { if (p[di]) document.getElementById(did).value = p[di]; });
-      const last = Math.min(p.length - 1, 5);
-      if (last >= 0) document.getElementById(ids[last]).focus();
-    });
-  });
-}
-
-// ══ LIGHTBOX ══════════════════════════════════════
-
-function openLightbox(src) {
-  document.getElementById('lb-img').src = src;
-  document.getElementById('lightbox').classList.add('on');
-}
-function closeLightbox() {
-  document.getElementById('lightbox').classList.remove('on');
-}
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeLightbox();
-});
-
-// ══ HELPERS ═══════════════════════════════════════
-
-function showView(id) {
-  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-
-async function doCopy(btn, text) {
-  try {
-    await navigator.clipboard.writeText(text);
-    const orig = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-    setTimeout(() => { btn.innerHTML = orig; }, 1800);
-  } catch { toast('fa-circle-exclamation','Copy failed'); }
-}
-
-async function doCopyBtn(btn, text) {
-  try {
-    await navigator.clipboard.writeText(text);
-    const orig = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-    setTimeout(() => { btn.innerHTML = orig; }, 1800);
-  } catch { toast('fa-circle-exclamation','Copy failed'); }
-}
-
-function esc(s) {
-  return String(s)
-    .replace(/&/g,'&amp;')
-    .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;');
-}
-
-function toast(icon, msg) {
-  const el = document.getElementById('toast');
-  const ico = el.querySelector('i');
-  ico.className = 'fas ' + icon + ' fa-sm';
-  document.getElementById('toast-txt').textContent = msg;
-  el.classList.add('on');
-  clearTimeout(el._t);
-  el._t = setTimeout(() => el.classList.remove('on'), 2800);
-}
-
-const tick  = () => new Promise(r => setTimeout(r, 0));
-const sleep = ms => new Promise(r => setTimeout(r, ms));
+const tick=()=>new Promise(r=>setTimeout(r,0));
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 </script>
 </body>
 </html>
