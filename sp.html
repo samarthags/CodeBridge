@@ -1,0 +1,1499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blend — Music Taste Analyzer</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --green: #1DB954;
+    --green-bright: #1ed760;
+    --green-dim: rgba(29,185,84,0.15);
+    --green-glow: rgba(29,185,84,0.3);
+    --bg: #060606;
+    --bg2: #0f0f0f;
+    --bg3: #161616;
+    --bg4: #1e1e1e;
+    --bg5: #252525;
+    --text: #ffffff;
+    --text2: #a7a7a7;
+    --text3: #5a5a5a;
+    --border: rgba(255,255,255,0.07);
+    --border2: rgba(255,255,255,0.12);
+    --radius: 14px;
+    --radius-sm: 8px;
+    --purple: #7c6fdf;
+    --coral: #e05c3a;
+    --amber: #f0a020;
+    --blue: #3a8fdd;
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Figtree', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ─── SCREENS ─── */
+  .screen { display: none; min-height: 100vh; flex-direction: column; }
+  .screen.active { display: flex; }
+
+  /* ─── PARTICLES BG ─── */
+  #particles-canvas {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    pointer-events: none; z-index: 0; opacity: 0.35;
+  }
+
+  .above { position: relative; z-index: 1; }
+
+  /* ─── LOGIN ─── */
+  #login {
+    align-items: center; justify-content: center;
+    text-align: center; padding: 2rem;
+    background: radial-gradient(ellipse at 50% 0%, rgba(29,185,84,0.12) 0%, transparent 60%);
+  }
+
+  .login-inner { max-width: 400px; width: 100%; position: relative; z-index: 1; }
+
+  .brand-logo {
+    width: 72px; height: 72px;
+    background: var(--green);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 2rem;
+    box-shadow: 0 0 60px rgba(29,185,84,0.4);
+    animation: pulse-logo 2.5s ease-in-out infinite;
+  }
+  .brand-logo i { font-size: 36px; color: #000; }
+  @keyframes pulse-logo {
+    0%, 100% { box-shadow: 0 0 40px rgba(29,185,84,0.3); }
+    50% { box-shadow: 0 0 80px rgba(29,185,84,0.6); }
+  }
+
+  .brand-name {
+    font-size: 42px; font-weight: 900;
+    letter-spacing: -2px; margin-bottom: 6px;
+    background: linear-gradient(135deg, #fff 40%, var(--green));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+
+  .brand-tagline { font-size: 15px; color: var(--text2); margin-bottom: 3rem; line-height: 1.6; font-weight: 400; }
+
+  .btn-login {
+    width: 100%; padding: 18px;
+    background: var(--green); color: #000;
+    border: none; border-radius: 50px;
+    font-size: 16px; font-weight: 800;
+    cursor: pointer; font-family: inherit;
+    letter-spacing: 0.3px;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    transition: all 0.2s; position: relative; overflow: hidden;
+  }
+  .btn-login::after {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.5s;
+  }
+  .btn-login:hover { background: var(--green-bright); transform: translateY(-2px); box-shadow: 0 8px 32px rgba(29,185,84,0.4); }
+  .btn-login:hover::after { transform: translateX(100%); }
+  .btn-login:active { transform: translateY(0); }
+
+  .login-note { font-size: 12px; color: var(--text3); margin-top: 1rem; line-height: 1.5; }
+  .login-note a { color: var(--text2); }
+
+  .features-row { display: flex; gap: 1.5rem; justify-content: center; margin: 2.5rem 0; flex-wrap: wrap; }
+  .feat { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .feat-icon { width: 44px; height: 44px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+  .feat-icon i { font-size: 18px; color: var(--green); }
+  .feat span { font-size: 11px; color: var(--text3); font-weight: 500; letter-spacing: 0.5px; }
+
+  /* ─── LOADING ─── */
+  #loading { align-items: center; justify-content: center; }
+  .loader-wrap { text-align: center; position: relative; z-index: 1; }
+  .loader-bars {
+    display: flex; align-items: flex-end; gap: 4px; justify-content: center;
+    height: 40px; margin-bottom: 2rem;
+  }
+  .bar {
+    width: 4px; background: var(--green); border-radius: 2px;
+    animation: bar-bounce 0.9s ease-in-out infinite;
+  }
+  .bar:nth-child(1) { animation-delay: 0s; }
+  .bar:nth-child(2) { animation-delay: 0.1s; }
+  .bar:nth-child(3) { animation-delay: 0.2s; }
+  .bar:nth-child(4) { animation-delay: 0.3s; }
+  .bar:nth-child(5) { animation-delay: 0.4s; }
+  @keyframes bar-bounce {
+    0%, 100% { height: 8px; opacity: 0.4; }
+    50% { height: 36px; opacity: 1; }
+  }
+  .loader-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+  .loader-sub { font-size: 13px; color: var(--text2); }
+
+  /* ─── NAV ─── */
+  .nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    background: rgba(6,6,6,0.9);
+    backdrop-filter: blur(20px);
+    position: sticky; top: 0; z-index: 100;
+  }
+  .nav-brand { font-size: 18px; font-weight: 900; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; }
+  .nav-brand i { font-size: 20px; color: var(--green); }
+  .nav-right { display: flex; align-items: center; gap: 10px; }
+  .nav-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid var(--border2); cursor: pointer; }
+  .nav-avatar-placeholder { width: 36px; height: 36px; border-radius: 50%; background: var(--bg4); border: 2px solid var(--border2); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: var(--green); }
+  .nav-btn {
+    padding: 8px 14px; border-radius: 50px;
+    background: var(--bg3); border: 1px solid var(--border2);
+    color: var(--text); font-size: 13px; font-weight: 600;
+    cursor: pointer; font-family: inherit;
+    display: flex; align-items: center; gap: 6px;
+    transition: all 0.2s;
+  }
+  .nav-btn:hover { background: var(--bg4); border-color: var(--border2); }
+  .nav-btn.green { background: var(--green); color: #000; border-color: var(--green); }
+  .nav-btn.green:hover { background: var(--green-bright); }
+
+  /* ─── PROFILE SCREEN ─── */
+  #profile { background: var(--bg); }
+
+  .profile-hero {
+    padding: 2rem 1.5rem 1.5rem;
+    background: linear-gradient(180deg, rgba(29,185,84,0.08) 0%, transparent 100%);
+    border-bottom: 1px solid var(--border);
+  }
+  .user-row { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+  .user-avatar { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; border: 3px solid var(--green); box-shadow: 0 0 20px rgba(29,185,84,0.3); flex-shrink: 0; }
+  .user-avatar-placeholder { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, var(--green), #0f6b30); display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 800; flex-shrink: 0; }
+  .user-name { font-size: 24px; font-weight: 800; }
+  .user-meta { font-size: 13px; color: var(--text2); margin-top: 3px; }
+  .user-meta span { color: var(--green); font-weight: 600; }
+
+  .period-tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px; }
+  .period-tab {
+    flex-shrink: 0; padding: 8px 16px; border-radius: 50px;
+    background: var(--bg3); border: 1px solid var(--border);
+    color: var(--text2); font-size: 13px; font-weight: 600;
+    cursor: pointer; font-family: inherit; transition: all 0.2s; white-space: nowrap;
+  }
+  .period-tab.active { background: var(--green); color: #000; border-color: var(--green); }
+  .period-tab:hover:not(.active) { border-color: var(--border2); color: var(--text); }
+
+  /* ─── CARDS ─── */
+  .section { padding: 1.5rem; }
+  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+  .section-title { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text2); }
+  .see-all { font-size: 12px; color: var(--green); font-weight: 600; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 1.5rem; }
+  .stat-card { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.1rem; position: relative; overflow: hidden; }
+  .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+  .stat-card.c-green::before { background: var(--green); }
+  .stat-card.c-purple::before { background: var(--purple); }
+  .stat-card.c-coral::before { background: var(--coral); }
+  .stat-card.c-amber::before { background: var(--amber); }
+  .stat-card.c-blue::before { background: var(--blue); }
+  .stat-card-label { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+  .stat-card-label i { font-size: 12px; }
+  .stat-card-value { font-size: 22px; font-weight: 800; line-height: 1; }
+  .stat-card-sub { font-size: 11px; color: var(--text3); margin-top: 4px; }
+
+  .track-list { display: flex; flex-direction: column; gap: 2px; }
+  .track-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 12px; border-radius: var(--radius-sm);
+    transition: background 0.2s; cursor: pointer;
+  }
+  .track-item:hover { background: var(--bg3); }
+  .track-rank { font-size: 12px; color: var(--text3); width: 18px; text-align: center; flex-shrink: 0; font-weight: 600; }
+  .track-img { width: 44px; height: 44px; border-radius: 6px; object-fit: cover; flex-shrink: 0; background: var(--bg4); }
+  .track-info { flex: 1; min-width: 0; }
+  .track-name { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .track-artist { font-size: 12px; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+  .track-action { width: 28px; height: 28px; border-radius: 50%; background: transparent; border: none; color: var(--text3); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; }
+  .track-action:hover { color: var(--green); background: var(--bg4); }
+  .play-btn { width: 36px; height: 36px; border-radius: 50%; background: var(--green); border: none; color: #000; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0; }
+  .play-btn:hover { background: var(--green-bright); transform: scale(1.08); }
+  .play-btn i { font-size: 12px; margin-left: 2px; }
+
+  .artist-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .artist-card { text-align: center; cursor: pointer; }
+  .artist-img { width: 100%; aspect-ratio: 1; border-radius: 50%; object-fit: cover; background: var(--bg4); margin-bottom: 8px; border: 2px solid var(--border); transition: all 0.2s; }
+  .artist-card:hover .artist-img { border-color: var(--green); transform: scale(1.04); }
+  .artist-name { font-size: 12px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .artist-rank-badge { font-size: 10px; color: var(--green); font-weight: 700; margin-top: 2px; }
+
+  .genre-bars { display: flex; flex-direction: column; gap: 10px; }
+  .genre-row { display: flex; align-items: center; gap: 10px; }
+  .genre-label { font-size: 12px; color: var(--text2); width: 80px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .genre-track-bg { flex: 1; height: 6px; background: var(--bg4); border-radius: 3px; overflow: hidden; }
+  .genre-fill { height: 100%; border-radius: 3px; background: var(--green); transition: width 1s ease; }
+  .genre-pct { font-size: 11px; color: var(--text3); width: 32px; text-align: right; font-weight: 600; }
+
+  .audio-features { display: flex; flex-direction: column; gap: 12px; }
+  .af-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .af-label { font-size: 12px; color: var(--text2); width: 100px; flex-shrink: 0; display: flex; align-items: center; gap: 6px; }
+  .af-label i { font-size: 12px; color: var(--green); }
+  .af-bar { flex: 1; height: 4px; background: var(--bg4); border-radius: 2px; overflow: hidden; }
+  .af-fill { height: 100%; border-radius: 2px; }
+  .af-val { font-size: 12px; font-weight: 700; width: 36px; text-align: right; }
+
+  .mood-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+  .mood-tag { padding: 6px 14px; background: var(--green-dim); color: var(--green); border-radius: 50px; font-size: 12px; font-weight: 600; border: 1px solid var(--green-glow); }
+
+  /* ─── BLEND SECTION ─── */
+  .blend-cta {
+    margin: 0 1.5rem 2rem;
+    background: linear-gradient(135deg, rgba(29,185,84,0.1), rgba(29,185,84,0.03));
+    border: 1px solid rgba(29,185,84,0.25);
+    border-radius: var(--radius);
+    padding: 1.75rem;
+    text-align: center;
+    position: relative; overflow: hidden;
+  }
+  .blend-cta::before {
+    content: '';
+    position: absolute; top: -40px; right: -40px;
+    width: 120px; height: 120px;
+    background: radial-gradient(circle, rgba(29,185,84,0.15), transparent 70%);
+    border-radius: 50%;
+  }
+  .blend-cta h3 { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+  .blend-cta p { font-size: 13px; color: var(--text2); margin-bottom: 1.5rem; line-height: 1.6; }
+  .btn-blend {
+    background: var(--green); color: #000;
+    border: none; border-radius: 50px;
+    padding: 14px 32px; font-size: 15px; font-weight: 800;
+    cursor: pointer; font-family: inherit;
+    display: inline-flex; align-items: center; gap: 8px;
+    transition: all 0.2s;
+  }
+  .btn-blend:hover { background: var(--green-bright); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(29,185,84,0.4); }
+
+  /* ─── BLEND SHARE ─── */
+  #blend-share { background: var(--bg); }
+  .share-hero {
+    padding: 2rem 1.5rem 1.5rem;
+    text-align: center;
+    background: linear-gradient(180deg, rgba(124,111,223,0.1) 0%, transparent 100%);
+    border-bottom: 1px solid var(--border);
+  }
+  .share-kicker { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; }
+  .share-title { font-size: 30px; font-weight: 900; letter-spacing: -1px; margin-bottom: 8px; }
+  .share-title span { color: var(--green); }
+  .share-desc { font-size: 13px; color: var(--text2); line-height: 1.6; }
+
+  .link-box {
+    margin: 1.25rem 1.5rem;
+    background: var(--bg3); border: 1px solid var(--border2);
+    border-radius: var(--radius); padding: 12px 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .link-icon { color: var(--green); font-size: 16px; flex-shrink: 0; }
+  .link-text { flex: 1; font-size: 13px; color: var(--text2); font-family: monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .btn-copy {
+    background: var(--green); color: #000; border: none;
+    padding: 8px 16px; border-radius: 8px;
+    font-size: 12px; font-weight: 700; cursor: pointer; font-family: inherit;
+    display: flex; align-items: center; gap: 6px;
+    transition: all 0.2s; flex-shrink: 0;
+  }
+  .btn-copy:hover { background: var(--green-bright); }
+
+  .share-actions { display: flex; gap: 8px; padding: 0 1.5rem 1.5rem; }
+  .share-action-btn {
+    flex: 1; padding: 12px 8px;
+    background: var(--bg3); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); color: var(--text);
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    font-family: inherit; display: flex; flex-direction: column;
+    align-items: center; gap: 6px; transition: all 0.2s;
+  }
+  .share-action-btn i { font-size: 18px; }
+  .share-action-btn.whatsapp:hover { background: rgba(37,211,102,0.1); border-color: #25d366; color: #25d366; }
+  .share-action-btn.twitter:hover { background: rgba(29,155,240,0.1); border-color: #1d9bf0; color: #1d9bf0; }
+  .share-action-btn.more:hover { background: var(--bg4); border-color: var(--border2); }
+
+  .friends-section { padding: 0 1.5rem 2rem; }
+  .friend-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px; border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--bg3); margin-bottom: 8px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .friend-item:hover { border-color: var(--green-glow); background: var(--bg4); }
+  .friend-avatar-wrap { position: relative; }
+  .friend-avatar { width: 46px; height: 46px; border-radius: 50%; object-fit: cover; background: var(--bg5); flex-shrink: 0; }
+  .friend-online { position: absolute; bottom: 1px; right: 1px; width: 10px; height: 10px; background: var(--green); border: 2px solid var(--bg3); border-radius: 50%; }
+  .friend-info { flex: 1; min-width: 0; }
+  .friend-name { font-size: 14px; font-weight: 700; }
+  .friend-shared { font-size: 12px; color: var(--text2); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .compat-preview { text-align: right; }
+  .compat-num { font-size: 18px; font-weight: 800; color: var(--green); }
+  .compat-lbl { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; }
+  .btn-blend-friend {
+    padding: 8px 14px; background: var(--green); color: #000;
+    border: none; border-radius: 50px; font-size: 12px;
+    font-weight: 700; cursor: pointer; font-family: inherit;
+    display: flex; align-items: center; gap: 5px;
+    transition: all 0.2s; flex-shrink: 0;
+  }
+  .btn-blend-friend:hover { background: var(--green-bright); }
+
+  /* ─── BLEND RESULT ─── */
+  #blend-result { background: var(--bg); }
+  .blend-hero-result {
+    padding: 2rem 1.5rem 1.5rem;
+    background: linear-gradient(180deg, rgba(124,111,223,0.12) 0%, transparent 100%);
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+  }
+
+  .blend-avatars-row {
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 1.5rem;
+  }
+  .blend-av {
+    width: 70px; height: 70px; border-radius: 50%;
+    object-fit: cover; border: 3px solid var(--bg);
+    background: var(--bg5);
+  }
+  .blend-av.you { margin-right: -14px; z-index: 1; border-color: var(--green); }
+  .blend-av.them { z-index: 0; border-color: var(--purple); }
+  .blend-av-placeholder { display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 800; }
+
+  .compat-circle-wrap { margin: 0 auto 1.5rem; width: 140px; height: 140px; position: relative; }
+  .compat-circle-wrap svg { transform: rotate(-90deg); }
+  .compat-inner { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .compat-pct { font-size: 36px; font-weight: 900; color: var(--green); line-height: 1; }
+  .compat-word { font-size: 11px; color: var(--text2); text-transform: uppercase; letter-spacing: 1px; }
+
+  .blend-names { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 4px; }
+  .blend-tagline { font-size: 13px; color: var(--text2); }
+
+  /* BLEND CONTENT */
+  .blend-card { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 10px; }
+  .blend-card-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text2); margin-bottom: 1rem; display: flex; align-items: center; gap: 6px; }
+  .blend-card-title i { font-size: 13px; color: var(--green); }
+
+  .vibe-compare { display: flex; flex-direction: column; gap: 12px; }
+  .vibe-row-compare { display: grid; grid-template-columns: 1fr 60px 1fr; align-items: center; gap: 8px; }
+  .vibe-bar-left { height: 6px; background: var(--bg5); border-radius: 3px; overflow: hidden; display: flex; justify-content: flex-end; }
+  .vibe-fill-left { height: 100%; background: var(--green); border-radius: 3px; }
+  .vibe-bar-right { height: 6px; background: var(--bg5); border-radius: 3px; overflow: hidden; }
+  .vibe-fill-right { height: 100%; background: var(--purple); border-radius: 3px; }
+  .vibe-center-label { font-size: 10px; color: var(--text3); text-align: center; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  .vibe-legend { display: flex; gap: 1.5rem; justify-content: center; margin-bottom: 1rem; }
+  .vibe-leg-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text2); font-weight: 600; }
+  .vibe-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  .shared-list { display: flex; flex-direction: column; gap: 8px; }
+  .shared-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: var(--bg4); border-radius: var(--radius-sm); }
+  .shared-img { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; background: var(--bg5); flex-shrink: 0; }
+  .shared-info { flex: 1; min-width: 0; }
+  .shared-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .shared-sub { font-size: 11px; color: var(--text2); margin-top: 1px; }
+  .shared-badge { font-size: 10px; padding: 3px 8px; border-radius: 50px; font-weight: 700; flex-shrink: 0; }
+  .badge-both { background: var(--green-dim); color: var(--green); }
+  .badge-discover { background: rgba(124,111,223,0.15); color: var(--purple); }
+
+  .contrast-grid { display: flex; flex-direction: column; gap: 10px; }
+  .contrast-row { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center; }
+  .contrast-you { text-align: right; }
+  .contrast-them { text-align: left; }
+  .contrast-val { font-size: 14px; font-weight: 700; }
+  .contrast-sub { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+  .contrast-vs { font-size: 10px; color: var(--text3); padding: 0 4px; }
+
+  .discover-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+  .disc-pill { background: var(--bg4); border-radius: 50px; padding: 6px 12px; font-size: 12px; display: flex; align-items: center; gap: 6px; }
+  .disc-badge { font-size: 10px; padding: 2px 6px; border-radius: 50px; font-weight: 700; }
+  .db-you { background: var(--green-dim); color: var(--green); }
+  .db-them { background: rgba(124,111,223,0.15); color: var(--purple); }
+
+  .playlist-scroll { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 6px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+  .playlist-scroll::-webkit-scrollbar { display: none; }
+  .pl-card { flex-shrink: 0; width: 90px; cursor: pointer; }
+  .pl-img { width: 90px; height: 90px; border-radius: 10px; object-fit: cover; background: var(--bg5); margin-bottom: 6px; transition: transform 0.2s; }
+  .pl-card:hover .pl-img { transform: scale(1.04); }
+  .pl-name { font-size: 11px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pl-artist { font-size: 10px; color: var(--text2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+
+  .blend-stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 1rem; }
+  .bst { background: var(--bg4); border-radius: var(--radius-sm); padding: 10px; text-align: center; }
+  .bst-n { font-size: 20px; font-weight: 800; color: var(--green); }
+  .bst-l { font-size: 10px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+
+  /* ─── BOTTOM ACTIONS ─── */
+  .bottom-actions {
+    display: flex; gap: 10px;
+    padding: 1rem 1.5rem 2rem;
+    position: sticky; bottom: 0;
+    background: linear-gradient(0deg, var(--bg) 70%, transparent);
+  }
+  .btn-secondary {
+    flex: 1; padding: 14px;
+    background: var(--bg3); border: 1px solid var(--border2);
+    color: var(--text); border-radius: 50px;
+    font-size: 14px; font-weight: 700;
+    cursor: pointer; font-family: inherit;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all 0.2s;
+  }
+  .btn-secondary:hover { background: var(--bg4); }
+  .btn-primary {
+    flex: 2; padding: 14px;
+    background: var(--green); color: #000;
+    border: none; border-radius: 50px;
+    font-size: 14px; font-weight: 800;
+    cursor: pointer; font-family: inherit;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all 0.2s;
+  }
+  .btn-primary:hover { background: var(--green-bright); box-shadow: 0 4px 16px rgba(29,185,84,0.3); }
+
+  /* ─── TOAST ─── */
+  .toast {
+    position: fixed; bottom: 2rem; left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--bg3); border: 1px solid var(--border2);
+    color: var(--text); padding: 12px 20px;
+    border-radius: 50px; font-size: 14px; font-weight: 600;
+    transition: transform 0.3s; z-index: 9999;
+    white-space: nowrap; display: flex; align-items: center; gap: 8px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  }
+  .toast i { color: var(--green); }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ─── ERROR ─── */
+  .error-box {
+    background: rgba(224,92,58,0.1); border: 1px solid rgba(224,92,58,0.3);
+    border-radius: var(--radius); padding: 1rem; margin: 1rem 1.5rem;
+    font-size: 13px; color: var(--coral); display: none; align-items: center; gap: 8px;
+  }
+  .error-box.show { display: flex; }
+
+  /* ─── SETUP MODAL ─── */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+    z-index: 1000; display: flex; align-items: center; justify-content: center;
+    padding: 1.5rem; display: none;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: var(--bg3); border: 1px solid var(--border2);
+    border-radius: 20px; padding: 2rem; max-width: 400px; width: 100%;
+    position: relative;
+  }
+  .modal h2 { font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+  .modal p { font-size: 13px; color: var(--text2); line-height: 1.6; margin-bottom: 1.25rem; }
+  .modal input {
+    width: 100%; padding: 12px 14px;
+    background: var(--bg4); border: 1px solid var(--border2);
+    border-radius: 10px; color: var(--text);
+    font-size: 13px; font-family: inherit;
+    margin-bottom: 10px; outline: none;
+    transition: border-color 0.2s;
+  }
+  .modal input:focus { border-color: var(--green); }
+  .modal input::placeholder { color: var(--text3); }
+  .modal label { font-size: 12px; color: var(--text2); margin-bottom: 5px; display: block; font-weight: 600; }
+  .modal-close { position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: var(--text2); font-size: 18px; cursor: pointer; }
+  .modal-close:hover { color: var(--text); }
+  .step-hint { font-size: 11px; color: var(--text3); line-height: 1.5; margin-bottom: 1rem; background: var(--bg4); padding: 10px; border-radius: 8px; }
+  .step-hint a { color: var(--green); }
+  .step-hint code { background: var(--bg5); padding: 1px 5px; border-radius: 4px; font-family: monospace; font-size: 10px; }
+
+  /* Utils */
+  .mt1 { margin-top: 1rem; }
+  .full-width { grid-column: 1 / -1; }
+  .divider { height: 1px; background: var(--border); margin: 0 1.5rem 1.5rem; }
+  .flex-center { display: flex; align-items: center; justify-content: center; }
+  .back-btn {
+    display: flex; align-items: center; gap: 8px;
+    background: none; border: none; color: var(--text2);
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    font-family: inherit; padding: 1rem 1.5rem 0;
+    transition: color 0.2s;
+  }
+  .back-btn:hover { color: var(--text); }
+  .empty-msg { color: var(--text3); font-size: 13px; text-align: center; padding: 2rem 0; }
+
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .fade-up { animation: fadeUp 0.4s ease forwards; }
+
+  @media (max-width: 380px) {
+    .stats-grid { grid-template-columns: 1fr; }
+    .artist-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- PARTICLES -->
+<canvas id="particles-canvas"></canvas>
+
+<!-- ════════════════ SETUP MODAL ════════════════ -->
+<div class="modal-overlay" id="setup-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeSetup()"><i class="fa fa-times"></i></button>
+    <h2><i class="fa-brands fa-spotify" style="color:var(--green)"></i> Spotify Setup</h2>
+    <p>To use real Spotify data, enter your Spotify App credentials. Your data stays in this browser only.</p>
+    <div class="step-hint">
+      1. Go to <a href="https://developer.spotify.com/dashboard" target="_blank">developer.spotify.com/dashboard</a><br>
+      2. Create an app (any name)<br>
+      3. Add <code>http://localhost</code> and this page URL as Redirect URIs<br>
+      4. Copy your Client ID below
+    </div>
+    <label>Spotify Client ID</label>
+    <input type="text" id="client-id-input" placeholder="e.g. a1b2c3d4e5f6..." />
+    <label>Redirect URI (this page's URL)</label>
+    <input type="text" id="redirect-uri-input" value="" />
+    <button class="btn-login" style="margin-top:6px;" onclick="saveCredentials()">
+      <i class="fa-brands fa-spotify"></i> Save & Connect
+    </button>
+  </div>
+</div>
+
+<!-- ════════════════ LOGIN ════════════════ -->
+<div id="login" class="screen active">
+  <div class="login-inner above" style="margin:auto;">
+    <div class="brand-logo"><i class="fa-brands fa-spotify"></i></div>
+    <div class="brand-name">Blend</div>
+    <p class="brand-tagline">Connect your Spotify. See your real listening data, discover your music DNA, and blend tastes with friends.</p>
+    <button class="btn-login" onclick="handleLogin()">
+      <i class="fa-brands fa-spotify" style="font-size:20px;"></i>
+      Continue with Spotify
+    </button>
+    <div class="error-box" id="login-error"><i class="fa fa-triangle-exclamation"></i><span id="login-error-msg">Error</span></div>
+    <p class="login-note">
+      <i class="fa fa-lock" style="color:var(--green)"></i>
+      Read-only access. Your credentials never leave your browser.<br>
+      <a onclick="openSetup()" style="cursor:pointer;">Set up Spotify credentials</a> to use real data.
+    </p>
+    <div class="features-row">
+      <div class="feat"><div class="feat-icon"><i class="fa fa-chart-bar"></i></div><span>Taste Profile</span></div>
+      <div class="feat"><div class="feat-icon"><i class="fa fa-users"></i></div><span>Friend Blend</span></div>
+      <div class="feat"><div class="feat-icon"><i class="fa fa-wand-magic-sparkles"></i></div><span>Music DNA</span></div>
+      <div class="feat"><div class="feat-icon"><i class="fa fa-share-nodes"></i></div><span>Share</span></div>
+    </div>
+    <button style="background:none;border:1px solid var(--border);color:var(--text2);padding:10px 20px;border-radius:50px;font-size:13px;cursor:pointer;font-family:inherit;margin-top:0.5rem;" onclick="loadDemo()">
+      <i class="fa fa-play" style="font-size:11px;"></i> Try with demo data
+    </button>
+  </div>
+</div>
+
+<!-- ════════════════ LOADING ════════════════ -->
+<div id="loading" class="screen">
+  <div class="loader-wrap above" style="margin:auto;">
+    <div class="loader-bars">
+      <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+      <div class="bar"></div><div class="bar"></div>
+    </div>
+    <div class="loader-title" id="loader-title">Connecting to Spotify</div>
+    <div class="loader-sub" id="loader-sub">Authenticating your account...</div>
+  </div>
+</div>
+
+<!-- ════════════════ PROFILE ════════════════ -->
+<div id="profile" class="screen">
+  <nav class="nav above">
+    <div class="nav-brand"><i class="fa-brands fa-spotify"></i> Blend</div>
+    <div class="nav-right">
+      <button class="nav-btn green" onclick="goBlend()"><i class="fa fa-link"></i> Blend</button>
+      <div id="nav-avatar-wrap"></div>
+    </div>
+  </nav>
+
+  <div class="profile-hero above fade-up">
+    <div class="user-row">
+      <div id="user-avatar-wrap"></div>
+      <div>
+        <div class="user-name" id="user-display-name">Loading...</div>
+        <div class="user-meta" id="user-meta-text">Spotify User</div>
+      </div>
+    </div>
+    <div class="period-tabs">
+      <button class="period-tab active" data-range="short_term" onclick="switchRange(this,'short_term')">Last 4 weeks</button>
+      <button class="period-tab" data-range="medium_term" onclick="switchRange(this,'medium_term')">6 months</button>
+      <button class="period-tab" data-range="long_term" onclick="switchRange(this,'long_term')">All time</button>
+    </div>
+  </div>
+
+  <div id="profile-content" class="above"></div>
+</div>
+
+<!-- ════════════════ BLEND SHARE ════════════════ -->
+<div id="blend-share" class="screen">
+  <button class="back-btn above" onclick="showScreen('profile')"><i class="fa fa-arrow-left"></i> Back</button>
+  <div class="share-hero above fade-up">
+    <div class="share-kicker">Create a blend</div>
+    <h1 class="share-title">Share your <span>Blend Link</span></h1>
+    <p class="share-desc">Send this link to a friend. When they open it, your music tastes combine into a compatibility score and shared playlist.</p>
+  </div>
+
+  <div class="link-box above">
+    <i class="fa fa-link link-icon"></i>
+    <span class="link-text" id="share-url-text">blend.app/b/loading...</span>
+    <button class="btn-copy" onclick="copyBlendLink()"><i class="fa fa-copy"></i> Copy</button>
+  </div>
+
+  <div class="share-actions above">
+    <button class="share-action-btn whatsapp" onclick="shareWhatsApp()">
+      <i class="fa-brands fa-whatsapp"></i> WhatsApp
+    </button>
+    <button class="share-action-btn twitter" onclick="shareTwitter()">
+      <i class="fa-brands fa-x-twitter"></i> Twitter
+    </button>
+    <button class="share-action-btn more" onclick="shareNative()">
+      <i class="fa fa-share-nodes"></i> More
+    </button>
+  </div>
+
+  <div class="friends-section above" id="friends-list">
+    <div class="section-title" style="margin-bottom:1rem;">Your Spotify Friends</div>
+    <div class="empty-msg"><i class="fa fa-circle-notch fa-spin"></i> Loading following...</div>
+  </div>
+</div>
+
+<!-- ════════════════ BLEND RESULT ════════════════ -->
+<div id="blend-result" class="screen">
+  <button class="back-btn above" onclick="showScreen('blend-share')"><i class="fa fa-arrow-left"></i> Change friend</button>
+  <div class="blend-hero-result above fade-up">
+    <div class="blend-avatars-row" id="blend-av-row"></div>
+    <div class="blend-names" id="blend-names-title">Blend</div>
+    <div class="blend-tagline" id="blend-tagline">Calculating compatibility...</div>
+    <div class="compat-circle-wrap">
+      <svg width="140" height="140" viewBox="0 0 140 140">
+        <circle cx="70" cy="70" r="58" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="10"/>
+        <circle cx="70" cy="70" r="58" fill="none" stroke="var(--green)" stroke-width="10" stroke-linecap="round" id="compat-arc" stroke-dasharray="0 365"/>
+      </svg>
+      <div class="compat-inner">
+        <div class="compat-pct" id="compat-pct-text">0%</div>
+        <div class="compat-word">match</div>
+      </div>
+    </div>
+  </div>
+  <div id="blend-content" class="above" style="padding:0 1.5rem;"></div>
+  <div class="bottom-actions above">
+    <button class="btn-secondary" onclick="reshareBlend()"><i class="fa fa-share-nodes"></i> Share</button>
+    <button class="btn-primary" onclick="openSpotify()"><i class="fa-brands fa-spotify"></i> Open Playlist</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"><i class="fa fa-check"></i> <span id="toast-msg">Done</span></div>
+
+<script>
+// ─── CONFIG ───
+const SCOPES = 'user-read-private user-read-email user-top-read user-follow-read user-library-read';
+const DEMO_CLIENT_ID = '';
+
+let STATE = {
+  clientId: localStorage.getItem('blend_client_id') || '',
+  redirectUri: window.location.href.split('?')[0].split('#')[0],
+  token: null,
+  user: null,
+  topTracks: { short_term: null, medium_term: null, long_term: null },
+  topArtists: { short_term: null, medium_term: null, long_term: null },
+  audioFeatures: {},
+  currentRange: 'short_term',
+  blendFriend: null,
+  blendData: null,
+  isDemo: false
+};
+
+// ─── PARTICLES ───
+(function() {
+  const c = document.getElementById('particles-canvas');
+  const ctx = c.getContext('2d');
+  let W, H, pts = [];
+  function resize() { W = c.width = window.innerWidth; H = c.height = window.innerHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+  for (let i = 0; i < 60; i++) pts.push({ x: Math.random()*1e4%W, y: Math.random()*H, r: Math.random()*1.5+0.3, vx: (Math.random()-.5)*.3, vy: (Math.random()-.5)*.3, a: Math.random() });
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    pts.forEach(p => {
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+      if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(29,185,84,${p.a * 0.4})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ─── UTILS ───
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function showToast(msg) {
+  document.getElementById('toast-msg').textContent = msg;
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+function setLoading(title, sub) {
+  document.getElementById('loader-title').textContent = title;
+  document.getElementById('loader-sub').textContent = sub;
+  showScreen('loading');
+}
+
+function showError(msg) {
+  const el = document.getElementById('login-error');
+  document.getElementById('login-error-msg').textContent = msg;
+  el.classList.add('show');
+  showScreen('login');
+}
+
+// ─── SETUP MODAL ───
+function openSetup() {
+  document.getElementById('redirect-uri-input').value = STATE.redirectUri;
+  if (STATE.clientId) document.getElementById('client-id-input').value = STATE.clientId;
+  document.getElementById('setup-modal').classList.add('show');
+}
+function closeSetup() { document.getElementById('setup-modal').classList.remove('show'); }
+function saveCredentials() {
+  const id = document.getElementById('client-id-input').value.trim();
+  const uri = document.getElementById('redirect-uri-input').value.trim();
+  if (!id) return showToast('Please enter your Client ID');
+  STATE.clientId = id;
+  STATE.redirectUri = uri || STATE.redirectUri;
+  localStorage.setItem('blend_client_id', id);
+  closeSetup();
+  showToast('Credentials saved');
+}
+
+// ─── PKCE OAUTH ───
+async function generateCodeVerifier() {
+  const array = new Uint8Array(32);
+  window.crypto.getRandomValues(array);
+  return btoa(String.fromCharCode(...array)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+}
+async function generateCodeChallenge(verifier) {
+  const data = new TextEncoder().encode(verifier);
+  const digest = await window.crypto.subtle.digest('SHA-256', data);
+  return btoa(String.fromCharCode(...new Uint8Array(digest))).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+}
+
+async function handleLogin() {
+  if (!STATE.clientId) {
+    openSetup();
+    return;
+  }
+  const verifier = await generateCodeVerifier();
+  const challenge = await generateCodeChallenge(verifier);
+  sessionStorage.setItem('pkce_verifier', verifier);
+  const params = new URLSearchParams({
+    response_type: 'code',
+    client_id: STATE.clientId,
+    scope: SCOPES,
+    redirect_uri: STATE.redirectUri,
+    code_challenge_method: 'S256',
+    code_challenge: challenge,
+    state: 'blend_auth'
+  });
+  window.location.href = `https://accounts.spotify.com/authorize?${params}`;
+}
+
+async function exchangeCode(code) {
+  const verifier = sessionStorage.getItem('pkce_verifier');
+  if (!verifier) throw new Error('No PKCE verifier found. Please try again.');
+  const resp = await fetch('https://accounts.spotify.com/api/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      grant_type: 'authorization_code',
+      code,
+      redirect_uri: STATE.redirectUri,
+      client_id: STATE.clientId,
+      code_verifier: verifier
+    })
+  });
+  if (!resp.ok) throw new Error('Token exchange failed. Check your Client ID and Redirect URI.');
+  const data = await resp.json();
+  sessionStorage.removeItem('pkce_verifier');
+  return data.access_token;
+}
+
+// ─── SPOTIFY API ───
+async function spotifyGet(endpoint, token) {
+  const resp = await fetch(`https://api.spotify.com/v1${endpoint}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({}));
+    throw new Error(err.error?.message || `API error ${resp.status}`);
+  }
+  return resp.json();
+}
+
+async function getAudioFeatures(trackIds, token) {
+  if (!trackIds.length) return [];
+  const resp = await spotifyGet(`/audio-features?ids=${trackIds.slice(0,50).join(',')}`, token);
+  return resp.audio_features || [];
+}
+
+// ─── LOAD ALL DATA ───
+async function loadUserData(token) {
+  setLoading('Fetching your profile', 'Getting your Spotify info...');
+  const [user, tracks_short, tracks_medium, tracks_long, artists_short, artists_medium, artists_long] = await Promise.all([
+    spotifyGet('/me', token),
+    spotifyGet('/me/top/tracks?limit=50&time_range=short_term', token),
+    spotifyGet('/me/top/tracks?limit=50&time_range=medium_term', token),
+    spotifyGet('/me/top/tracks?limit=50&time_range=long_term', token),
+    spotifyGet('/me/top/artists?limit=50&time_range=short_term', token),
+    spotifyGet('/me/top/artists?limit=50&time_range=medium_term', token),
+    spotifyGet('/me/top/artists?limit=50&time_range=long_term', token),
+  ]);
+
+  setLoading('Analysing your music DNA', 'Calculating audio features...');
+  const allTrackIds = [...new Set([
+    ...tracks_short.items.map(t=>t.id),
+    ...tracks_medium.items.slice(0,20).map(t=>t.id)
+  ])].slice(0,50);
+  const features = await getAudioFeatures(allTrackIds, token);
+
+  STATE.token = token;
+  STATE.user = user;
+  STATE.topTracks = { short_term: tracks_short.items, medium_term: tracks_medium.items, long_term: tracks_long.items };
+  STATE.topArtists = { short_term: artists_short.items, medium_term: artists_medium.items, long_term: artists_long.items };
+  features.forEach(f => { if(f) STATE.audioFeatures[f.id] = f; });
+}
+
+// ─── DEMO DATA ───
+function loadDemo() {
+  STATE.isDemo = true;
+  STATE.token = 'demo';
+  STATE.user = {
+    display_name: 'Demo User', id: 'demo',
+    followers: { total: 42 },
+    images: []
+  };
+  const makeTrack = (name, artist, img, id) => ({ id, name, artists:[{name:artist}], album:{name:'Album',images:[{url:img}]}, external_urls:{spotify:'https://open.spotify.com'} });
+  const makeArtist = (name, genres, img, id, pop) => ({ id, name, genres, images:[{url:img}], popularity:pop, external_urls:{spotify:'https://open.spotify.com'} });
+  const ph = 'https://via.placeholder.com/64/1DB954/000000?text=';
+  const tracks = [
+    makeTrack('Take Me to Church','Hozier','','t1'),
+    makeTrack('Motion Sickness','Phoebe Bridgers','','t2'),
+    makeTrack('Electric Feel','MGMT','','t3'),
+    makeTrack('Ribs','Lorde','','t4'),
+    makeTrack('Skinny Love','Bon Iver','','t5'),
+    makeTrack('Holocene','Bon Iver','','t6'),
+    makeTrack('Dog Days Are Over','Florence + The Machine','','t7'),
+    makeTrack('Little Talks','Of Monsters and Men','','t8'),
+    makeTrack('Home','Daughter','','t9'),
+    makeTrack('Youth','Daughter','','t10'),
+  ];
+  const artists = [
+    makeArtist('Hozier',['indie folk','alternative'],'','a1',82),
+    makeArtist('Phoebe Bridgers',['indie folk','chamber pop'],'','a2',79),
+    makeArtist('Bon Iver',['indie folk','folk'],'','a3',75),
+    makeArtist('Lorde',['indie pop','electropop'],'','a4',80),
+    makeArtist('MGMT',['psychedelic pop','indie rock'],'','a5',72),
+    makeArtist('Florence + The Machine',['indie rock','baroque pop'],'','a6',78),
+  ];
+  const af = { t1:{energy:0.82,danceability:0.54,valence:0.38,acousticness:0.21,instrumentalness:0.0,tempo:129,loudness:-5.2},
+    t2:{energy:0.55,danceability:0.48,valence:0.31,acousticness:0.45,instrumentalness:0.0,tempo:96,loudness:-9.1},
+    t3:{energy:0.76,danceability:0.72,valence:0.74,acousticness:0.08,instrumentalness:0.02,tempo:118,loudness:-6.3},
+    t4:{energy:0.44,danceability:0.39,valence:0.25,acousticness:0.62,instrumentalness:0.0,tempo:84,loudness:-11},
+    t5:{energy:0.38,danceability:0.35,valence:0.22,acousticness:0.71,instrumentalness:0.1,tempo:76,loudness:-13},
+  };
+  STATE.topTracks = { short_term: tracks, medium_term: tracks, long_term: tracks };
+  STATE.topArtists = { short_term: artists, medium_term: artists, long_term: artists };
+  STATE.audioFeatures = af;
+  renderProfile();
+}
+
+// ─── RENDER PROFILE ───
+function renderProfile() {
+  const u = STATE.user;
+  // nav avatar
+  const navWrap = document.getElementById('nav-avatar-wrap');
+  navWrap.innerHTML = u.images?.[0] ? `<img class="nav-avatar" src="${u.images[0].url}">` : `<div class="nav-avatar-placeholder">${(u.display_name||'?')[0].toUpperCase()}</div>`;
+  // user avatar
+  const avWrap = document.getElementById('user-avatar-wrap');
+  avWrap.innerHTML = u.images?.[0] ? `<img class="user-avatar" src="${u.images[0].url}">` : `<div class="user-avatar-placeholder user-avatar">${(u.display_name||'?')[0].toUpperCase()}</div>`;
+  document.getElementById('user-display-name').textContent = u.display_name || 'Spotify User';
+  document.getElementById('user-meta-text').innerHTML = `<span>${u.followers?.total || 0}</span> followers · Spotify`;
+
+  // Generate blend link
+  const blendId = btoa(u.id + ':' + Date.now()).replace(/=/g,'').slice(0,10);
+  document.getElementById('share-url-text').textContent = `blend.app/b/${blendId}`;
+
+  renderRange(STATE.currentRange);
+  showScreen('profile');
+}
+
+function switchRange(btn, range) {
+  document.querySelectorAll('.period-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  STATE.currentRange = range;
+  renderRange(range);
+}
+
+function renderRange(range) {
+  const tracks = STATE.topTracks[range] || [];
+  const artists = STATE.topArtists[range] || [];
+  const features = computeAverageFeatures(tracks.slice(0,20));
+  const genres = computeGenres(artists);
+  const moods = computeMoods(features);
+
+  const el = document.getElementById('profile-content');
+  el.innerHTML = '';
+
+  // Stats
+  const topGenre = genres[0]?.name || 'Mixed';
+  const topArtist = artists[0]?.name || '—';
+  const topTrack = tracks[0]?.name || '—';
+  const statsHTML = `
+  <div class="section fade-up">
+    <div class="stats-grid">
+      <div class="stat-card c-green full-width">
+        <div class="stat-card-label"><i class="fa fa-music"></i> Top genre</div>
+        <div class="stat-card-value" style="font-size:18px;">${topGenre}</div>
+      </div>
+      <div class="stat-card c-purple">
+        <div class="stat-card-label"><i class="fa fa-star"></i> Top artist</div>
+        <div class="stat-card-value" style="font-size:14px;margin-top:4px;">${topArtist}</div>
+        <div class="stat-card-sub">${artists[0]?.genres?.[0] || ''}</div>
+      </div>
+      <div class="stat-card c-coral">
+        <div class="stat-card-label"><i class="fa fa-fire"></i> Top track</div>
+        <div class="stat-card-value" style="font-size:12px;margin-top:4px;">${topTrack}</div>
+        <div class="stat-card-sub">${tracks[0]?.artists?.[0]?.name || ''}</div>
+      </div>
+      <div class="stat-card c-amber">
+        <div class="stat-card-label"><i class="fa fa-bolt"></i> Energy level</div>
+        <div class="stat-card-value">${Math.round((features.energy||0)*100)}%</div>
+        <div class="stat-card-sub">${features.energy > 0.7 ? 'High energy listener' : features.energy > 0.4 ? 'Balanced vibe' : 'Chill listener'}</div>
+      </div>
+      <div class="stat-card c-blue">
+        <div class="stat-card-label"><i class="fa fa-compact-disc"></i> Artists</div>
+        <div class="stat-card-value">${artists.length}</div>
+        <div class="stat-card-sub">In your top list</div>
+      </div>
+    </div>
+  </div>`;
+
+  // Mood
+  const moodHTML = `
+  <div class="section fade-up">
+    <div class="section-header"><span class="section-title"><i class="fa fa-face-smile"></i> Your listening mood</span></div>
+    <div class="mood-tags">${moods.map(m=>`<span class="mood-tag">${m}</span>`).join('')}</div>
+  </div>`;
+
+  // Audio features
+  const afHTML = `
+  <div class="section fade-up">
+    <div class="section-header"><span class="section-title"><i class="fa fa-wave-square"></i> Audio DNA</span></div>
+    <div class="audio-features">
+      ${afRow('fa-bolt','Energy', features.energy, '#1DB954')}
+      ${afRow('fa-person-running','Danceability', features.danceability, '#7c6fdf')}
+      ${afRow('fa-face-smile','Valence (mood)', features.valence, '#f0a020')}
+      ${afRow('fa-guitar','Acousticness', features.acousticness, '#e05c3a')}
+      ${afRow('fa-headphones','Instrumentalness', features.instrumentalness, '#3a8fdd')}
+      ${afRow('fa-music','Speechiness', features.speechiness, '#1DB954')}
+    </div>
+  </div>`;
+
+  // Top tracks
+  const tracksHTML = `
+  <div class="section fade-up">
+    <div class="section-header"><span class="section-title"><i class="fa fa-list-ol"></i> Top tracks</span></div>
+    <div class="track-list">
+      ${tracks.slice(0,10).map((t,i) => `
+        <div class="track-item" onclick="openTrack('${t.external_urls?.spotify || '#'}')">
+          <span class="track-rank">${i+1}</span>
+          <img class="track-img" src="${t.album?.images?.[2]?.url || t.album?.images?.[0]?.url || ''}" onerror="this.style.background='var(--bg5)';this.src=''" loading="lazy">
+          <div class="track-info">
+            <div class="track-name">${esc(t.name)}</div>
+            <div class="track-artist">${esc(t.artists.map(a=>a.name).join(', '))}</div>
+          </div>
+          <button class="play-btn" onclick="event.stopPropagation();openTrack('${t.external_urls?.spotify || '#'}')">
+            <i class="fa fa-play"></i>
+          </button>
+        </div>`).join('')}
+    </div>
+  </div>`;
+
+  // Top artists
+  const artistsHTML = `
+  <div class="section fade-up">
+    <div class="section-header"><span class="section-title"><i class="fa fa-microphone"></i> Top artists</span></div>
+    <div class="artist-grid">
+      ${artists.slice(0,9).map((a,i) => `
+        <div class="artist-card" onclick="openTrack('${a.external_urls?.spotify || '#'}')">
+          <img class="artist-img" src="${a.images?.[1]?.url || a.images?.[0]?.url || ''}" onerror="this.style.background='var(--bg5)';this.src=''" loading="lazy">
+          <div class="artist-name">${esc(a.name)}</div>
+          <div class="artist-rank-badge">#${i+1}</div>
+        </div>`).join('')}
+    </div>
+  </div>`;
+
+  // Genres
+  const genreHTML = `
+  <div class="section fade-up">
+    <div class="section-header"><span class="section-title"><i class="fa fa-tags"></i> Genre breakdown</span></div>
+    <div class="genre-bars">
+      ${genres.slice(0,8).map(g => `
+        <div class="genre-row">
+          <span class="genre-label">${esc(g.name)}</span>
+          <div class="genre-track-bg"><div class="genre-fill" style="width:${g.pct}%"></div></div>
+          <span class="genre-pct">${Math.round(g.pct)}%</span>
+        </div>`).join('')}
+    </div>
+  </div>`;
+
+  el.innerHTML = statsHTML + moodHTML + afHTML + tracksHTML + artistsHTML + genreHTML + `
+  <div class="blend-cta above fade-up">
+    <h3>Blend with a friend</h3>
+    <p>Share a link, combine tastes, see your music compatibility score and a blended playlist.</p>
+    <button class="btn-blend" onclick="goBlend()">
+      <i class="fa fa-wand-magic-sparkles"></i> Create Blend Link
+    </button>
+  </div>`;
+}
+
+function afRow(icon, label, val, color) {
+  const pct = Math.round((val||0)*100);
+  return `
+  <div class="af-row">
+    <div class="af-label"><i class="fa ${icon}"></i> ${label}</div>
+    <div class="af-bar"><div class="af-fill" style="width:${pct}%;background:${color}"></div></div>
+    <div class="af-val" style="color:${color}">${pct}%</div>
+  </div>`;
+}
+
+// ─── BLEND SHARE ───
+function goBlend() {
+  loadFriends();
+  showScreen('blend-share');
+}
+
+async function loadFriends() {
+  const container = document.getElementById('friends-list');
+  if (STATE.isDemo) {
+    const demoFriends = [
+      { id:'f1', display_name:'Jordan K.', images:[], shared_genres:['Indie Folk','Alternative'], compat:94 },
+      { id:'f2', display_name:'Maya R.', images:[], shared_genres:['Pop','Indie'], compat:78 },
+      { id:'f3', display_name:'Sam P.', images:[], shared_genres:['Electronic','Ambient'], compat:61 },
+    ];
+    renderFriends(demoFriends, container);
+    return;
+  }
+  try {
+    const data = await spotifyGet('/me/following?type=artist&limit=5', STATE.token);
+    // Spotify doesn't expose friend list publicly, so show a note
+    container.innerHTML = `
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;text-align:center;">
+        <i class="fa fa-circle-info" style="color:var(--amber);font-size:24px;margin-bottom:8px;display:block;"></i>
+        <p style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:1rem;">Spotify's API does not expose friend lists. Share your blend link above and ask your friend to open it — when they log in, your tastes combine.</p>
+        <p style="font-size:12px;color:var(--text3);">You follow ${data.artists?.total || 0} artists on Spotify.</p>
+      </div>`;
+  } catch(e) {
+    container.innerHTML = `<div class="empty-msg"><i class="fa fa-circle-exclamation"></i> ${e.message}</div>`;
+  }
+}
+
+function renderFriends(friends, container) {
+  container.innerHTML = `<div class="section-title" style="margin-bottom:1rem;">Demo friends</div>`;
+  friends.forEach(f => {
+    const initials = f.display_name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const avatarEl = f.images?.[0] ? `<img class="friend-avatar" src="${f.images[0].url}">` : `<div class="friend-avatar" style="background:linear-gradient(135deg,var(--green),#0f6b30);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;">${initials}</div>`;
+    const el = document.createElement('div');
+    el.className = 'friend-item';
+    el.innerHTML = `
+      <div class="friend-avatar-wrap">${avatarEl}<div class="friend-online"></div></div>
+      <div class="friend-info">
+        <div class="friend-name">${esc(f.display_name)}</div>
+        <div class="friend-shared">${f.shared_genres?.join(' · ') || 'Music lover'}</div>
+      </div>
+      <div class="compat-preview">
+        <div class="compat-num">${f.compat}%</div>
+        <div class="compat-lbl">predicted</div>
+      </div>
+      <button class="btn-blend-friend" onclick="event.stopPropagation();startBlend(${JSON.stringify(f).replace(/"/g,'&quot;')})">
+        <i class="fa fa-link"></i> Blend
+      </button>`;
+    container.appendChild(el);
+  });
+}
+
+// ─── BLEND ───
+function startBlend(friend) {
+  STATE.blendFriend = friend;
+  setLoading('Blending tastes', 'Calculating music compatibility...');
+
+  const myTracks = STATE.topTracks[STATE.currentRange] || [];
+  const myArtists = STATE.topArtists[STATE.currentRange] || [];
+  const myFeatures = computeAverageFeatures(myTracks.slice(0,20));
+  const myGenres = computeGenres(myArtists);
+
+  // For demo/no-API: generate synthetic friend data
+  const friendTracks = generateFriendTracks(myTracks, friend.compat || 75);
+  const friendArtists = generateFriendArtists(myArtists, friend.compat || 75);
+  const friendFeatures = perturbFeatures(myFeatures, 0.15);
+  const friendGenres = computeGenres(friendArtists);
+
+  const compat = computeCompatibility(myFeatures, friendFeatures, myGenres, friendGenres, friend.compat);
+  const sharedArtists = findSharedArtists(myArtists, friendArtists);
+  const sharedGenres = findSharedGenres(myGenres, friendGenres);
+  const blendTracks = blendPlaylists(myTracks, friendTracks);
+  const discoverForYou = friendArtists.filter(fa => !myArtists.find(ma => ma.id===fa.id || ma.name===fa.name)).slice(0,4);
+  const discoverForThem = myArtists.filter(ma => !friendArtists.find(fa => fa.id===ma.id || fa.name===ma.name)).slice(0,3);
+  const contrasts = computeContrasts(myFeatures, friendFeatures, myGenres, friendGenres);
+
+  STATE.blendData = { compat, sharedArtists, sharedGenres, blendTracks, discoverForYou, discoverForThem, contrasts, myFeatures, friendFeatures, friend };
+
+  setTimeout(() => { renderBlendResult(); showScreen('blend-result'); }, 1200);
+}
+
+function renderBlendResult() {
+  const { compat, sharedArtists, blendTracks, discoverForYou, discoverForThem, contrasts, myFeatures, friendFeatures, friend } = STATE.blendData;
+  const me = STATE.user;
+
+  // Avatars
+  const myInit = (me.display_name||'?')[0].toUpperCase();
+  const frInit = (friend.display_name||'?')[0].toUpperCase();
+  const avRow = document.getElementById('blend-av-row');
+  avRow.innerHTML = `
+    <div class="blend-av you blend-av-placeholder" style="background:linear-gradient(135deg,var(--green),#0f6b30)">${myInit}</div>
+    <div class="blend-av them blend-av-placeholder" style="background:linear-gradient(135deg,var(--purple),#534AB7)">${frInit}</div>`;
+  if (me.images?.[0]) avRow.children[0].innerHTML = `<img style="width:100%;height:100%;border-radius:50%;object-fit:cover" src="${me.images[0].url}">`;
+
+  document.getElementById('blend-names-title').textContent = `${me.display_name?.split(' ')[0] || 'You'} & ${friend.display_name?.split(' ')[0] || 'Friend'}`;
+  document.getElementById('blend-tagline').textContent = compatLabel(compat) + ' music taste';
+
+  // Animate ring
+  const circ = 2 * Math.PI * 58;
+  const arc = document.getElementById('compat-arc');
+  const pctEl = document.getElementById('compat-pct-text');
+  let cur = 0;
+  const step = compat / 50;
+  const iv = setInterval(() => {
+    cur = Math.min(cur + step, compat);
+    arc.setAttribute('stroke-dasharray', (cur/100*circ) + ' ' + circ);
+    pctEl.textContent = Math.round(cur) + '%';
+    if (cur >= compat) clearInterval(iv);
+  }, 20);
+  arc.style.stroke = compat >= 80 ? 'var(--green)' : compat >= 60 ? 'var(--amber)' : 'var(--purple)';
+
+  // Content
+  const myName = me.display_name?.split(' ')[0] || 'You';
+  const frName = friend.display_name?.split(' ')[0] || 'Friend';
+
+  const content = document.getElementById('blend-content');
+  content.innerHTML = `
+    <!-- VIBE COMPARE -->
+    <div class="blend-card fade-up">
+      <div class="blend-card-title"><i class="fa fa-wave-square"></i> Music DNA comparison</div>
+      <div class="vibe-legend">
+        <div class="vibe-leg-item"><div class="vibe-dot" style="background:var(--green)"></div>${myName}</div>
+        <div class="vibe-leg-item"><div class="vibe-dot" style="background:var(--purple)"></div>${frName}</div>
+      </div>
+      <div class="vibe-compare">
+        ${vibeRow('Energy', myFeatures.energy, friendFeatures.energy)}
+        ${vibeRow('Danceability', myFeatures.danceability, friendFeatures.danceability)}
+        ${vibeRow('Mood', myFeatures.valence, friendFeatures.valence)}
+        ${vibeRow('Acoustic', myFeatures.acousticness, friendFeatures.acousticness)}
+        ${vibeRow('Instrumental', myFeatures.instrumentalness, friendFeatures.instrumentalness)}
+      </div>
+    </div>
+
+    <!-- SHARED ARTISTS -->
+    <div class="blend-card fade-up">
+      <div class="blend-card-title"><i class="fa fa-heart"></i> Artists you both love</div>
+      ${sharedArtists.length ? `<div class="shared-list">
+        ${sharedArtists.slice(0,5).map(a => `
+          <div class="shared-item">
+            <img class="shared-img" src="${a.images?.[2]?.url || a.images?.[0]?.url || ''}" onerror="this.style.background='var(--bg5)';this.src=''">
+            <div class="shared-info">
+              <div class="shared-name">${esc(a.name)}</div>
+              <div class="shared-sub">${a.genres?.[0] || 'Artist'}</div>
+            </div>
+            <span class="shared-badge badge-both"><i class="fa fa-check"></i> Both</span>
+          </div>`).join('')}
+      </div>` : `<p style="font-size:13px;color:var(--text3);padding:0.5rem 0;">No exact artist overlap — but your genres align! Perfect for discovering new music together.</p>`}
+    </div>
+
+    <!-- TASTE CONTRAST -->
+    ${contrasts.length ? `<div class="blend-card fade-up">
+      <div class="blend-card-title"><i class="fa fa-shuffle"></i> Where you differ — discover together</div>
+      <div class="contrast-grid">
+        ${contrasts.map(c => `
+          <div class="contrast-row">
+            <div class="contrast-you">
+              <div class="contrast-val" style="color:var(--green)">${c.you}</div>
+              <div class="contrast-sub">${myName}</div>
+            </div>
+            <div class="contrast-vs">vs</div>
+            <div class="contrast-them">
+              <div class="contrast-val" style="color:var(--purple)">${c.them}</div>
+              <div class="contrast-sub">${frName}</div>
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>` : ''}
+
+    <!-- DISCOVER -->
+    ${discoverForYou.length ? `<div class="blend-card fade-up">
+      <div class="blend-card-title"><i class="fa fa-compass"></i> Discover through ${frName}</div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:10px;">${frName} loves these — you might not know them yet</div>
+      <div class="discover-pills">
+        ${discoverForYou.map(a=>`<div class="disc-pill">${esc(a.name)} <span class="disc-badge db-them">${frName}</span></div>`).join('')}
+      </div>
+      ${discoverForThem.length ? `
+      <div style="font-size:12px;color:var(--text3);margin:14px 0 10px;">Your music ${frName} should explore</div>
+      <div class="discover-pills">
+        ${discoverForThem.map(a=>`<div class="disc-pill">${esc(a.name)} <span class="disc-badge db-you">${myName}</span></div>`).join('')}
+      </div>` : ''}
+    </div>` : ''}
+
+    <!-- BLEND PLAYLIST -->
+    ${blendTracks.length ? `<div class="blend-card fade-up">
+      <div class="blend-card-title"><i class="fa fa-list-music"></i> Your blend playlist</div>
+      <div class="blend-stats-row">
+        <div class="bst"><div class="bst-n">${blendTracks.length}</div><div class="bst-l">Tracks</div></div>
+        <div class="bst"><div class="bst-n">${Math.floor(blendTracks.length/2)}</div><div class="bst-l">From you</div></div>
+        <div class="bst"><div class="bst-n">${Math.ceil(blendTracks.length/2)}</div><div class="bst-l">From ${frName}</div></div>
+      </div>
+      <div class="playlist-scroll">
+        ${blendTracks.slice(0,10).map(t => `
+          <div class="pl-card" onclick="openTrack('${t.external_urls?.spotify || '#'}')">
+            <img class="pl-img" src="${t.album?.images?.[1]?.url || t.album?.images?.[0]?.url || ''}" onerror="this.style.background='var(--bg5)';this.src=''" loading="lazy">
+            <div class="pl-name">${esc(t.name)}</div>
+            <div class="pl-artist">${esc(t.artists?.[0]?.name || '')}</div>
+          </div>`).join('')}
+      </div>
+    </div>` : ''}
+  `;
+}
+
+function vibeRow(label, myVal, themVal) {
+  const mp = Math.round((myVal||0)*100);
+  const tp = Math.round((themVal||0)*100);
+  return `
+  <div class="vibe-row-compare">
+    <div class="vibe-bar-left"><div class="vibe-fill-left" style="width:${mp}%"></div></div>
+    <div class="vibe-center-label">${label}</div>
+    <div class="vibe-bar-right"><div class="vibe-fill-right" style="width:${tp}%"></div></div>
+  </div>`;
+}
+
+// ─── ALGORITHMS ───
+function computeAverageFeatures(tracks) {
+  const featureKeys = ['energy','danceability','valence','acousticness','instrumentalness','speechiness','tempo'];
+  const sums = {}; let count = 0;
+  tracks.forEach(t => {
+    const f = STATE.audioFeatures[t.id];
+    if (!f) return;
+    featureKeys.forEach(k => sums[k] = (sums[k]||0) + f[k]);
+    count++;
+  });
+  if (!count) return { energy:0.6, danceability:0.5, valence:0.5, acousticness:0.3, instrumentalness:0.05, speechiness:0.1, tempo:120 };
+  const avg = {};
+  featureKeys.forEach(k => avg[k] = (sums[k]||0) / count);
+  return avg;
+}
+
+function computeGenres(artists) {
+  const counts = {};
+  artists.forEach(a => (a.genres||[]).forEach(g => counts[g] = (counts[g]||0) + 1));
+  const total = artists.length || 1;
+  return Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([name,c]) => ({ name: name.replace(/(^|\s)\w/g,l=>l.toUpperCase()), pct: Math.min(100,(c/total)*100*2) }));
+}
+
+function computeMoods(f) {
+  const moods = [];
+  if (f.valence < 0.35) moods.push('Melancholic');
+  if (f.valence > 0.65) moods.push('Upbeat');
+  if (f.energy > 0.7) moods.push('High Energy');
+  if (f.energy < 0.4) moods.push('Chill');
+  if (f.danceability > 0.7) moods.push('Danceable');
+  if (f.acousticness > 0.5) moods.push('Acoustic');
+  if (f.instrumentalness > 0.3) moods.push('Instrumental');
+  if (f.energy > 0.5 && f.valence < 0.4) moods.push('Intense');
+  if (f.energy < 0.5 && f.valence > 0.5) moods.push('Dreamy');
+  if (f.tempo > 130) moods.push('Fast Paced');
+  if (f.tempo < 90) moods.push('Slow Burn');
+  if (!moods.length) moods.push('Eclectic');
+  return moods.slice(0,6);
+}
+
+function computeCompatibility(mf, ff, mg, fg, hint) {
+  if (hint) return hint;
+  const featureKeys = ['energy','danceability','valence','acousticness'];
+  let featureScore = 0;
+  featureKeys.forEach(k => featureScore += 1 - Math.abs((mf[k]||0) - (ff[k]||0)));
+  featureScore = (featureScore / featureKeys.length) * 100;
+  const myGenreNames = new Set(mg.map(g=>g.name));
+  const shared = fg.filter(g => myGenreNames.has(g.name)).length;
+  const genreScore = Math.min(100, (shared / Math.max(mg.length,1)) * 200);
+  return Math.round(featureScore * 0.6 + genreScore * 0.4);
+}
+
+function findSharedArtists(mine, theirs) {
+  return mine.filter(ma => theirs.some(ta => ta.id === ma.id || ta.name === ma.name));
+}
+
+function findSharedGenres(mine, theirs) {
+  const theirNames = new Set(theirs.map(g=>g.name));
+  return mine.filter(g => theirNames.has(g.name));
+}
+
+function blendPlaylists(mine, theirs) {
+  const out = []; const seen = new Set();
+  const maxLen = Math.min(mine.length, theirs.length, 15);
+  for (let i = 0; i < maxLen; i++) {
+    if (mine[i] && !seen.has(mine[i].id)) { out.push(mine[i]); seen.add(mine[i].id); }
+    if (theirs[i] && !seen.has(theirs[i].id)) { out.push(theirs[i]); seen.add(theirs[i].id); }
+  }
+  return out.slice(0, 20);
+}
+
+function computeContrasts(mf, ff) {
+  const contrasts = [];
+  const diff = (a,b) => Math.abs((a||0)-(b||0));
+  if (diff(mf.valence,ff.valence) > 0.2) contrasts.push({ you: mf.valence > ff.valence ? 'Upbeat' : 'Melancholic', them: ff.valence > mf.valence ? 'Upbeat' : 'Melancholic' });
+  if (diff(mf.energy,ff.energy) > 0.2) contrasts.push({ you: mf.energy > ff.energy ? 'High Energy' : 'Chill', them: ff.energy > mf.energy ? 'High Energy' : 'Chill' });
+  if (diff(mf.acousticness,ff.acousticness) > 0.2) contrasts.push({ you: mf.acousticness > ff.acousticness ? 'Acoustic' : 'Electronic', them: ff.acousticness > mf.acousticness ? 'Acoustic' : 'Electronic' });
+  if (diff(mf.danceability,ff.danceability) > 0.15) contrasts.push({ you: mf.danceability > ff.danceability ? 'Danceable' : 'Atmospheric', them: ff.danceability > mf.danceability ? 'Danceable' : 'Atmospheric' });
+  return contrasts.slice(0,3);
+}
+
+function perturbFeatures(f, amount) {
+  const out = {};
+  Object.keys(f).forEach(k => {
+    if (k === 'tempo') { out[k] = f[k] + (Math.random()-0.5) * 30; }
+    else { out[k] = Math.max(0, Math.min(1, (f[k]||0) + (Math.random()-0.5) * amount * 2)); }
+  });
+  return out;
+}
+
+function generateFriendTracks(myTracks, compat) {
+  // mix some real tracks with permuted list
+  const shuffled = [...myTracks].sort(() => Math.random()-0.5);
+  const overlap = Math.floor(myTracks.length * (compat/100) * 0.4);
+  return [...myTracks.slice(0,overlap), ...shuffled.slice(0, myTracks.length - overlap)];
+}
+
+function generateFriendArtists(myArtists, compat) {
+  const shuffled = [...myArtists].sort(() => Math.random()-0.5);
+  const overlap = Math.floor(myArtists.length * (compat/100) * 0.5);
+  return [...myArtists.slice(0,overlap), ...shuffled.slice(0, Math.min(6, myArtists.length - overlap))];
+}
+
+function compatLabel(pct) {
+  if (pct >= 85) return 'Twin flame';
+  if (pct >= 70) return 'Kindred spirit';
+  if (pct >= 55) return 'Harmonious';
+  if (pct >= 40) return 'Complementary';
+  return 'Contrasting';
+}
+
+function esc(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ─── SHARE ACTIONS ───
+function copyBlendLink() {
+  const url = document.getElementById('share-url-text').textContent;
+  navigator.clipboard?.writeText(`https://${url}`).catch(()=>{});
+  document.querySelector('.btn-copy').innerHTML = '<i class="fa fa-check"></i> Copied!';
+  setTimeout(() => document.querySelector('.btn-copy').innerHTML = '<i class="fa fa-copy"></i> Copy', 2000);
+  showToast('Link copied to clipboard');
+}
+
+function shareWhatsApp() {
+  const url = document.getElementById('share-url-text').textContent;
+  window.open(`https://wa.me/?text=${encodeURIComponent('Check out our music blend! ' + url)}`, '_blank');
+}
+
+function shareTwitter() {
+  const url = document.getElementById('share-url-text').textContent;
+  window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent('Blending music tastes with me 🎵')}&&url=${encodeURIComponent(url)}`, '_blank');
+}
+
+function shareNative() {
+  const url = document.getElementById('share-url-text').textContent;
+  if (navigator.share) { navigator.share({ title:'Music Blend', text:'Check our blend!', url:`https://${url}` }); }
+  else copyBlendLink();
+}
+
+function reshareBlend() {
+  if (navigator.share) { navigator.share({ title:'My Music Blend', text:`We scored ${STATE.blendData?.compat || '?'}% compatibility!`, url: window.location.href }); }
+  else showToast('Link copied');
+}
+
+function openSpotify() {
+  window.open('https://open.spotify.com', '_blank');
+}
+
+function openTrack(url) {
+  if (url && url !== '#') window.open(url, '_blank');
+}
+
+// ─── INIT (handle OAuth callback) ───
+async function init() {
+  document.getElementById('redirect-uri-input').value = STATE.redirectUri;
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('code');
+  const error = params.get('error');
+
+  // Clean URL
+  if (code || error) window.history.replaceState({}, '', window.location.pathname);
+
+  if (error) { showError('Spotify denied access: ' + error); return; }
+
+  if (code) {
+    try {
+      setLoading('Authenticating', 'Exchanging authorization code...');
+      const token = await exchangeCode(code);
+      setLoading('Loading your data', 'Fetching top tracks and artists...');
+      await loadUserData(token);
+      renderProfile();
+    } catch(e) {
+      showError(e.message);
+    }
+    return;
+  }
+
+  // Check stored token
+  const storedToken = sessionStorage.getItem('blend_token');
+  if (storedToken) {
+    try {
+      setLoading('Loading your profile', 'Getting your data...');
+      await loadUserData(storedToken);
+      renderProfile();
+      return;
+    } catch(e) {}
+  }
+
+  showScreen('login');
+}
+
+init();
+</script>
+</body>
+</html>
