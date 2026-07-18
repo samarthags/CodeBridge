@@ -3,7 +3,108 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bridge — P2P Transfer</title>
+
+<!-- Primary SEO -->
+<title>Flex API — Instant P2P File & Text Sharing Between Any Devices</title>
+<meta name="title" content="Flex API — Instant P2P File & Text Sharing Between Any Devices">
+<meta name="description" content="Flex API is a free peer-to-peer sharing tool. Send files, images, audio, links and text between PC, laptop, and mobile — any device to any device — using a QR code or 6-digit pairing code. No login. No server storage. End-to-end, point-to-point encrypted.">
+<meta name="keywords" content="flex api, p2p file sharing, share files between devices, phone to pc file transfer, pc to mobile sharing, cross device file transfer, no login file sharing, webrtc file share, qr code file transfer, secure peer to peer transfer">
+<meta name="author" content="Samartha Gs">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://flexapi.app/">
+<meta name="theme-color" content="#000000">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://flexapi.app/">
+<meta property="og:site_name" content="Flex API">
+<meta property="og:title" content="Flex API — Instant P2P File & Text Sharing Between Any Devices">
+<meta property="og:description" content="Send files, images, audio, links and text between any two devices — PC, laptop, or mobile — using a QR code or pairing code. No login, no server storage, point-to-point encrypted.">
+<meta property="og:image" content="https://flexapi.app/og-cover.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://flexapi.app/">
+<meta name="twitter:title" content="Flex API — Instant P2P File & Text Sharing Between Any Devices">
+<meta name="twitter:description" content="Any device to any device. QR or code pairing. No login, no server storage — point-to-point encrypted.">
+<meta name="twitter:image" content="https://flexapi.app/og-cover.png">
+<meta name="twitter:creator" content="@samarthags">
+
+<!-- Favicon -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23000'/%3E%3Ctext x='50' y='68' font-size='58' text-anchor='middle' fill='%23fff' font-family='Georgia,serif' font-style='italic'%3EF%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23000'/%3E%3Ctext x='50' y='68' font-size='58' text-anchor='middle' fill='%23fff' font-family='Georgia,serif' font-style='italic'%3EF%3C/text%3E%3C/svg%3E">
+<meta name="application-name" content="Flex API">
+<meta name="apple-mobile-web-app-title" content="Flex API">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+
+<!-- Structured data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Flex API",
+  "alternateName": "Flex API P2P Sharing",
+  "url": "https://flexapi.app/",
+  "applicationCategory": "UtilitiesApplication",
+  "operatingSystem": "Any (Web-based)",
+  "description": "Flex API is a free peer-to-peer sharing tool that lets you send files, images, audio, links and text between any two devices — PC, laptop, or mobile — using a QR code or 6-digit pairing code. No login required, no data stored on any server, point-to-point encrypted transfer.",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "author": {
+    "@type": "Person",
+    "name": "Samartha Gs"
+  },
+  "featureList": [
+    "Any device to any device transfer (PC to mobile, mobile to PC, mobile to mobile, PC to PC)",
+    "QR code and 6-digit code pairing",
+    "No login or account required",
+    "No server-side data storage",
+    "Point-to-point encrypted WebRTC transfer",
+    "Text, image, audio, video, link and file sharing",
+    "Unlimited file count"
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Does Flex API store my files on a server?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Flex API transfers everything directly between devices using a point-to-point encrypted connection. Nothing is uploaded to or stored on any server."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do I need to log in to use Flex API?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No login or account is required. Just create a session on one device and join it from another using a QR code or pairing code."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I share files between any two devices?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Flex API supports PC to mobile, mobile to PC, mobile to mobile, and PC to PC transfers — any device with a modern browser can create or join a session."
+      }
+    }
+  ]
+}
+</script>
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.4/peerjs.min.js"></script>
@@ -45,22 +146,13 @@ body{
   overflow-x:hidden;
 }
 
-/* ── Grain ── */
-body::after{
-  content:'';position:fixed;inset:0;
-  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-  background-size:200px 200px;pointer-events:none;z-index:9999;
-}
-
-/* ── Layout ── */
 .wrap{
   flex:1;display:flex;flex-direction:column;
   align-items:center;justify-content:center;
-  padding:24px 16px 32px;
+  padding:40px 20px 48px;
   position:relative;z-index:1;
 }
 
-/* ── Header ── */
 .hd{
   display:flex;align-items:center;gap:12px;
   margin-bottom:28px;user-select:none;
@@ -80,26 +172,16 @@ body::after{
 .hd-dot{
   width:5px;height:5px;border-radius:50%;
   background:var(--white);
-  animation:pulse 3s ease-in-out infinite;
 }
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.2}}
 
-/* ── Card ── */
-.card{
-  background:var(--gray-950);
-  border:1px solid var(--gray-800);
-  border-radius:16px;
-  width:100%;max-width:500px;
-  overflow:hidden;
-  box-shadow:0 32px 80px rgba(0,0,0,0.8),0 1px 0 rgba(255,255,255,0.04) inset;
+.stage{
+  width:100%;max-width:460px;
+  display:flex;flex-direction:column;
 }
-.card-body{padding:32px}
 
-/* ── Views ── */
 .view{display:none;flex-direction:column;gap:20px}
 .view.active{display:flex}
 
-/* ── Typography ── */
 .lbl{
   font-family:var(--mono);font-size:0.6rem;
   letter-spacing:0.18em;text-transform:uppercase;color:var(--gray-500);
@@ -116,7 +198,6 @@ body::after{
 .row-sb{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .col{display:flex;flex-direction:column;gap:8px}
 
-/* ── Status ── */
 .status-pill{
   display:inline-flex;align-items:center;gap:7px;
   padding:5px 11px;border-radius:99px;
@@ -125,29 +206,21 @@ body::after{
 }
 .sdot{width:6px;height:6px;border-radius:50%;flex-shrink:0;transition:background 0.3s}
 .sdot.idle{background:var(--gray-600)}
-.sdot.wait{background:var(--warn);animation:bk 1.2s ease-in-out infinite;box-shadow:0 0 6px var(--warn)}
-.sdot.live{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+.sdot.wait{background:var(--warn)}
+.sdot.live{background:var(--ok)}
 .sdot.err{background:var(--danger)}
-@keyframes bk{0%,100%{opacity:.15}50%{opacity:1}}
 
-/* ── QR ── */
 .qr-outer{
-  position:relative;
   display:inline-flex;
-  border-radius:16px;
-  overflow:hidden;
-  padding:2px;
-  background:linear-gradient(135deg,var(--gray-700),var(--gray-800),var(--gray-700));
+  border-radius:12px;padding:1px;
+  background:var(--gray-800);
 }
 .qr-inner{
-  background:var(--white);
-  border-radius:14px;
-  padding:16px;
+  background:var(--white);border-radius:11px;padding:16px;
   display:flex;align-items:center;justify-content:center;
 }
 #qrcode canvas,#qrcode img{display:block}
 
-/* ── Buttons ── */
 .btn{
   display:inline-flex;align-items:center;justify-content:center;
   gap:7px;padding:10px 16px;
@@ -180,7 +253,18 @@ body::after{
 .btn-copy{color:var(--gray-200);border-color:var(--gray-700)}
 .btn-copy:hover{color:var(--white);border-color:var(--gray-500)}
 
-/* ── Inputs ── */
+.choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.choice-card{
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  padding:26px 14px;border:1px solid var(--gray-800);border-radius:12px;
+  background:var(--gray-900);cursor:pointer;transition:all .15s;
+  text-align:center;
+}
+.choice-card:hover{border-color:var(--gray-500);background:var(--gray-800);transform:translateY(-2px)}
+.choice-ico{font-size:1.6rem;color:var(--white)}
+.choice-title{font-weight:600;font-size:0.9rem}
+.choice-sub{font-family:var(--mono);font-size:0.62rem;color:var(--gray-500);letter-spacing:.03em;line-height:1.5}
+
 textarea,input.txt-in{
   width:100%;background:var(--gray-900);
   border:1px solid var(--gray-800);border-radius:var(--r);
@@ -191,7 +275,15 @@ textarea,input.txt-in{
 textarea:focus,input.txt-in:focus{border-color:var(--gray-600)}
 textarea::placeholder,input.txt-in::placeholder{color:var(--gray-600)}
 
-/* ── Divider ── */
+.code-input{
+  width:100%;text-align:center;
+  font-family:var(--mono);font-size:1.7rem;letter-spacing:0.5em;
+  padding:16px 10px 16px 16px;
+  background:var(--gray-900);border:1px solid var(--gray-800);border-radius:var(--r);
+  color:var(--white);outline:none;transition:border-color .15s;
+}
+.code-input:focus{border-color:var(--gray-500)}
+
 .divider{height:1px;background:var(--gray-800);margin:4px 0}
 .divider-label{
   display:flex;align-items:center;gap:10px;
@@ -201,7 +293,6 @@ textarea::placeholder,input.txt-in::placeholder{color:var(--gray-600)}
 }
 .divider-label::before,.divider-label::after{content:'';flex:1;height:1px;background:var(--gray-800)}
 
-/* ── Tabs ── */
 .tabs{
   display:flex;background:var(--gray-900);
   border:1px solid var(--gray-800);border-radius:10px;
@@ -222,7 +313,6 @@ textarea::placeholder,input.txt-in::placeholder{color:var(--gray-600)}
 .tab-panel{display:none;flex-direction:column;gap:14px}
 .tab-panel.active{display:flex}
 
-/* ── Drop zone ── */
 .drop-zone{
   border:1px dashed var(--gray-700);border-radius:var(--r);
   padding:28px 20px;text-align:center;
@@ -235,7 +325,6 @@ textarea::placeholder,input.txt-in::placeholder{color:var(--gray-600)}
 .drop-txt{font-size:0.78rem;color:var(--gray-500);line-height:1.7}
 .drop-txt span{color:var(--gray-200)}
 
-/* ── File list ── */
 .file-list{display:flex;flex-direction:column;gap:5px;max-height:200px;overflow-y:auto}
 .file-list::-webkit-scrollbar{width:3px}
 .file-list::-webkit-scrollbar-thumb{background:var(--gray-700);border-radius:3px}
@@ -250,14 +339,12 @@ textarea::placeholder,input.txt-in::placeholder{color:var(--gray-600)}
 .fi-rm{background:none;border:none;color:var(--gray-600);cursor:pointer;padding:4px 6px;border-radius:4px;transition:color 0.15s;line-height:1}
 .fi-rm:hover{color:var(--danger)}
 
-/* ── Progress ── */
 .prog-wrap{display:none;gap:6px;flex-direction:column}
 .prog-wrap.on{display:flex}
 .prog-bar{height:2px;background:var(--gray-800);border-radius:2px;overflow:hidden}
 .prog-fill{height:100%;background:var(--white);border-radius:2px;transition:width .12s;width:0%}
 .prog-txt{font-size:0.65rem;color:var(--gray-500);font-family:var(--mono);text-align:right}
 
-/* ── Copy link row ── */
 .copy-link-row{
   display:flex;gap:6px;align-items:center;
   background:var(--gray-900);border:1px solid var(--gray-800);
@@ -269,8 +356,7 @@ textarea::placeholder,input.txt-in::placeholder{color:var(--gray-600)}
   color:var(--gray-500);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
 
-/* ── Received ── */
-.rcv-list{display:flex;flex-direction:column;gap:10px;max-height:450px;overflow-y:auto;padding-right:2px}
+.rcv-list{display:flex;flex-direction:column;gap:10px;max-height:340px;overflow-y:auto;padding-right:2px}
 .rcv-list::-webkit-scrollbar{width:3px}
 .rcv-list::-webkit-scrollbar-track{background:transparent}
 .rcv-list::-webkit-scrollbar-thumb{background:var(--gray-700);border-radius:3px}
@@ -311,7 +397,6 @@ textarea::placeholder,input.txt-in::placeholder{color:var(--gray-600)}
 .rcv-link:hover{color:var(--white);text-decoration:underline}
 .rcv-ts{font-size:0.59rem;color:var(--gray-600);font-family:var(--mono);margin-top:10px}
 
-/* ── Stats ── */
 .stats-bar{display:flex;gap:8px;flex-wrap:wrap}
 .stat-chip{
   display:flex;align-items:center;gap:5px;
@@ -329,28 +414,12 @@ textarea::placeholder,input.txt-in::placeholder{color:var(--gray-600)}
 .filter-btn.on{background:var(--gray-800);border-color:var(--gray-600);color:var(--white)}
 .filter-btn:hover:not(.on){color:var(--gray-300);border-color:var(--gray-700)}
 
-/* ── Empty state ── */
 .empty-state{
   display:flex;flex-direction:column;align-items:center;gap:10px;
-  padding:40px 20px;text-align:center;
+  padding:32px 20px;text-align:center;
 }
-.empty-icon{font-size:2rem;color:var(--gray-700)}
+.empty-icon{font-size:1.7rem;color:var(--gray-700)}
 
-/* ── Success ── */
-.success-wrap{
-  display:flex;flex-direction:column;align-items:center;
-  gap:14px;padding:16px 0;text-align:center;
-}
-.success-ico{
-  width:56px;height:56px;border-radius:50%;
-  border:1px solid var(--gray-700);background:var(--gray-900);
-  display:flex;align-items:center;justify-content:center;
-  font-size:1.4rem;color:var(--ok);
-  animation:popIn .4s cubic-bezier(.34,1.56,.64,1) both;
-}
-@keyframes popIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
-
-/* ── Connecting ── */
 .connecting-wrap{
   display:flex;flex-direction:column;align-items:center;
   gap:16px;padding:32px 0;text-align:center;
@@ -358,55 +427,46 @@ textarea::placeholder,input.txt-in::placeholder{color:var(--gray-600)}
 .spin{animation:spin 1s linear infinite}
 @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 
-/* ── Mobile wait view ── */
-.mobile-gate{
-  display:flex;flex-direction:column;align-items:center;
-  gap:24px;padding:20px 0;text-align:center;
-}
-.big-lock{
-  font-size:3.5rem;
-  color:var(--gray-700);
-  margin-bottom:4px;
-}
-.gate-title{
-  font-family:var(--serif);
-  font-style:italic;
-  font-size:1.8rem;
-  color:var(--white);
-  line-height:1.2;
-}
-.gate-sub{
-  font-family:var(--mono);
-  font-size:0.78rem;
-  color:var(--gray-500);
-  line-height:1.8;
-  max-width:280px;
-}
-.gate-steps{
-  display:flex;flex-direction:column;gap:10px;
-  width:100%;
-  background:var(--gray-900);
-  border:1px solid var(--gray-800);
-  border-radius:12px;
-  padding:18px;
-  text-align:left;
-}
-.gate-step{
-  display:flex;align-items:flex-start;gap:12px;
-}
-.gate-step-num{
-  width:22px;height:22px;border-radius:50%;
+.audio-player{
   background:var(--gray-800);border:1px solid var(--gray-700);
-  display:flex;align-items:center;justify-content:center;
-  font-family:var(--mono);font-size:0.65rem;color:var(--gray-400);
-  flex-shrink:0;margin-top:1px;
+  border-radius:var(--r);padding:12px;margin-top:8px;
 }
-.gate-step-txt{
-  font-family:var(--mono);font-size:0.76rem;color:var(--gray-300);
-  line-height:1.6;
+.audio-player audio{width:100%;outline:none}
+
+.batch-info{
+  background:var(--gray-900);border:1px solid var(--gray-800);
+  border-radius:var(--r);padding:10px 14px;
+  font-family:var(--mono);font-size:0.73rem;color:var(--gray-400);
+  display:flex;align-items:center;gap:8px;
 }
 
-/* ── Toast ── */
+.session-tabs{display:flex;background:var(--gray-900);border:1px solid var(--gray-800);border-radius:10px;padding:3px;gap:2px}
+.session-tab{
+  flex:1;padding:9px 8px;border:none;background:transparent;
+  color:var(--gray-500);font-family:var(--sans);font-size:0.78rem;font-weight:600;
+  border-radius:7px;cursor:pointer;transition:all .15s;
+  display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.session-tab.active{background:var(--gray-800);color:var(--white);border:1px solid var(--gray-700)}
+.session-panel{display:none;flex-direction:column;gap:16px}
+.session-panel.active{display:flex}
+
+footer{
+  position:relative;z-index:1;
+  border-top:1px solid var(--gray-900);
+  padding:14px 16px;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  flex-wrap:wrap;
+}
+.ft-text{
+  font-family:var(--mono);font-size:0.6rem;
+  color:var(--gray-600);letter-spacing:0.07em;
+  display:flex;align-items:center;gap:5px;
+}
+.ft-sep{color:var(--gray-800)}
+.ft-credit{color:var(--gray-500)}
+.ft-credit b{color:var(--gray-300);font-weight:600}
+
 .toast{
   position:fixed;bottom:68px;left:50%;
   transform:translateX(-50%) translateY(12px);
@@ -419,7 +479,6 @@ textarea::placeholder,input.txt-in::placeholder{color:var(--gray-600)}
 }
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 
-/* ── Lightbox ── */
 .lightbox{
   display:none;position:fixed;inset:0;
   background:rgba(0,0,0,0.96);z-index:10000;
@@ -438,46 +497,14 @@ textarea::placeholder,input.txt-in::placeholder{color:var(--gray-600)}
 }
 .lightbox-close:hover{background:var(--gray-700);color:var(--white)}
 
-/* ── Audio player ── */
-.audio-player{
-  background:var(--gray-800);border:1px solid var(--gray-700);
-  border-radius:var(--r);padding:12px;margin-top:8px;
-}
-.audio-player audio{width:100%;outline:none}
-
-/* ── Batch send summary ── */
-.batch-info{
-  background:var(--gray-900);border:1px solid var(--gray-800);
-  border-radius:var(--r);padding:10px 14px;
-  font-family:var(--mono);font-size:0.73rem;color:var(--gray-400);
-  display:flex;align-items:center;gap:8px;
-}
-
-/* ── Footer ── */
-footer{
-  position:relative;z-index:1;
-  border-top:1px solid var(--gray-900);
-  padding:12px 16px;
-  display:flex;align-items:center;justify-content:center;gap:8px;
-  flex-wrap:wrap;
-}
-.ft-text{
-  font-family:var(--mono);font-size:0.6rem;
-  color:var(--gray-600);letter-spacing:0.07em;
-  display:flex;align-items:center;gap:5px;
-}
-.ft-sep{color:var(--gray-800)}
-
-/* ── Scrollbar global ── */
 ::-webkit-scrollbar{width:4px;height:4px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--gray-700);border-radius:4px}
 
-/* ── Responsive ── */
 @media(max-width:520px){
-  .card-body{padding:20px 16px}
   .h1{font-size:1.8rem}
-  .tab-btn{font-size:.66rem;padding:7px 4px;gap:3px}
+  .tab-btn,.session-tab{font-size:.66rem;padding:7px 4px;gap:3px}
+  .choice-grid{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -486,30 +513,63 @@ footer{
 <div class="wrap">
   <div class="hd">
     <div class="hd-dot"></div>
-    <div class="hd-logo">Bridge</div>
+    <div class="hd-logo">Flex API</div>
     <div class="hd-sep">/</div>
-    <div class="hd-tag">P2P Transfer</div>
+    <div class="hd-tag">Any Device Sharing</div>
   </div>
 
-  <div class="card">
-    <div class="card-body">
+  <div class="stage">
 
-      <!-- ═══ DESKTOP: WAITING ═══ -->
-      <div id="vd-wait" class="view" style="align-items:center">
+      <!-- LANDING: CHOOSE CREATE OR JOIN -->
+      <div id="vw-landing" class="view active" style="align-items:center">
+        <div class="col" style="align-items:center;gap:6px">
+          <span class="lbl tc">Any two devices</span>
+          <div class="h1 tc" style="font-size:1.8rem">Send files between devices</div>
+          <p class="sm muted tc" style="max-width:320px;line-height:1.6">Pair with a QR code or a 6-digit code. Files transfer directly between the two devices.</p>
+        </div>
+
+        <div class="choice-grid" style="width:100%">
+          <div class="choice-card" onclick="goCreate()">
+            <div class="choice-ico"><i class="fas fa-qrcode"></i></div>
+            <div class="choice-title">Start a Session</div>
+            <div class="choice-sub">Generate a code &amp; QR<br>on this device</div>
+          </div>
+          <div class="choice-card" onclick="goJoinEntry()">
+            <div class="choice-ico"><i class="fas fa-keyboard"></i></div>
+            <div class="choice-title">Join a Session</div>
+            <div class="choice-sub">Enter a 6-digit code<br>from another device</div>
+          </div>
+        </div>
+
+        <p class="xs tc" style="color:var(--gray-600);font-family:var(--mono);line-height:1.7">
+          <i class="fas fa-lock" style="margin-right:4px"></i>
+          No login · No server storage · Point-to-point encrypted
+        </p>
+      </div>
+
+      <!-- CREATE: WAITING FOR PEER -->
+      <div id="vw-create-wait" class="view" style="align-items:center">
         <div class="col" style="align-items:center;gap:20px;width:100%">
 
           <div class="col" style="gap:6px;align-items:center">
-            <span class="lbl tc">Scan QR or share link</span>
-            <div class="h1 tc" style="font-size:1.6rem">Open on your phone to send files</div>
+            <span class="lbl tc">Scan QR or share the code</span>
+            <div class="h1 tc" style="font-size:1.6rem">Waiting for a device to join</div>
           </div>
 
           <div class="qr-outer">
             <div class="qr-inner"><div id="qrcode"></div></div>
           </div>
 
-          <div class="status-pill">
-            <div class="sdot wait"></div>
-            <span>Waiting for connection…</span>
+          <div class="row" style="gap:10px">
+            <div class="status-pill">
+              <div class="sdot wait"></div>
+              <span>Waiting for connection…</span>
+            </div>
+          </div>
+
+          <div class="col" style="align-items:center;gap:6px;width:100%">
+            <span class="lbl tc" style="margin:0">Pairing code</span>
+            <div class="mono" style="font-size:1.9rem;letter-spacing:.4em;font-weight:600" id="s-code">------</div>
           </div>
 
           <div class="copy-link-row">
@@ -520,100 +580,33 @@ footer{
             </button>
           </div>
 
-          <p class="xs tc" style="color:var(--gray-600);font-family:var(--mono);line-height:1.7;max-width:280px">
-            <i class="fas fa-lock" style="margin-right:4px"></i>
-            Private session · No server storage · P2P encrypted
-          </p>
+          <button class="btn btn-ghost btn-sm" onclick="goLanding(true)"><i class="fas fa-arrow-left"></i> Cancel</button>
         </div>
       </div>
 
-      <!-- ═══ DESKTOP: RECEIVED ═══ -->
-      <div id="vd-rcv" class="view">
-        <div class="row-sb">
-          <div class="col" style="gap:4px">
-            <div class="h2">Inbox</div>
-            <span class="mono xs muted" id="rcv-count">0 items received</span>
+      <!-- JOIN: CODE ENTRY (any device) -->
+      <div id="vw-join-entry" class="view" style="align-items:center">
+        <div class="col" style="align-items:center;gap:20px;width:100%">
+          <div class="col" style="gap:6px;align-items:center">
+            <span class="lbl tc">Enter the code shown on the other device</span>
+            <div class="h1 tc" style="font-size:1.6rem">Join a session</div>
           </div>
-          <div class="status-pill">
-            <div class="sdot live"></div>
-            <span style="color:var(--ok)">Live</span>
-          </div>
-        </div>
 
-        <div class="stats-bar" id="stats-bar" style="display:none">
-          <div class="stat-chip" id="stat-text" style="display:none"><i class="fas fa-font"></i><span id="cnt-text">0</span> text</div>
-          <div class="stat-chip" id="stat-link" style="display:none"><i class="fas fa-link"></i><span id="cnt-link">0</span> links</div>
-          <div class="stat-chip" id="stat-image" style="display:none"><i class="fas fa-image"></i><span id="cnt-image">0</span> img</div>
-          <div class="stat-chip" id="stat-audio" style="display:none"><i class="fas fa-music"></i><span id="cnt-audio">0</span> audio</div>
-          <div class="stat-chip" id="stat-video" style="display:none"><i class="fas fa-video"></i><span id="cnt-video">0</span> video</div>
-          <div class="stat-chip" id="stat-file" style="display:none"><i class="fas fa-file"></i><span id="cnt-file">0</span> files</div>
-        </div>
+          <input class="code-input" id="join-code-in" inputmode="numeric" maxlength="6" placeholder="000000" autocomplete="off">
 
-        <div class="filter-bar" id="filter-bar" style="display:none">
-          <button class="filter-btn on" onclick="setFilter('all',this)">All</button>
-          <button class="filter-btn" id="fb-text" onclick="setFilter('text',this)" style="display:none">Text</button>
-          <button class="filter-btn" id="fb-link" onclick="setFilter('link',this)" style="display:none">Links</button>
-          <button class="filter-btn" id="fb-image" onclick="setFilter('image',this)" style="display:none">Images</button>
-          <button class="filter-btn" id="fb-audio" onclick="setFilter('audio',this)" style="display:none">Audio</button>
-          <button class="filter-btn" id="fb-video" onclick="setFilter('video',this)" style="display:none">Video</button>
-          <button class="filter-btn" id="fb-file" onclick="setFilter('file',this)" style="display:none">Files</button>
-        </div>
-
-        <div class="divider"></div>
-
-        <div id="rcv-list" class="rcv-list">
-          <div class="empty-state" id="empty-msg">
-            <div class="empty-icon"><i class="fas fa-inbox"></i></div>
-            <div class="mono xs" style="color:var(--gray-600)">Nothing yet — send from your phone</div>
-          </div>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="row">
-          <button class="btn btn-w btn-sm" onclick="clearInbox()">
-            <i class="fas fa-trash-can"></i> Clear
+          <button class="btn btn-white btn-w" onclick="submitJoinCode()">
+            <i class="fas fa-arrow-right-to-bracket"></i> Connect
           </button>
-          <button class="btn btn-w btn-sm" onclick="downloadAll()" id="dl-all-btn" style="display:none">
-            <i class="fas fa-download"></i> Download All
-          </button>
-          <button class="btn btn-w btn-sm" onclick="resetDesktop()">
-            <i class="fas fa-rotate-right"></i> New Session
-          </button>
+
+          <div class="divider-label" style="width:100%">or scan a QR code</div>
+          <p class="xs muted tc" style="line-height:1.6">Opening a shared Flex API link on this device will fill the code automatically.</p>
+
+          <button class="btn btn-ghost btn-sm" onclick="goLanding(false)"><i class="fas fa-arrow-left"></i> Cancel</button>
         </div>
       </div>
 
-      <!-- ═══ MOBILE: GATE (no code entry — QR/link only) ═══ -->
-      <div id="vm-gate" class="view" style="align-items:center">
-        <div class="mobile-gate">
-          <div class="big-lock"><i class="fas fa-qrcode"></i></div>
-          <div class="gate-title">Access via QR or Link</div>
-          <div class="gate-sub">
-            This session is private. To connect, scan the QR code or open the shared link from a desktop.
-          </div>
-          <div class="gate-steps">
-            <div class="gate-step">
-              <div class="gate-step-num">1</div>
-              <div class="gate-step-txt">Open Bridge on a desktop or laptop browser</div>
-            </div>
-            <div class="gate-step">
-              <div class="gate-step-num">2</div>
-              <div class="gate-step-txt">Scan the QR code with your phone camera, or tap <strong style="color:var(--white)">Copy Link</strong> and open it here</div>
-            </div>
-            <div class="gate-step">
-              <div class="gate-step-num">3</div>
-              <div class="gate-step-txt">Send files, text, images, links — instantly</div>
-            </div>
-          </div>
-          <p class="xs" style="color:var(--gray-600);font-family:var(--mono);text-align:center;line-height:1.7">
-            <i class="fas fa-shield-halved" style="margin-right:4px"></i>
-            P2P encrypted · No server · Nothing stored
-          </p>
-        </div>
-      </div>
-
-      <!-- ═══ MOBILE: CONNECTING ═══ -->
-      <div id="vm-connecting" class="view" style="align-items:center">
+      <!-- CONNECTING -->
+      <div id="vw-connecting" class="view" style="align-items:center">
         <div class="connecting-wrap">
           <i class="fas fa-circle-nodes fa-2x spin" style="color:var(--gray-400)"></i>
           <div class="h2">Connecting…</div>
@@ -624,195 +617,193 @@ footer{
         </div>
       </div>
 
-      <!-- ═══ MOBILE: SENDER ═══ -->
-      <div id="vm-send" class="view">
-        <!-- connection banner -->
+      <!-- SESSION HUB: send + inbox, same for both devices -->
+      <div id="vw-session" class="view">
         <div class="row-sb" style="padding:10px 14px;background:var(--gray-900);border:1px solid var(--gray-800);border-radius:var(--r)">
           <div class="row" style="gap:8px">
             <div class="sdot live"></div>
-            <span class="mono xs" id="mob-sess-lbl" style="color:var(--gray-300)">Connected</span>
+            <span class="mono xs" id="sess-lbl" style="color:var(--gray-300)">Connected</span>
           </div>
-          <button class="btn btn-xs btn-danger" onclick="disconnectMobile()">
+          <button class="btn btn-xs btn-danger" onclick="endSession()">
             <i class="fas fa-power-off"></i> End
           </button>
         </div>
 
-        <!-- tabs -->
-        <div class="tabs">
-          <button class="tab-btn active" onclick="switchTab('text',this)">
-            <i class="fas fa-font"></i> Text
-          </button>
-          <button class="tab-btn" onclick="switchTab('image',this)">
-            <i class="fas fa-image"></i> Image
-          </button>
-          <button class="tab-btn" onclick="switchTab('audio',this)">
-            <i class="fas fa-music"></i> Audio
-          </button>
-          <button class="tab-btn" onclick="switchTab('file',this)">
-            <i class="fas fa-paperclip"></i> Files
-          </button>
-          <button class="tab-btn" onclick="switchTab('link',this)">
-            <i class="fas fa-link"></i> Link
-          </button>
-          <button class="tab-btn" onclick="switchTab('clip',this)">
-            <i class="fas fa-clipboard"></i> Paste
-          </button>
+        <div class="session-tabs">
+          <button class="session-tab active" onclick="switchSessionTab('send',this)"><i class="fas fa-paper-plane"></i> Send</button>
+          <button class="session-tab" onclick="switchSessionTab('inbox',this)"><i class="fas fa-inbox"></i> Inbox <span id="inbox-badge" class="mono xs" style="display:none"></span></button>
         </div>
 
-        <!-- TEXT -->
-        <div id="tab-text" class="tab-panel active">
-          <div>
-            <span class="lbl">Message / Code / Notes</span>
-            <textarea id="txt-in" rows="6" placeholder="Type or paste anything…"></textarea>
+        <!-- SEND PANEL -->
+        <div id="sp-send" class="session-panel active">
+          <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('text',this)"><i class="fas fa-font"></i> Text</button>
+            <button class="tab-btn" onclick="switchTab('image',this)"><i class="fas fa-image"></i> Image</button>
+            <button class="tab-btn" onclick="switchTab('audio',this)"><i class="fas fa-music"></i> Audio</button>
+            <button class="tab-btn" onclick="switchTab('file',this)"><i class="fas fa-paperclip"></i> Files</button>
+            <button class="tab-btn" onclick="switchTab('link',this)"><i class="fas fa-link"></i> Link</button>
+            <button class="tab-btn" onclick="switchTab('clip',this)"><i class="fas fa-clipboard"></i> Paste</button>
           </div>
-          <div class="row-sb">
-            <span class="mono xs muted" id="char-count">0 chars</span>
-            <button class="btn btn-xs btn-ghost" onclick="clearText()"><i class="fas fa-eraser"></i></button>
+
+          <div id="tab-text" class="tab-panel active">
+            <div>
+              <span class="lbl">Message / Code / Notes</span>
+              <textarea id="txt-in" rows="6" placeholder="Type or paste anything…"></textarea>
+            </div>
+            <div class="row-sb">
+              <span class="mono xs muted" id="char-count">0 chars</span>
+              <button class="btn btn-xs btn-ghost" onclick="clearText()"><i class="fas fa-eraser"></i></button>
+            </div>
+            <button class="btn btn-white btn-w" onclick="sendText()">
+              <i class="fas fa-paper-plane"></i> Send Text
+            </button>
           </div>
-          <button class="btn btn-white btn-w" onclick="sendText()">
-            <i class="fas fa-paper-plane"></i> Send Text
-          </button>
+
+          <div id="tab-image" class="tab-panel">
+            <div class="drop-zone" id="drop-zone-img"
+                 ondragover="onDragImg(event,true)" ondragleave="onDragImg(event,false)" ondrop="onDropImg(event)">
+              <input type="file" accept="image/*" id="img-input" onchange="onImgChange(event)">
+              <div class="drop-icon"><i class="fas fa-image"></i></div>
+              <div class="drop-txt">Tap to select · <span>drop here</span><br>
+                <span style="font-size:.68rem;color:var(--gray-600)">JPG PNG GIF WEBP SVG · up to 50 MB</span>
+              </div>
+            </div>
+            <div id="img-preview-wrap" style="display:none">
+              <div style="background:var(--gray-900);border:1px solid var(--gray-800);border-radius:var(--r);overflow:hidden">
+                <img id="img-preview" style="width:100%;max-height:180px;object-fit:contain;display:block">
+              </div>
+              <div class="row-sb" style="margin-top:8px">
+                <span class="mono xs muted" id="img-name-lbl">—</span>
+                <button class="btn btn-xs btn-ghost" onclick="clearImg()"><i class="fas fa-xmark"></i></button>
+              </div>
+            </div>
+            <div class="prog-wrap" id="prog-wrap-img">
+              <div class="prog-bar"><div class="prog-fill" id="prog-fill-img"></div></div>
+              <div class="prog-txt" id="prog-txt-img">0%</div>
+            </div>
+            <button class="btn btn-white btn-w" id="send-img-btn" onclick="sendImage()">
+              <i class="fas fa-image"></i> Send Image
+            </button>
+          </div>
+
+          <div id="tab-audio" class="tab-panel">
+            <div class="drop-zone" id="drop-zone-aud"
+                 ondragover="onDragAud(event,true)" ondragleave="onDragAud(event,false)" ondrop="onDropAud(event)">
+              <input type="file" accept="audio/*" id="aud-input" onchange="onAudChange(event)">
+              <div class="drop-icon"><i class="fas fa-music"></i></div>
+              <div class="drop-txt">Tap to select · <span>drop here</span><br>
+                <span style="font-size:.68rem;color:var(--gray-600)">MP3 WAV OGG M4A FLAC · up to 50 MB</span>
+              </div>
+            </div>
+            <div id="aud-preview-wrap" style="display:none">
+              <div class="audio-player"><audio id="aud-preview" controls></audio></div>
+              <div class="row-sb" style="margin-top:8px">
+                <span class="mono xs muted" id="aud-name-lbl">—</span>
+                <button class="btn btn-xs btn-ghost" onclick="clearAud()"><i class="fas fa-xmark"></i></button>
+              </div>
+            </div>
+            <div class="prog-wrap" id="prog-wrap-aud">
+              <div class="prog-bar"><div class="prog-fill" id="prog-fill-aud"></div></div>
+              <div class="prog-txt" id="prog-txt-aud">0%</div>
+            </div>
+            <button class="btn btn-white btn-w" id="send-aud-btn" onclick="sendAudio()">
+              <i class="fas fa-music"></i> Send Audio
+            </button>
+          </div>
+
+          <div id="tab-file" class="tab-panel">
+            <div class="drop-zone" id="drop-zone"
+                 ondragover="onDrag(event,true)" ondragleave="onDrag(event,false)" ondrop="onDrop(event)">
+              <input type="file" multiple id="file-input" onchange="onFileChange(event)">
+              <div class="drop-icon"><i class="fas fa-cloud-arrow-up"></i></div>
+              <div class="drop-txt">Tap to select files · <span>drop here</span><br>
+                <span style="font-size:.68rem;color:var(--gray-600)">Any type · Unlimited files · 50 MB each</span>
+              </div>
+            </div>
+            <div id="file-list" class="file-list"></div>
+            <div id="batch-info" class="batch-info" style="display:none">
+              <i class="fas fa-layer-group" style="color:var(--gray-500)"></i>
+              <span id="batch-txt"></span>
+            </div>
+            <div class="prog-wrap" id="prog-wrap">
+              <div class="prog-bar"><div class="prog-fill" id="prog-fill"></div></div>
+              <div class="prog-txt" id="prog-txt">0%</div>
+            </div>
+            <div class="row">
+              <button class="btn btn-xs btn-ghost" onclick="clearFiles()" style="flex-shrink:0">
+                <i class="fas fa-trash-can"></i> Clear
+              </button>
+              <button class="btn btn-white btn-w" id="send-files-btn" onclick="sendFiles()">
+                <i class="fas fa-cloud-arrow-up"></i> Send All Files
+              </button>
+            </div>
+          </div>
+
+          <div id="tab-link" class="tab-panel">
+            <div>
+              <span class="lbl">URL</span>
+              <textarea id="link-in" rows="3" placeholder="https://…"></textarea>
+            </div>
+            <button class="btn btn-white btn-w" onclick="sendLink()">
+              <i class="fas fa-arrow-up-right-from-square"></i> Send Link
+            </button>
+          </div>
+
+          <div id="tab-clip" class="tab-panel">
+            <div style="text-align:center;padding:16px 0 4px">
+              <i class="fas fa-clipboard" style="font-size:2rem;color:var(--gray-600);margin-bottom:12px;display:block"></i>
+              <div class="sm" style="color:var(--gray-400);line-height:1.7">Reads your clipboard and sends<br>it directly to the other device.</div>
+            </div>
+            <button class="btn btn-white btn-w" onclick="sendClipboard()">
+              <i class="fas fa-clipboard-check"></i> Read &amp; Send
+            </button>
+          </div>
         </div>
 
-        <!-- IMAGE -->
-        <div id="tab-image" class="tab-panel">
-          <div class="drop-zone" id="drop-zone-img"
-               ondragover="onDragImg(event,true)" ondragleave="onDragImg(event,false)" ondrop="onDropImg(event)">
-            <input type="file" accept="image/*" id="img-input" onchange="onImgChange(event)">
-            <div class="drop-icon"><i class="fas fa-image"></i></div>
-            <div class="drop-txt">Tap to select · <span>drop here</span><br>
-              <span style="font-size:.68rem;color:var(--gray-600)">JPG PNG GIF WEBP SVG · up to 50 MB</span>
-            </div>
+        <!-- INBOX PANEL -->
+        <div id="sp-inbox" class="session-panel">
+          <div class="stats-bar" id="stats-bar" style="display:none">
+            <div class="stat-chip" id="stat-text" style="display:none"><i class="fas fa-font"></i><span id="cnt-text">0</span> text</div>
+            <div class="stat-chip" id="stat-link" style="display:none"><i class="fas fa-link"></i><span id="cnt-link">0</span> links</div>
+            <div class="stat-chip" id="stat-image" style="display:none"><i class="fas fa-image"></i><span id="cnt-image">0</span> img</div>
+            <div class="stat-chip" id="stat-audio" style="display:none"><i class="fas fa-music"></i><span id="cnt-audio">0</span> audio</div>
+            <div class="stat-chip" id="stat-video" style="display:none"><i class="fas fa-video"></i><span id="cnt-video">0</span> video</div>
+            <div class="stat-chip" id="stat-file" style="display:none"><i class="fas fa-file"></i><span id="cnt-file">0</span> files</div>
           </div>
-          <div id="img-preview-wrap" style="display:none">
-            <div style="background:var(--gray-900);border:1px solid var(--gray-800);border-radius:var(--r);overflow:hidden">
-              <img id="img-preview" style="width:100%;max-height:180px;object-fit:contain;display:block">
-            </div>
-            <div class="row-sb" style="margin-top:8px">
-              <span class="mono xs muted" id="img-name-lbl">—</span>
-              <button class="btn btn-xs btn-ghost" onclick="clearImg()"><i class="fas fa-xmark"></i></button>
-            </div>
-          </div>
-          <div class="prog-wrap" id="prog-wrap-img">
-            <div class="prog-bar"><div class="prog-fill" id="prog-fill-img"></div></div>
-            <div class="prog-txt" id="prog-txt-img">0%</div>
-          </div>
-          <button class="btn btn-white btn-w" id="send-img-btn" onclick="sendImage()">
-            <i class="fas fa-image"></i> Send Image
-          </button>
-        </div>
 
-        <!-- AUDIO -->
-        <div id="tab-audio" class="tab-panel">
-          <div class="drop-zone" id="drop-zone-aud"
-               ondragover="onDragAud(event,true)" ondragleave="onDragAud(event,false)" ondrop="onDropAud(event)">
-            <input type="file" accept="audio/*" id="aud-input" onchange="onAudChange(event)">
-            <div class="drop-icon"><i class="fas fa-music"></i></div>
-            <div class="drop-txt">Tap to select · <span>drop here</span><br>
-              <span style="font-size:.68rem;color:var(--gray-600)">MP3 WAV OGG M4A FLAC · up to 50 MB</span>
-            </div>
+          <div class="filter-bar" id="filter-bar" style="display:none">
+            <button class="filter-btn on" onclick="setFilter('all',this)">All</button>
+            <button class="filter-btn" id="fb-text" onclick="setFilter('text',this)" style="display:none">Text</button>
+            <button class="filter-btn" id="fb-link" onclick="setFilter('link',this)" style="display:none">Links</button>
+            <button class="filter-btn" id="fb-image" onclick="setFilter('image',this)" style="display:none">Images</button>
+            <button class="filter-btn" id="fb-audio" onclick="setFilter('audio',this)" style="display:none">Audio</button>
+            <button class="filter-btn" id="fb-video" onclick="setFilter('video',this)" style="display:none">Video</button>
+            <button class="filter-btn" id="fb-file" onclick="setFilter('file',this)" style="display:none">Files</button>
           </div>
-          <div id="aud-preview-wrap" style="display:none">
-            <div class="audio-player"><audio id="aud-preview" controls></audio></div>
-            <div class="row-sb" style="margin-top:8px">
-              <span class="mono xs muted" id="aud-name-lbl">—</span>
-              <button class="btn btn-xs btn-ghost" onclick="clearAud()"><i class="fas fa-xmark"></i></button>
-            </div>
-          </div>
-          <div class="prog-wrap" id="prog-wrap-aud">
-            <div class="prog-bar"><div class="prog-fill" id="prog-fill-aud"></div></div>
-            <div class="prog-txt" id="prog-txt-aud">0%</div>
-          </div>
-          <button class="btn btn-white btn-w" id="send-aud-btn" onclick="sendAudio()">
-            <i class="fas fa-music"></i> Send Audio
-          </button>
-        </div>
 
-        <!-- FILES (unlimited, multiple) -->
-        <div id="tab-file" class="tab-panel">
-          <div class="drop-zone" id="drop-zone"
-               ondragover="onDrag(event,true)" ondragleave="onDrag(event,false)" ondrop="onDrop(event)">
-            <input type="file" multiple id="file-input" onchange="onFileChange(event)">
-            <div class="drop-icon"><i class="fas fa-cloud-arrow-up"></i></div>
-            <div class="drop-txt">Tap to select files · <span>drop here</span><br>
-              <span style="font-size:.68rem;color:var(--gray-600)">Any type · Unlimited files · 50 MB each</span>
+          <div id="rcv-list" class="rcv-list">
+            <div class="empty-state" id="empty-msg">
+              <div class="empty-icon"><i class="fas fa-inbox"></i></div>
+              <div class="mono xs" style="color:var(--gray-600)">Nothing yet — send from the other device</div>
             </div>
           </div>
-          <div id="file-list" class="file-list"></div>
-          <div id="batch-info" class="batch-info" style="display:none">
-            <i class="fas fa-layer-group" style="color:var(--gray-500)"></i>
-            <span id="batch-txt"></span>
-          </div>
-          <div class="prog-wrap" id="prog-wrap">
-            <div class="prog-bar"><div class="prog-fill" id="prog-fill"></div></div>
-            <div class="prog-txt" id="prog-txt">0%</div>
-          </div>
+
           <div class="row">
-            <button class="btn btn-xs btn-ghost" onclick="clearFiles()" style="flex-shrink:0">
+            <button class="btn btn-w btn-sm" onclick="clearInbox()">
               <i class="fas fa-trash-can"></i> Clear
             </button>
-            <button class="btn btn-white btn-w" id="send-files-btn" onclick="sendFiles()">
-              <i class="fas fa-cloud-arrow-up"></i> Send All Files
-            </button>
-          </div>
-        </div>
-
-        <!-- LINK -->
-        <div id="tab-link" class="tab-panel">
-          <div>
-            <span class="lbl">URL</span>
-            <textarea id="link-in" rows="3" placeholder="https://…"></textarea>
-          </div>
-          <button class="btn btn-white btn-w" onclick="sendLink()">
-            <i class="fas fa-arrow-up-right-from-square"></i> Send Link
-          </button>
-        </div>
-
-        <!-- CLIPBOARD -->
-        <div id="tab-clip" class="tab-panel">
-          <div style="text-align:center;padding:16px 0 4px">
-            <i class="fas fa-clipboard" style="font-size:2rem;color:var(--gray-600);margin-bottom:12px;display:block"></i>
-            <div class="sm" style="color:var(--gray-400);line-height:1.7">Reads your clipboard and sends<br>it directly to the desktop.</div>
-          </div>
-          <div id="clip-preview" style="display:none;flex-direction:column;gap:6px">
-            <span class="lbl">Preview</span>
-            <div style="background:var(--gray-900);border:1px solid var(--gray-800);border-radius:var(--r);padding:12px;
-              font-family:var(--mono);font-size:.76rem;line-height:1.65;max-height:90px;overflow:hidden;
-              color:var(--gray-400);" id="clip-txt"></div>
-          </div>
-          <button class="btn btn-white btn-w" onclick="sendClipboard()">
-            <i class="fas fa-clipboard-check"></i> Read &amp; Send
-          </button>
-        </div>
-      </div>
-
-      <!-- ═══ MOBILE: SUCCESS ═══ -->
-      <div id="vm-success" class="view" style="align-items:center">
-        <div class="success-wrap">
-          <div class="success-ico"><i class="fas fa-check"></i></div>
-          <div class="h2">Sent</div>
-          <div class="mono xs muted">It's on your desktop now.</div>
-          <div class="row" style="gap:8px;margin-top:8px">
-            <button class="btn btn-sm" onclick="backToSend()">
-              <i class="fas fa-arrow-left"></i> Send More
-            </button>
-            <button class="btn btn-sm btn-ghost" onclick="disconnectMobile()">
-              <i class="fas fa-power-off"></i> Done
+            <button class="btn btn-w btn-sm" onclick="downloadAll()" id="dl-all-btn" style="display:none">
+              <i class="fas fa-download"></i> Download All
             </button>
           </div>
         </div>
       </div>
 
-    </div>
   </div>
 </div>
 
 <footer>
-  <span class="ft-text">Bridge</span>
-  <span class="ft-sep">·</span>
-  <span class="ft-text"><i class="fas fa-lock"></i> P2P Encrypted</span>
-  <span class="ft-sep">·</span>
-  <span class="ft-text"><i class="fas fa-server"></i> No server storage</span>
+  <span class="ft-text ft-credit">Developed by <b>Samartha Gs</b></span>
 </footer>
 
 <div class="toast" id="toast">
@@ -826,55 +817,77 @@ footer{
 </div>
 
 <script>
-// ══════════════════════════════════════════════
-//  Bridge v4 — QR/Link-only access, B&W design
-// ══════════════════════════════════════════════
+
+//  Flex API — any device to any device P2P sharing
+//  No login · No server storage · Point-to-point
 
 const CHUNK = 16 * 1024;
 
-let peer=null, conn=null, isMobile=false, session='',
+let peer=null, conn=null, role=null, session='',
     activeTab='text', pendingFiles=[], pendingImg=null, pendingAud=null,
     rcvCount=0, activeFilter='all';
 
 const typeCounts = {text:0,link:0,image:0,audio:0,video:0,file:0};
 let inFile=null, inChunks=[], inRcv=0;
-
-// all received blobs for "download all"
 const allReceived = [];
-
-// ── Detect ─────────────────────────────────
-const detectMobile = () =>
-  /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || window.innerWidth <= 768;
 
 const genCode = () => String(Math.floor(100000 + Math.random() * 900000));
 
 // ── Boot ────────────────────────────────────
 window.addEventListener('load', () => {
-  isMobile = detectMobile();
   const params = new URLSearchParams(location.search);
   const codeParam = params.get('code');
 
-  if (isMobile) {
-    if (codeParam && /^\d{6}$/.test(codeParam)) {
-      connectAsMobile(codeParam);
-    } else {
-      // Show gate — no manual code entry allowed
-      showView('vm-gate');
-    }
+  if (codeParam && /^\d{6}$/.test(codeParam)) {
+    document.getElementById('join-code-in').value = codeParam;
+    goJoinEntry();
+    connectAsJoiner(codeParam);
   } else {
-    initDesktop();
+    goLanding(false);
   }
 
   document.getElementById('txt-in').addEventListener('input', function () {
     document.getElementById('char-count').textContent = this.value.length + ' chars';
   });
+
+  const codeIn = document.getElementById('join-code-in');
+  codeIn.addEventListener('input', function(){ this.value = this.value.replace(/\D/g,'').slice(0,6); });
+  codeIn.addEventListener('keydown', e => { if(e.key==='Enter') submitJoinCode(); });
 });
 
-// ══ DESKTOP ════════════════════════════════
+// NAVIGATION
+function goLanding(teardown){
+  if(teardown) teardownPeer();
+  showView('vw-landing');
+}
 
-function initDesktop() {
+function goCreate(){
+  initHost();
+}
+
+function goJoinEntry(){
+  showView('vw-join-entry');
+  setTimeout(()=>document.getElementById('join-code-in')?.focus(),50);
+}
+
+function submitJoinCode(){
+  const v = document.getElementById('join-code-in').value.trim();
+  if(!/^\d{6}$/.test(v)){ toast('fa-triangle-exclamation','Enter the 6-digit code'); return; }
+  connectAsJoiner(v);
+}
+
+function teardownPeer(){
+  if(conn){try{conn.close()}catch(e){}}
+  if(peer){try{peer.destroy()}catch(e){}}
+  conn=null;peer=null;inFile=null;inChunks=[];inRcv=0;
+}
+
+// HOST (create session)
+function initHost() {
+  role='host';
   session = genCode();
-  showView('vd-wait');
+  showView('vw-create-wait');
+  document.getElementById('s-code').textContent = session.slice(0,3)+' '+session.slice(3);
 
   peer = new Peer(session, {
     config:{
@@ -888,7 +901,6 @@ function initDesktop() {
   });
 
   peer.on('open', id => {
-    document.getElementById('s-code') && (document.getElementById('s-code').textContent = id);
     renderQR(id);
     const url = location.origin + location.pathname + '?code=' + id;
     document.getElementById('share-url').textContent = url;
@@ -897,12 +909,10 @@ function initDesktop() {
   peer.on('connection', c => {
     conn = c;
     bindConn();
-    showView('vd-rcv');
-    toast('fa-plug','Device connected');
   });
 
   peer.on('error', err => {
-    if (err.type === 'unavailable-id') { peer.destroy(); initDesktop(); }
+    if (err.type === 'unavailable-id') { peer.destroy(); initHost(); }
     else toast('fa-triangle-exclamation','Error: ' + err.type);
   });
 }
@@ -922,57 +932,11 @@ function copyShareLink() {
   navigator.clipboard.writeText(url).then(() => toast('fa-check','Link copied!'));
 }
 
-function resetDesktop() {
-  rcvCount=0; Object.keys(typeCounts).forEach(k=>typeCounts[k]=0);
-  activeFilter='all'; allReceived.length=0;
-  document.getElementById('rcv-list').innerHTML = `
-    <div class="empty-state" id="empty-msg">
-      <div class="empty-icon"><i class="fas fa-inbox"></i></div>
-      <div class="mono xs" style="color:var(--gray-600)">Nothing yet — send from your phone</div>
-    </div>`;
-  document.getElementById('rcv-count').textContent='0 items received';
-  document.getElementById('stats-bar').style.display='none';
-  document.getElementById('filter-bar').style.display='none';
-  document.getElementById('dl-all-btn').style.display='none';
-  if(conn){try{conn.close()}catch(e){}}
-  if(peer){try{peer.destroy()}catch(e){}}
-  conn=null;peer=null;inFile=null;inChunks=[];inRcv=0;
-  initDesktop();
-}
-
-function clearInbox() {
-  if(!confirm('Clear all received items?')) return;
-  rcvCount=0; Object.keys(typeCounts).forEach(k=>typeCounts[k]=0);
-  activeFilter='all'; allReceived.length=0;
-  document.getElementById('rcv-list').innerHTML=`
-    <div class="empty-state" id="empty-msg">
-      <div class="empty-icon"><i class="fas fa-inbox"></i></div>
-      <div class="mono xs" style="color:var(--gray-600)">Nothing yet — send from your phone</div>
-    </div>`;
-  document.getElementById('rcv-count').textContent='0 items received';
-  document.getElementById('stats-bar').style.display='none';
-  document.getElementById('filter-bar').style.display='none';
-  document.getElementById('dl-all-btn').style.display='none';
-  updateStatsUI();
-}
-
-async function downloadAll() {
-  if(!allReceived.length){ toast('fa-triangle-exclamation','Nothing to download'); return; }
-  for(const item of allReceived){
-    const a=document.createElement('a');
-    a.href=item.url; a.download=item.name||'file';
-    a.click();
-    await sleep(200);
-  }
-  toast('fa-download',`Downloading ${allReceived.length} file(s)…`);
-}
-
-// ══ MOBILE ═════════════════════════════════
-
-function connectAsMobile(code) {
+// JOINER (enter code)
+function connectAsJoiner(code) {
+  role='joiner';
   session = code;
-  showView('vm-connecting');
-  document.getElementById('mob-sess-lbl').textContent = 'Session ' + code;
+  showView('vw-connecting');
 
   peer = new Peer({
     config:{
@@ -989,39 +953,41 @@ function connectAsMobile(code) {
   });
 
   peer.on('error', err => {
-    if(err.type==='peer-unavailable') toast('fa-circle-exclamation','Session not found. Try opening a fresh link.');
+    if(err.type==='peer-unavailable') toast('fa-circle-exclamation','Session not found — check the code');
     else toast('fa-triangle-exclamation','Error: '+err.type);
-    showView('vm-gate');
+    goJoinEntry();
   });
 }
 
-function disconnectMobile() {
-  if(conn){try{conn.close()}catch(e){}}
-  if(peer){try{peer.destroy()}catch(e){}}
-  conn=null;peer=null;
-  showView('vm-gate');
+function endSession() {
+  teardownPeer();
+  resetSessionState();
+  goLanding(false);
 }
 
-// ══ CONNECTION ══════════════════════════════
-
+// CONNECTION
 function bindConn() {
   conn.on('open', () => {
-    if(isMobile){ showView('vm-send'); toast('fa-check','Connected!'); }
+    document.getElementById('sess-lbl').textContent = 'Connected · code '+session.slice(0,3)+' '+session.slice(3);
+    showView('vw-session');
+    switchSessionTab('send', document.querySelector('.session-tab'));
+    toast('fa-check','Connected!');
   });
   conn.on('data', handleData);
   conn.on('close', () => {
-    if(isMobile){ toast('fa-power-off','Disconnected'); showView('vm-gate'); }
-    else toast('fa-power-off','Device disconnected');
+    toast('fa-power-off','Device disconnected');
+    teardownPeer();
+    resetSessionState();
+    goLanding(false);
   });
   conn.on('error', err => {
     toast('fa-circle-exclamation','Connection error');
   });
 }
 
-// ══ DATA HANDLER ════════════════════════════
-
+// DATA HANDLER (symmetric — both sides receive)
 function handleData(data) {
-  if(!data || isMobile) return;
+  if(!data) return;
   if(data.type==='TEXT') appendRcv('text', data);
   else if(data.type==='LINK') appendRcv('link', data);
   else if(data.type==='FILE_META'){
@@ -1045,12 +1011,13 @@ function handleData(data) {
 function appendRcv(kind, payload) {
   rcvCount++;
   typeCounts[kind]=(typeCounts[kind]||0)+1;
-  document.getElementById('rcv-count').textContent = rcvCount + (rcvCount===1?' item received':' items received');
+  const badge=document.getElementById('inbox-badge');
+  badge.style.display='inline';
+  badge.textContent='('+rcvCount+')';
 
   const em=document.getElementById('empty-msg');
   if(em) em.remove();
 
-  // track for download-all
   if(payload.url && payload.name){
     allReceived.push({url:payload.url, name:payload.name});
     document.getElementById('dl-all-btn').style.display='';
@@ -1161,8 +1128,7 @@ function appendRcv(kind, payload) {
   toast('fa-inbox', (payload.name||kind)+' received');
 }
 
-// ══ STATS & FILTER ══════════════════════════
-
+// STATS & FILTER
 function updateStatsUI(){
   const bar=document.getElementById('stats-bar');
   const fbar=document.getElementById('filter-bar');
@@ -1193,8 +1159,53 @@ function setFilter(type,btn){
   });
 }
 
-// ══ SEND (mobile) ═══════════════════════════
+function clearInbox() {
+  if(!confirm('Clear all received items?')) return;
+  resetInboxUI();
+}
 
+function resetInboxUI(){
+  rcvCount=0; Object.keys(typeCounts).forEach(k=>typeCounts[k]=0);
+  activeFilter='all'; allReceived.length=0;
+  document.getElementById('rcv-list').innerHTML=`
+    <div class="empty-state" id="empty-msg">
+      <div class="empty-icon"><i class="fas fa-inbox"></i></div>
+      <div class="mono xs" style="color:var(--gray-600)">Nothing yet — send from the other device</div>
+    </div>`;
+  const badge=document.getElementById('inbox-badge');
+  badge.style.display='none'; badge.textContent='';
+  document.getElementById('stats-bar').style.display='none';
+  document.getElementById('filter-bar').style.display='none';
+  document.getElementById('dl-all-btn').style.display='none';
+}
+
+function resetSessionState(){
+  resetInboxUI();
+  pendingFiles=[];pendingImg=null;pendingAud=null;
+  renderFileList();updateBatchInfo();clearImg();clearAud();clearText();
+  document.getElementById('link-in').value='';
+}
+
+async function downloadAll() {
+  if(!allReceived.length){ toast('fa-triangle-exclamation','Nothing to download'); return; }
+  for(const item of allReceived){
+    const a=document.createElement('a');
+    a.href=item.url; a.download=item.name||'file';
+    a.click();
+    await sleep(200);
+  }
+  toast('fa-download',`Downloading ${allReceived.length} file(s)…`);
+}
+
+// SESSION TABS (Send / Inbox)
+function switchSessionTab(name,btn){
+  document.querySelectorAll('.session-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.session-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('sp-'+name).classList.add('active');
+}
+
+// SEND
 function sendText(){
   if(!conn?.open){toast('fa-triangle-exclamation','Not connected');return}
   const v=document.getElementById('txt-in').value.trim();
@@ -1202,7 +1213,7 @@ function sendText(){
   conn.send({type:'TEXT',content:v});
   document.getElementById('txt-in').value='';
   document.getElementById('char-count').textContent='0 chars';
-  showView('vm-success');
+  toast('fa-paper-plane','Text sent');
 }
 
 function clearText(){
@@ -1217,7 +1228,7 @@ function sendLink(){
   if(!/^https?:\/\//i.test(v)) v='https://'+v;
   conn.send({type:'LINK',content:v});
   document.getElementById('link-in').value='';
-  showView('vm-success');
+  toast('fa-link','Link sent');
 }
 
 async function sendSingleFile(file,progFill,progTxt,progWrap){
@@ -1249,7 +1260,7 @@ async function sendImage(){
     document.getElementById('prog-txt-img'),
     document.getElementById('prog-wrap-img'));
   btn.disabled=false; btn.innerHTML='<i class="fas fa-image"></i> Send Image';
-  if(ok){clearImg();showView('vm-success')}
+  if(ok){clearImg();toast('fa-image','Image sent')}
 }
 
 async function sendAudio(){
@@ -1262,7 +1273,7 @@ async function sendAudio(){
     document.getElementById('prog-txt-aud'),
     document.getElementById('prog-wrap-aud'));
   btn.disabled=false; btn.innerHTML='<i class="fas fa-music"></i> Send Audio';
-  if(ok){clearAud();showView('vm-success')}
+  if(ok){clearAud();toast('fa-music','Audio sent')}
 }
 
 async function sendFiles(){
@@ -1298,7 +1309,7 @@ async function sendFiles(){
   prog.classList.remove('on'); fill.style.width='0%';
   pendingFiles=[];renderFileList();updateBatchInfo();
   btn.disabled=false; btn.innerHTML='<i class="fas fa-cloud-arrow-up"></i> Send All Files';
-  showView('vm-success');
+  toast('fa-cloud-arrow-up','Files sent');
 }
 
 async function sendClipboard(){
@@ -1306,32 +1317,28 @@ async function sendClipboard(){
   try{
     const txt=await navigator.clipboard.readText();
     if(!txt?.trim()){toast('fa-triangle-exclamation','Clipboard is empty');return}
-    document.getElementById('clip-txt').textContent=txt.slice(0,200)+(txt.length>200?'…':'');
-    document.getElementById('clip-preview').style.display='flex';
     conn.send({type:'TEXT',content:txt});
-    showView('vm-success');
+    toast('fa-clipboard-check','Clipboard sent');
   }catch(e){
     toast('fa-triangle-exclamation','Clipboard denied — needs HTTPS');
   }
 }
 
-function backToSend(){ showView('vm-send'); }
-
-// ══ IMAGE ════════════════════════════════════
+// IMAGE
 function onDragImg(e,over){e.preventDefault();document.getElementById('drop-zone-img').classList.toggle('drag-over',over)}
 function onDropImg(e){e.preventDefault();onDragImg(e,false);const f=e.dataTransfer.files[0];if(f&&/^image\//.test(f.type))setImg(f);else toast('fa-triangle-exclamation','Not an image')}
 function onImgChange(e){if(e.target.files[0])setImg(e.target.files[0]);e.target.value=''}
 function setImg(file){pendingImg=file;const url=URL.createObjectURL(file);document.getElementById('img-preview').src=url;document.getElementById('img-name-lbl').textContent=file.name+' — '+humanSize(file.size);document.getElementById('img-preview-wrap').style.display='block'}
 function clearImg(){pendingImg=null;document.getElementById('img-preview').src='';document.getElementById('img-preview-wrap').style.display='none'}
 
-// ══ AUDIO ════════════════════════════════════
+// AUDIO
 function onDragAud(e,over){e.preventDefault();document.getElementById('drop-zone-aud').classList.toggle('drag-over',over)}
 function onDropAud(e){e.preventDefault();onDragAud(e,false);const f=e.dataTransfer.files[0];if(f&&/^audio\//.test(f.type))setAud(f);else toast('fa-triangle-exclamation','Not an audio file')}
 function onAudChange(e){if(e.target.files[0])setAud(e.target.files[0]);e.target.value=''}
 function setAud(file){pendingAud=file;const url=URL.createObjectURL(file);document.getElementById('aud-preview').src=url;document.getElementById('aud-name-lbl').textContent=file.name+' — '+humanSize(file.size);document.getElementById('aud-preview-wrap').style.display='block'}
 function clearAud(){pendingAud=null;document.getElementById('aud-preview').src='';document.getElementById('aud-preview-wrap').style.display='none'}
 
-// ══ FILES ════════════════════════════════════
+// FILES
 function onDrag(e,over){e.preventDefault();document.getElementById('drop-zone').classList.toggle('drag-over',over)}
 function onDrop(e){e.preventDefault();onDrag(e,false);addFiles(e.dataTransfer.files)}
 function onFileChange(e){addFiles(e.target.files);e.target.value=''}
@@ -1362,21 +1369,21 @@ function updateBatchInfo(){
   }
 }
 
-// ══ TABS ═════════════════════════════════════
+// TABS (send sub-tabs)
 function switchTab(name,btn){
   activeTab=name;
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#sp-send .tab-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('#sp-send .tab-panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('tab-'+name).classList.add('active');
 }
 
-// ══ LIGHTBOX ═════════════════════════════════
+// LIGHTBOX
 function openLightbox(src){document.getElementById('lb-img').src=src;document.getElementById('lightbox').classList.add('on')}
 function closeLightbox(){document.getElementById('lightbox').classList.remove('on')}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLightbox()});
 
-// ══ HELPERS ══════════════════════════════════
+// HELPERS
 function showView(id){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById(id).classList.add('active');
